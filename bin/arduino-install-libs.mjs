@@ -1,31 +1,78 @@
-import { readFileSync } from "fs";
+import { createWriteStream, readFileSync, unlink } from "fs";
 import { exec } from "child_process";
+import { dirname, join } from "path";
+import archiver from "archiver";
 
-const executeWithOutput = (command, callback) => {
+const executeWithOutput = (command, postExecute = null) => {
   exec(command, (error, stdout, stderr) => {
     if (error !== null) {
       console.log(`Command failed with error ${error}: ${command}`);
       console.error(stderr);
       console.log(stdout);
     }
+    if (postExecute) {
+      postExecute();
+    }
   });
+};
+
+const zipFolderIntoFile = (folderPath) => {
+  const archiveFileName = `${folderPath}.zip`;
+  const output = createWriteStream(archiveFileName);
+  const archive = archiver("zip", {
+    zlib: { level: 9 }, // Sets the compression level.
+  });
+
+  output.on("close", () => {
+    console.log(archive.pointer() + " total bytes zipped");
+  });
+
+  archive.on("warning", (err) => {
+    if (err.code === "ENOENT") {
+      console.log("No such file or directory");
+    } else {
+      throw err;
+    }
+  });
+
+  archive.on("error", (err) => {
+    throw err;
+  });
+
+  archive.pipe(output);
+  console.log("folderPath:", folderPath);
+  archive.directory(folderPath, folderPath);
+  archive.finalize();
+
+  return archiveFileName;
 };
 
 const loadPublishedArduinoLib = (libString) => {
   executeWithOutput(`arduino-cli lib install -v ${libString}`);
 };
 
-const loadLocalFilePathArduinoLib = (libString) => {
-  console.log("TODO");
+const loadLocalFilePathArduinoLib = (libString, operatingDir) => {
+  const zipFileName = zipFolderIntoFile(join(operatingDir, libString));
+
+  executeWithOutput(
+    `ARDUINO_LIBRARY_ENABLE_UNSAFE_INSTALL=true arduino-cli lib install -v --zip-path ${zipFileName}`,
+    () => {
+      unlink(zipFileName, (err) => {
+        if (err) {
+          throw err;
+        }
+      });
+    }
+  );
 };
 
-const loadArduinoLib = (libString) => {
+const loadArduinoLib = (operatingDir) => (libString) => {
   console.log(`Loading arduino lib: ${libString}`);
 
   if (libString.includes("@")) {
     loadPublishedArduinoLib(libString);
   } else {
-    loadLocalFilePathArduinoLib(libString);
+    loadLocalFilePathArduinoLib(libString, operatingDir);
   }
 };
 
@@ -33,7 +80,8 @@ const configFile = process.argv.length > 2 ? process.argv[2] : "package.json";
 
 console.log(`Reading config file: ${configFile}`);
 
+const operatingDir = dirname(configFile);
 const rawFile = readFileSync(configFile);
 const configJson = JSON.parse(rawFile);
 
-configJson.arduinoLibs.forEach(loadArduinoLib);
+configJson.arduinoLibs.forEach(loadArduinoLib(operatingDir));
