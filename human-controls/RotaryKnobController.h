@@ -1,14 +1,14 @@
-#include <RotaryEncoder.h>
-
 #ifndef ENCODERCONTROLLER_H
 #define ENCODERCONTROLLER_H
 
 #include "MenuInterface.h"
+#include <RotaryEncoder.h>
 
 class RotaryKnobController : public MenuInterface
 {
 public:
-    RotaryKnobController(unsigned int, unsigned int);
+    RotaryKnobController(unsigned int pinClk, unsigned int pinDt);
+    ~RotaryKnobController();
     void updateRotaryKnob();
     void menuUp();
     void menuDown();

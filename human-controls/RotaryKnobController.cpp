@@ -6,6 +6,11 @@ RotaryKnobController::RotaryKnobController(unsigned int pinClk, unsigned int pin
     this->encoder = new RotaryEncoder(pinClk, pinDt, RotaryEncoder::LatchMode::TWO03);
 }
 
+RotaryKnobController::~RotaryKnobController()
+{
+    delete (this->encoder);
+}
+
 void RotaryKnobController::updateRotaryKnob()
 {
     this->encoder->tick();
