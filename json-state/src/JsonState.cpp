@@ -1,70 +1,97 @@
 #include "JsonState.h"
 
-JsonState::JsonState(String initialState, JsonStateSink *sink)
-  : JsonState::JsonState(initialState, sink, JSON_DEFAULT_STATE_MAX_LEN)
+const String JsonState::Ok = "OK";
+
+JsonState::JsonState(String initialState)
+  : JsonState::JsonState(initialState, JSONSTATE_DEFAULT_STATE_MAX_LEN)
 {}
 
-JsonState::JsonState(String initialState, JsonStateSink *sink, size_t stateMaxLen) {
-  this->stateMaxLen = stateMaxLen;
-  this->stateStringBuffer = new char[stateMaxLen];
-  this->state = new DynamicJsonDocument(stateMaxLen);
-  this->sink = sink;
-  deserializeJson(*this->state, initialState);
+JsonState::JsonState(String initialState, size_t stateMaxLen)
+  : document(DynamicJsonDocument(stateMaxLen))
+{
+  deserializeJson(this->document, initialState);
 }
 
-JsonState::~JsonState() {
-  delete(this->stateStringBuffer);
-  delete(this->state);
+JsonObject JsonState::getState() {
+  return this->document.as<JsonObject>();
 }
 
-JsonDocument *JsonState::getState() {
-  return this->state;
+String JsonState::appendToString(String str, bool pretty) {
+  if (pretty) {
+    serializeJsonPretty(this->document, str);
+  } else {
+    serializeJson(this->document, str);
+  }
+  return str;
 }
 
-void JsonState::sendState() {
-  size_t written = serializeJson(*this->state, this->stateStringBuffer, stateMaxLen);
-  this->sink->write(this->stateStringBuffer, written);
+void JsonState::writeToSerial(bool pretty) {
+  if (pretty) {
+    serializeJsonPretty(this->document, Serial);
+  } else {
+    serializeJson(this->document, Serial);
+  }
 }
 
-void JsonState::write(char *input, size_t inputSize) {
-  StaticJsonDocument<1024> message;
-  DeserializationError readErr = deserializeJson(message, input, inputSize);
+String JsonState::updateFromString(String str) {
+  StaticJsonDocument<JSONSTATE_DEFAULT_STATE_MAX_LEN> message;
+  DeserializationError readErr = deserializeJson(message, str);
 
   if (DeserializationError::Ok != readErr) {
-    setError("JSON Parse", readErr.c_str());
-    sendState();
-    return;
+    return readErr.c_str();
   }
 
   JsonObject fields = message.as<JsonObject>();
+  updateObject(this->document.as<JsonObject>(), fields);
+  return JsonState::Ok;
+}
 
-  updateObject(this->state->as<JsonObject>(), fields);
-  clearError();
-  sendState();
+String JsonState::updateFromSerial() {
+  return this->updateFromString(Serial.readString());
+}
+
+String JsonState::getStringValue(JsonObject stateObject, String fieldName) {
+  JsonVariant variant = stateObject[fieldName];
+  return variant.as<String>();
+}
+
+int JsonState::getIntValue(JsonObject stateObject, String fieldName) {
+  JsonVariant variant = stateObject[fieldName];
+  return variant.as<int>();
+}
+
+double JsonState::getDoubleValue(JsonObject stateObject, String fieldName) {
+  JsonVariant variant = stateObject[fieldName];
+  return variant.as<double>();
+}
+
+bool JsonState::getBooleanValue(JsonObject stateObject, String fieldName) {
+  JsonVariant variant = stateObject[fieldName];
+  return variant.as<bool>();
 }
 
 void JsonState::updateField(JsonObject stateObject, String fieldName, String value) {
-  StaticJsonDocument<JSON_STRING_LEN> fields;
+  StaticJsonDocument<JSONSTATE_STRING_LEN> fields;
   deserializeJson(fields, "{" + fieldName + ": '" + value + "'}");
   updateObject(stateObject, fields.as<JsonObject>());
 }
 
 void JsonState::updateField(JsonObject stateObject, String fieldName, double value) {
-  StaticJsonDocument<JSON_DOUBLE_LEN> fields;
+  StaticJsonDocument<JSONSTATE_DOUBLE_LEN> fields;
   String valueStr(value);
   deserializeJson(fields, "{" + fieldName + ": " + value + "}");
   updateObject(stateObject, fields.as<JsonObject>());
 }
 
 void JsonState::updateField(JsonObject stateObject, String fieldName, int value) {
-  StaticJsonDocument<JSON_INT_LEN> fields;
+  StaticJsonDocument<JSONSTATE_INT_LEN> fields;
   String valueStr(value);
   deserializeJson(fields, "{" + fieldName + ": " + valueStr + "}");
   updateObject(stateObject, fields.as<JsonObject>());
 }
 
 void JsonState::updateField(JsonObject stateObject, String fieldName, bool value) {
-  StaticJsonDocument<JSON_BOOL_LEN> fields;
+  StaticJsonDocument<JSONSTATE_BOOL_LEN> fields;
   String valueStr = value ? "true" : "false";
   deserializeJson(fields, "{" + fieldName + ": " + valueStr + "}");
   updateObject(stateObject, fields.as<JsonObject>());
@@ -87,14 +114,4 @@ void JsonState::updateObject(JsonObject stateObject, JsonObject fields) {
       stateObject[key] = value;
     }
   }
-}
-
-void JsonState::setError(String type, String message) {
-  StaticJsonDocument<512> error;
-  deserializeJson(error, "{type: '" + type + "', message: '" + message + "'}");
-  (*this->state)["error"] = error.as<JsonObject>();
-}
-
-void JsonState::clearError() {
-  this->state->as<JsonObject>().remove("error");
 }
