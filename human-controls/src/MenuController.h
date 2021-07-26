@@ -1,24 +1,25 @@
 #ifndef MENUCONTROLLER_H
 #define MENUCONTROLLER_H
 
+#include "Arduino.h"
 #include "DisplayPage.h"
 #include "RotaryKnobController.h"
 #include "DisplayController.h"
 
-class MenuController : DisplayPage
+class MenuController
 {
 public:
     MenuController(unsigned int encoderPinClk, unsigned int encoderPinDt, unsigned int displayAddress, unsigned int displayLen, unsigned int displayWidth);
     ~MenuController();
     void menuInit();
-    void clockwisedate();
+    void menuUpdate();
     void menuPress();
-    void clockwise();
-    void counterClockwise();
-    void menuSelect();
 
 private:
     RotaryKnobController *rotaryKnob;
     DisplayController *display;
+    int rotation, menuIndex, menuSize, lastMenuIndex;
+    DisplayPage *displayPages;
+    bool isActive;
 };
 #endif

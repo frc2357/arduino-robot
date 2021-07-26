@@ -1,7 +1,10 @@
+#include "Arduino.h"
 #include "FTDebouncer.h"
-#include "RotaryKnobController.h"
-#include "MenuController.h"
-#include "CharacterDisplayNumberSix.h"
+#include "src/RotaryKnobController.h"
+#include "src/CharacterDisplay.h"
+#include "src/MenuController.h"
+#include "src/DisplayController.h"
+#include "src/DisplayPage.h"
 
 #define ENCODER_PIN_CLK 3    //CLK gets degrees for rotary knob
 #define ENCODER_PIN_DT 4     //DT gets direction for rotary knob
@@ -26,7 +29,8 @@ void setup()
 
 void loop()
 {
-    menuController.clockwisedate();
+    menuController.menuUpdate();
+    //rotaryKnob.getValue();
     pinDebouncer.update();
 }
 
@@ -36,7 +40,7 @@ void onPinActivated(int pinNr)
     switch (pinNr)
     {
     case ENCODER_PIN_SW:
-        menuController.menuSelect();
+        menuController.menuPress();
         break;
     }
 }
