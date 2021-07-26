@@ -17,10 +17,6 @@ void DisplayController::displayInit()
     this->lcd->clear();
 }
 
-void DisplayController::displayUpdate()
-{
-}
-
 void DisplayController::clear()
 {
     this->lcd->clear();
@@ -30,17 +26,4 @@ void DisplayController::printRegion(int x, int y, String text)
 {
     this->lcd->setCursor(x, y);
     this->lcd->print(text);
-}
-
-void DisplayController::clockwise()
-{
-    Serial.println("up");
-}
-void DisplayController::counterClockwise()
-{
-    Serial.println("down");
-}
-void DisplayController::menuSelect()
-{
-    Serial.println("select");
 }
