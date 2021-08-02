@@ -2,22 +2,27 @@
 
 DisplayPage::DisplayPage()
 {
-    this->name = "";
     this->isActivate = false;
+    this->modifyValue = 0;
+    increment = 0;
 }
 
-DisplayPage::DisplayPage(String name, bool isActivate)
+DisplayPage::DisplayPage(int increment, bool isActivate, int printersLength, Printer printers[])
 {
-    this->name = name;
     this->isActivate = isActivate;
-    this->value = 0;
+    this->modifyValue = 0;
+    this->increment = increment;
+    this->printersLength = printersLength;
+    this->printers = printers;
 }
 
-void DisplayPage::displayPageInit(String name, bool isActivate)
+void DisplayPage::displayPageInit(int increment, bool isActivate, int printersLength, Printer printers[])
 {
-    this->name = name;
     this->isActivate = isActivate;
-    this->value = 0;
+    this->modifyValue = 0;
+    this->increment = increment;
+    this->printersLength = printersLength;
+    this->printers = printers;
 }
 
 DisplayPage::~DisplayPage()
@@ -29,20 +34,41 @@ void DisplayPage::cleanUp(DisplayController &display)
 }
 void DisplayPage::paint(DisplayController &display, bool isActive)
 {
+    display.clear();
     //Serial.println("painting to " + this->name);
-    if (isActive & isActivate)
+    /*if (isActive & isActivate)
     {
-        display.printRegion(8, 1, String(this->value));
+        display.printRegion(8, 1, String(this->modifyValue));
     }
-    display.printRegion(2, 0, this->name);
+    display.printRegion(2, 0, this->name);*/
+    for (int i = 0; i < this->printersLength; i++)
+    {
+        Serial.println(this->printers[i].getText());
+        if (isActive & isActivate & this->printers[i].isActiveText())
+        {
+            display.printRegion(this->printers[i].getX(), this->printers[i].getY(), this->printers[i].getText());
+        }
+        else if (this->printers[i].isActiveText() == false)
+        {
+            if (this->printers[i].getText() == "!modifyValue!")
+            {
+                display.printRegion(this->printers[i].getX(), this->printers[i].getY(), String(this->modifyValue));
+            }
+            else
+            {
+                display.printRegion(this->printers[i].getX(), this->printers[i].getY(), this->printers[i].getText());
+            }
+        }
+    }
 }
+
 void DisplayPage::clockwise()
 {
-    this->value++;
+    this->modifyValue += this->increment;
 }
 void DisplayPage::counterClockwise()
 {
-    this->value--;
+    this->modifyValue -= this->increment;
 }
 bool DisplayPage::canActivate()
 {
