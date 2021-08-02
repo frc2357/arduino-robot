@@ -4,13 +4,16 @@
 #include "DisplayInterface.h"
 #include "RotaryKnobController.h"
 #include "DisplayController.h"
+#include "Printer.h"
 
+//For array of printers:
+//A printer with text value of "!modifyValue! indicates where the modifiable integer will be inserted"
 class DisplayPage : DisplayInterface
 {
 public:
     DisplayPage();
-    DisplayPage(String name, bool isActivate);
-    void displayPageInit(String name, bool isActivate);
+    DisplayPage(int increment, bool isActivate, int printersLength, Printer printers[]);
+    void displayPageInit(int increment, bool isActivate, int printersLength, Printer printers[]);
     ~DisplayPage();
     void cleanUp(DisplayController &display);
     void paint(DisplayController &display, bool isActive);
@@ -20,7 +23,7 @@ public:
 
 private:
     bool isActivate;
-    String name;
-    int value;
+    int modifyValue, increment, printersLength;
+    Printer *printers;
 };
 #endif

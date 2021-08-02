@@ -9,9 +9,11 @@
 class MenuController
 {
 public:
-    MenuController(unsigned int encoderPinClk, unsigned int encoderPinDt, unsigned int displayAddress, unsigned int displayLen, unsigned int displayWidth);
+    MenuController(unsigned int encoderPinClk, unsigned int encoderPinDt,
+                   unsigned int displayAddress, unsigned int displayLen, unsigned int displayWidth,
+                   unsigned int menuSize);
     ~MenuController();
-    void menuInit();
+    void menuInit(DisplayPage displayPages[]);
     void menuUpdate();
     void menuPress();
 

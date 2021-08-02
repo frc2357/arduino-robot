@@ -25,14 +25,12 @@ int RotaryKnobController::getValue()
         //COUNTERCLOCKWISE
         if (this->encoder->getDirection() == RotaryEncoder::Direction::CLOCKWISE)
         {
-            Serial.println("counterClockwise");
             return -1;
         }
 
         //CLOCKWISE
         else if (this->encoder->getDirection() == RotaryEncoder::Direction::NOROTATION)
         {
-            Serial.println("clockwise");
             return 1;
         }
     }

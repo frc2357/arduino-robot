@@ -1,31 +1,32 @@
 #include "MenuController.h"
 
-MenuController::MenuController(unsigned int encoderPinClk, unsigned int encoderPinDt, unsigned int displayAddress, unsigned int displayLen, unsigned int displayWidth)
+MenuController::MenuController(unsigned int encoderPinClk, unsigned int encoderPinDt,
+                               unsigned int displayAddress, unsigned int displayLen, unsigned int displayWidth,
+                               unsigned int menuSize)
 {
     this->rotaryKnob = new RotaryKnobController(encoderPinClk, encoderPinDt);
     this->display = new DisplayController(displayAddress, displayLen, displayWidth);
+
+    this->menuSize = menuSize;
+    this->isActive = false;
+
     this->rotation = -1;
     this->menuIndex = 0;
-    this->menuSize = 4;
     this->lastMenuIndex = 0;
-    this->isActive = false;
-    this->displayPages = new DisplayPage[this->menuSize];
-    this->displayPages[0].displayPageInit("Dash", false);
-    this->displayPages[1].displayPageInit("Elevator Angle", true);
-    this->displayPages[2].displayPageInit("Shot Pressure", true);
-    this->displayPages[3].displayPageInit("Valve Duration", true);
+}
+
+void MenuController::menuInit(DisplayPage displayPages[])
+{
+    this->displayPages = displayPages;
+    this->display->displayInit();
+    this->displayPages[menuIndex].paint(*display, this->isActive);
+    Serial.print("Menu Init");
 }
 
 MenuController::~MenuController()
 {
     delete (this->rotaryKnob);
     delete (this->display);
-}
-
-void MenuController::menuInit()
-{
-    this->display->displayInit();
-    this->displayPages[menuIndex].paint(*display, isActive);
 }
 
 void MenuController::menuUpdate()
@@ -72,4 +73,5 @@ void MenuController::menuUpdate()
 void MenuController::menuPress()
 {
     this->isActive = !this->isActive;
+    this->displayPages[menuIndex].paint(*display, isActive);
 }
