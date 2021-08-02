@@ -25,6 +25,14 @@
 #define SHOT_PRINTER_LEN 4
 #define VALVE_PRINTER_LEN 4
 
+//Min - Max
+#define ANGLE_MIN 0      //Minimum elevator angle
+#define ANGLE_MAX 10     //Maximum elevator angle
+#define PRESSURE_MIN 60  //Minimum shot pressure
+#define PRESSURE_MAX 100 //Maximum shot pressure
+#define DURATION_MIN 0   //Minimum valve duration
+#define DURATION_MAX 10  //Maximum valve duration
+
 FTDebouncer pinDebouncer(30);
 //RotaryKnobController rotaryKnob(ENCODER_PIN_CLK, ENCODER_PIN_DT);
 
@@ -43,13 +51,13 @@ void setup()
     pinDebouncer.addPin(ENCODER_PIN_SW, HIGH, INPUT_PULLUP);
     pinDebouncer.begin();
 
-    displayPages[0].displayPageInit(25, false, DASH_PRINTER_LEN, dashPrinters);
+    displayPages[0].displayPageInit(25, 0, 0, false, DASH_PRINTER_LEN, dashPrinters);
 
-    displayPages[1].displayPageInit(1, true, ELEVATOR_PRINTER_LEN, elevatorPrinters);
+    displayPages[1].displayPageInit(1, ANGLE_MIN, ANGLE_MAX, true, ELEVATOR_PRINTER_LEN, elevatorPrinters);
 
-    displayPages[2].displayPageInit(1, true, SHOT_PRINTER_LEN, shotPrinters);
+    displayPages[2].displayPageInit(1, PRESSURE_MIN, PRESSURE_MAX, true, SHOT_PRINTER_LEN, shotPrinters);
 
-    displayPages[3].displayPageInit(1, true, VALVE_PRINTER_LEN, valvePrinters);
+    displayPages[3].displayPageInit(1, DURATION_MIN, DURATION_MAX, true, VALVE_PRINTER_LEN, valvePrinters);
 
     menuController.menuInit(displayPages);
 }

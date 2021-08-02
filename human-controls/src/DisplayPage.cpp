@@ -5,21 +5,27 @@ DisplayPage::DisplayPage()
     this->isActivate = false;
     this->modifyValue = 0;
     increment = 0;
+    this->min = 0;
+    this->max = 0;
 }
 
-DisplayPage::DisplayPage(int increment, bool isActivate, int printersLength, Printer printers[])
+DisplayPage::DisplayPage(int increment, int min, int max, bool isActivate, int printersLength, Printer printers[])
 {
     this->isActivate = isActivate;
-    this->modifyValue = 0;
+    this->modifyValue = min;
+    this->min = min;
+    this->max = max;
     this->increment = increment;
     this->printersLength = printersLength;
     this->printers = printers;
 }
 
-void DisplayPage::displayPageInit(int increment, bool isActivate, int printersLength, Printer printers[])
+void DisplayPage::displayPageInit(int increment, int min, int max, bool isActivate, int printersLength, Printer printers[])
 {
     this->isActivate = isActivate;
-    this->modifyValue = 0;
+    this->modifyValue = min;
+    this->min = min;
+    this->max = max;
     this->increment = increment;
     this->printersLength = printersLength;
     this->printers = printers;
@@ -35,12 +41,6 @@ void DisplayPage::cleanUp(DisplayController &display)
 void DisplayPage::paint(DisplayController &display, bool isActive)
 {
     display.clear();
-    //Serial.println("painting to " + this->name);
-    /*if (isActive & isActivate)
-    {
-        display.printRegion(8, 1, String(this->modifyValue));
-    }
-    display.printRegion(2, 0, this->name);*/
     for (int i = 0; i < this->printersLength; i++)
     {
         Serial.println(this->printers[i].getText());
@@ -64,11 +64,17 @@ void DisplayPage::paint(DisplayController &display, bool isActive)
 
 void DisplayPage::clockwise()
 {
-    this->modifyValue += this->increment;
+    if (this->modifyValue < this->max)
+    {
+        this->modifyValue += this->increment;
+    }
 }
 void DisplayPage::counterClockwise()
 {
-    this->modifyValue -= this->increment;
+    if (this->modifyValue > this->min)
+    {
+        this->modifyValue -= this->increment;
+    }
 }
 bool DisplayPage::canActivate()
 {
