@@ -6,11 +6,16 @@
 #include "src/DisplayController.h"
 #include "src/DisplayPage.h"
 #include "src/Printer.h"
+#include "src/JoyStickController.h"
 
 //Pins
-#define ENCODER_PIN_CLK 3 //CLK gets degrees for rotary knob
-#define ENCODER_PIN_DT 4  //DT gets direction for rotary knob
-#define ENCODER_PIN_SW 5  //Gets the button for rotary knob
+//LCD connects SDA in analog pin 4 and SCL in analog pin 5
+#define ENCODER_PIN_CLK 3  //CLK gets degrees for rotary knob
+#define ENCODER_PIN_DT 4   //DT gets direction for rotary knob
+#define ENCODER_PIN_SW 5   //Gets the button for rotary knob
+#define JOYSTICK_PIN_SW 6  //Button for joystick
+#define JOYSTICK_PIN_VRX 0 //Analog Pin for joystick x
+#define JOYSTICK_PIN_VRY 1 //Analog Pin for joystick y
 
 //Other constraints
 #define DISPLAY_ADDRESS 0X27 //I2c address of the lcd display
@@ -18,6 +23,7 @@
 #define DISPLAY_WIDTH 2      //width of the lcd display
 #define MENU_SIZE 4          //Number of menu pages
 #define USB_BAUDRATE 115200
+#define DEAD_ZONE_SIZE 0.1
 
 //Lengths of printers inside each DisplayPage
 #define DASH_PRINTER_LEN 1
@@ -25,7 +31,7 @@
 #define SHOT_PRINTER_LEN 4
 #define VALVE_PRINTER_LEN 4
 
-//Min - Max
+//Min - Max FOR sensors
 #define ANGLE_MIN 0      //Minimum elevator angle
 #define ANGLE_MAX 10     //Maximum elevator angle
 #define PRESSURE_MIN 60  //Minimum shot pressure
@@ -35,7 +41,7 @@
 
 FTDebouncer pinDebouncer(30);
 //RotaryKnobController rotaryKnob(ENCODER_PIN_CLK, ENCODER_PIN_DT);
-
+//Menu Setup
 Printer dashPrinters[DASH_PRINTER_LEN]{{2, 0, "Dash", false}};
 Printer elevatorPrinters[ELEVATOR_PRINTER_LEN]{{2, 0, "Elevator Angle", false}, {6, 1, "<[", true}, {8, 1, "!modifyValue!", false}, {10, 1, "]>", true}};
 Printer shotPrinters[SHOT_PRINTER_LEN]{{2, 0, "Shot Pressure", false}, {6, 1, "<[", true}, {8, 1, "!modifyValue!", false}, {10, 1, "]>", true}};
@@ -44,6 +50,9 @@ Printer valvePrinters[VALVE_PRINTER_LEN]{{2, 0, "Valve Duration", false}, {6, 1,
 DisplayPage displayPages[MENU_SIZE];
 
 MenuController menuController(ENCODER_PIN_CLK, ENCODER_PIN_DT, DISPLAY_ADDRESS, DISPLAY_LENGTH, DISPLAY_WIDTH, MENU_SIZE);
+
+//Joystick setup
+JoystickController joystick(JOYSTICK_PIN_VRX, JOYSTICK_PIN_VRY, DEAD_ZONE_SIZE);
 
 void setup()
 {
@@ -67,6 +76,8 @@ void loop()
     menuController.menuUpdate();
     //rotaryKnob.getValue();
     pinDebouncer.update();
+    Serial.println("X: " + String(joystick.getX()));
+    Serial.println("Y: " + String(joystick.getY()));
 }
 
 //Methods for debouncer
