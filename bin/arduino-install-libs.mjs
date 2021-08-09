@@ -1,6 +1,6 @@
 import { createWriteStream, readFileSync, unlink } from "fs";
 import { exec } from "child_process";
-import { dirname, join } from "path";
+import { basename, dirname, join } from "path";
 import archiver from "archiver";
 
 const executeWithOutput = (command, postExecute = null) => {
@@ -17,7 +17,8 @@ const executeWithOutput = (command, postExecute = null) => {
 };
 
 const zipFolderIntoFile = (folderPath) => {
-  const archiveFileName = `${folderPath}.zip`;
+  const basePath = basename(folderPath);
+  const archiveFileName = `${basePath}.zip`;
   const output = createWriteStream(archiveFileName);
   const archive = archiver("zip", {
     zlib: { level: 9 }, // Sets the compression level.
@@ -40,8 +41,8 @@ const zipFolderIntoFile = (folderPath) => {
   });
 
   archive.pipe(output);
-  console.log("folderPath:", folderPath);
-  archive.directory(folderPath, folderPath);
+  console.log(`${folderPath} -> ${basePath}`);
+  archive.directory(folderPath, basePath);
   archive.finalize();
 
   return archiveFileName;
@@ -52,7 +53,8 @@ const loadPublishedArduinoLib = (libString) => {
 };
 
 const loadLocalFilePathArduinoLib = (libString, operatingDir) => {
-  const zipFileName = zipFolderIntoFile(join(operatingDir, libString));
+  const folderPath = join(operatingDir, libString);
+  const zipFileName = zipFolderIntoFile(folderPath);
 
   executeWithOutput(
     `ARDUINO_LIBRARY_ENABLE_UNSAFE_INSTALL=true arduino-cli lib install -v --zip-path ${zipFileName}`,
