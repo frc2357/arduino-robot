@@ -15,7 +15,7 @@ private:
     double calcReturnValue(double value);
 
     int xPin, yPin;
-    double min, max;
+    double min, max, center, remainingProportion;
 };
 
 #endif

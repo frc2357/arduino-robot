@@ -6,6 +6,8 @@ JoystickController::JoystickController(int xPin, int yPin, double deadZoneSize)
     this->yPin = yPin;
     this->min = 0.5 - (deadZoneSize / 2);
     this->max = (deadZoneSize / 2) + 0.5;
+    this->center = 1023 / 2;
+    this->remainingProportion = center - ((max - 0.5) * 1023);
 }
 double JoystickController::getX()
 {
@@ -19,7 +21,6 @@ double JoystickController::getY()
 double JoystickController::calcReturnValue(double value)
 {
     double proportion = value / 1023;
-    double center = 1023 / 2;
 
     //Serial.println("Value: " + String(value));
     //Serial.println("Proportion: " + String(proportion));
@@ -31,11 +32,11 @@ double JoystickController::calcReturnValue(double value)
 
     if (proportion > 0.5)
     {
-        return (value - (center + ((max - 0.5) * 1023))) / (center - ((max - 0.5) * 1023));
+        return (value - (center + ((max - 0.5) * 1023))) / remainingProportion;
     }
     if (proportion < 0.5)
     {
-        return -1 * (1 - (value / (center - ((0.5 - min) * 1023))));
+        return -1 * (1 - (value / remainingProportion));
     }
 
     return 0.0;
