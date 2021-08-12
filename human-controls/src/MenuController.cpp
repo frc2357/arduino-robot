@@ -3,14 +3,12 @@
 MenuController::MenuController(unsigned int encoderPinClk, unsigned int encoderPinDt,
                                unsigned int displayAddress, unsigned int displayLen, unsigned int displayWidth,
                                unsigned int menuSize)
+    : rotaryKnob(encoderPinClk, encoderPinDt), display(displayAddress, displayLen, displayWidth)
 {
-    this->rotaryKnob = new RotaryKnobController(encoderPinClk, encoderPinDt);
-    this->display = new DisplayController(displayAddress, displayLen, displayWidth);
-
     this->menuSize = menuSize;
     this->isActive = false;
 
-    this->rotation = -1;
+    this->rotation = 0;
     this->menuIndex = 0;
     this->lastMenuIndex = 0;
 }
@@ -18,34 +16,27 @@ MenuController::MenuController(unsigned int encoderPinClk, unsigned int encoderP
 void MenuController::menuInit(DisplayPage displayPages[])
 {
     this->displayPages = displayPages;
-    this->display->displayInit();
-    this->displayPages[menuIndex].paint(*display, this->isActive);
+    this->display.displayInit();
+    this->displayPages[menuIndex].paint(display, this->isActive);
     Serial.print("Menu Init");
-}
-
-MenuController::~MenuController()
-{
-    delete (this->rotaryKnob);
-    delete (this->display);
 }
 
 void MenuController::menuUpdate()
 {
-    this->rotation = this->rotaryKnob->getValue();
-    //Serial.println(this->rotation);
-    //this->rotaryKnob->getValue();
+    this->rotation = this->rotaryKnob.getValue();
+
     if (isActive & this->displayPages[menuIndex].canActivate())
     {
         if (this->rotation == 1)
         {
             this->displayPages[menuIndex].clockwise();
-            this->displayPages[menuIndex].paint(*display, isActive);
+            this->displayPages[menuIndex].paint(display, isActive);
         }
 
         if (this->rotation == -1)
         {
             this->displayPages[menuIndex].counterClockwise();
-            this->displayPages[menuIndex].paint(*display, isActive);
+            this->displayPages[menuIndex].paint(display, isActive);
         }
     }
     else
@@ -62,9 +53,9 @@ void MenuController::menuUpdate()
 
         if (menuIndex != lastMenuIndex)
         {
-            this->displayPages[lastMenuIndex].cleanUp(*display);
+            this->displayPages[lastMenuIndex].cleanUp(display);
             lastMenuIndex = menuIndex;
-            this->displayPages[menuIndex].paint(*display, isActive);
+            this->displayPages[menuIndex].paint(display, isActive);
         }
         this->isActive = false;
     }
@@ -73,5 +64,5 @@ void MenuController::menuUpdate()
 void MenuController::menuPress()
 {
     this->isActive = !this->isActive;
-    this->displayPages[menuIndex].paint(*display, isActive);
+    this->displayPages[menuIndex].paint(display, isActive);
 }

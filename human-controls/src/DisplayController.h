@@ -10,12 +10,11 @@ class DisplayController : CharacterDisplay
 {
 public:
     DisplayController(unsigned int displayAddress, unsigned int displayLen, unsigned int displayWidth);
-    ~DisplayController();
     void displayInit();
     void clear();
     void printRegion(int x, int y, String text);
 
 private:
-    LiquidCrystal_I2C *lcd;
+    LiquidCrystal_I2C lcd;
 };
 #endif
