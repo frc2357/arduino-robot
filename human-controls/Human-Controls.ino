@@ -23,7 +23,14 @@
 #define DISPLAY_WIDTH 2      //width of the lcd display
 #define MENU_SIZE 4          //Number of menu pages
 #define USB_BAUDRATE 115200
-#define DEAD_ZONE_SIZE 0.1
+
+//Joystick deadzones
+#define X_DEAD_ZONE_SIZE 100 //Total size of the x deadzone
+#define X_MIN 0
+#define X_MAX 1023
+#define Y_DEAD_ZONE_SIZE 100 //Total size of the y deadzone
+#define Y_MIN 0
+#define Y_MAX 1023
 
 //Lengths of printers inside each DisplayPage
 #define DASH_PRINTER_LEN 1
@@ -52,7 +59,7 @@ DisplayPage displayPages[MENU_SIZE];
 MenuController menuController(ENCODER_PIN_CLK, ENCODER_PIN_DT, DISPLAY_ADDRESS, DISPLAY_LENGTH, DISPLAY_WIDTH, MENU_SIZE);
 
 //Joystick setup
-JoystickController joystick(JOYSTICK_PIN_VRX, JOYSTICK_PIN_VRY, DEAD_ZONE_SIZE);
+JoystickController joystick(JOYSTICK_PIN_VRX, JOYSTICK_PIN_VRY, X_DEAD_ZONE_SIZE, Y_DEAD_ZONE_SIZE, X_MIN, X_MAX, Y_MIN, Y_MAX);
 
 void setup()
 {
@@ -74,6 +81,7 @@ void setup()
 void loop()
 {
     menuController.menuUpdate();
+    joystick.update();
     //rotaryKnob.getValue();
     pinDebouncer.update();
     Serial.println("X: " + String(joystick.getX()));
