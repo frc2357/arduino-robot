@@ -5,7 +5,7 @@ DisplayController::DisplayController(unsigned int displayAddress, unsigned int d
 {
 }
 
-void DisplayController::displayInit()
+void DisplayController::init()
 {
     this->lcd.begin();
     this->lcd.backlight();
