@@ -13,11 +13,11 @@ MenuController::MenuController(unsigned int encoderPinClk, unsigned int encoderP
     this->lastMenuIndex = 0;
 }
 
-void MenuController::menuInit(DisplayPage displayPages[])
+void MenuController::init(Page pages[])
 {
-    this->displayPages = displayPages;
-    this->display.displayInit();
-    this->displayPages[menuIndex].paint(display, this->isActive);
+    this->pages = pages;
+    this->display.init();
+    this->pages[menuIndex].paint(display, this->isActive);
     Serial.print("Menu Init");
 }
 
@@ -25,18 +25,18 @@ void MenuController::menuUpdate()
 {
     this->rotation = this->rotaryKnob.getValue();
 
-    if (isActive & this->displayPages[menuIndex].canActivate())
+    if (isActive & this->pages[menuIndex].canActivate())
     {
         if (this->rotation == 1)
         {
-            this->displayPages[menuIndex].clockwise();
-            this->displayPages[menuIndex].paint(display, isActive);
+            this->pages[menuIndex].clockwise();
+            this->pages[menuIndex].paint(display, isActive);
         }
 
         if (this->rotation == -1)
         {
-            this->displayPages[menuIndex].counterClockwise();
-            this->displayPages[menuIndex].paint(display, isActive);
+            this->pages[menuIndex].counterClockwise();
+            this->pages[menuIndex].paint(display, isActive);
         }
     }
     else
@@ -53,9 +53,9 @@ void MenuController::menuUpdate()
 
         if (menuIndex != lastMenuIndex)
         {
-            this->displayPages[lastMenuIndex].cleanUp(display);
+            this->pages[lastMenuIndex].cleanUp(display);
             lastMenuIndex = menuIndex;
-            this->displayPages[menuIndex].paint(display, isActive);
+            this->pages[menuIndex].paint(display, isActive);
         }
         this->isActive = false;
     }
@@ -64,5 +64,5 @@ void MenuController::menuUpdate()
 void MenuController::menuPress()
 {
     this->isActive = !this->isActive;
-    this->displayPages[menuIndex].paint(display, isActive);
+    this->pages[menuIndex].paint(display, isActive);
 }

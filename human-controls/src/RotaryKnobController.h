@@ -1,7 +1,6 @@
 #ifndef ENCODERCONTROLLER_H
 #define ENCODERCONTROLLER_H
 
-#include "DisplayPage.h"
 #include <RotaryEncoder.h>
 
 class RotaryKnobController

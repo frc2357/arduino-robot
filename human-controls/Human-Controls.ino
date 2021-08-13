@@ -4,7 +4,7 @@
 #include "src/CharacterDisplay.h"
 #include "src/MenuController.h"
 #include "src/DisplayController.h"
-#include "src/DisplayPage.h"
+#include "src/Page.h"
 #include "src/Printer.h"
 
 //Pins
@@ -19,7 +19,7 @@
 #define MENU_SIZE 4          //Number of menu pages
 #define USB_BAUDRATE 115200
 
-//Lengths of printers inside each DisplayPage
+//Lengths of printers inside each Page
 #define DASH_PRINTER_LEN 1
 #define ELEVATOR_PRINTER_LEN 4
 #define SHOT_PRINTER_LEN 4
@@ -41,7 +41,7 @@ Printer elevatorPrinters[ELEVATOR_PRINTER_LEN]{{2, 0, "Elevator Angle", false}, 
 Printer shotPrinters[SHOT_PRINTER_LEN]{{2, 0, "Shot Pressure", false}, {6, 1, "<[", true}, {8, 1, "!modifyValue!", false}, {10, 1, "]>", true}};
 Printer valvePrinters[VALVE_PRINTER_LEN]{{2, 0, "Valve Duration", false}, {6, 1, "<[", true}, {8, 1, "!modifyValue!", false}, {10, 1, "]>", true}};
 
-DisplayPage displayPages[MENU_SIZE];
+Page pages[MENU_SIZE];
 
 MenuController menuController(ENCODER_PIN_CLK, ENCODER_PIN_DT, DISPLAY_ADDRESS, DISPLAY_LENGTH, DISPLAY_WIDTH, MENU_SIZE);
 
@@ -51,15 +51,15 @@ void setup()
     pinDebouncer.addPin(ENCODER_PIN_SW, HIGH, INPUT_PULLUP);
     pinDebouncer.begin();
 
-    displayPages[0].displayPageInit(25, 0, 0, false, DASH_PRINTER_LEN, dashPrinters);
+    pages[0].init(25, 0, 0, false, DASH_PRINTER_LEN, dashPrinters);
 
-    displayPages[1].displayPageInit(1, ANGLE_MIN, ANGLE_MAX, true, ELEVATOR_PRINTER_LEN, elevatorPrinters);
+    pages[1].init(1, ANGLE_MIN, ANGLE_MAX, true, ELEVATOR_PRINTER_LEN, elevatorPrinters);
 
-    displayPages[2].displayPageInit(1, PRESSURE_MIN, PRESSURE_MAX, true, SHOT_PRINTER_LEN, shotPrinters);
+    pages[2].init(1, PRESSURE_MIN, PRESSURE_MAX, true, SHOT_PRINTER_LEN, shotPrinters);
 
-    displayPages[3].displayPageInit(1, DURATION_MIN, DURATION_MAX, true, VALVE_PRINTER_LEN, valvePrinters);
+    pages[3].init(1, DURATION_MIN, DURATION_MAX, true, VALVE_PRINTER_LEN, valvePrinters);
 
-    menuController.menuInit(displayPages);
+    menuController.init(pages);
 }
 
 void loop()

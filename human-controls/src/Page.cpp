@@ -1,6 +1,6 @@
-#include "DisplayPage.h"
+#include "Page.h"
 
-DisplayPage::DisplayPage()
+Page::Page()
 {
     this->isActivate = false;
     this->modifyValue = 0;
@@ -9,7 +9,7 @@ DisplayPage::DisplayPage()
     this->max = 0;
 }
 
-DisplayPage::DisplayPage(int increment, int min, int max, bool isActivate, int printersLength, Printer printers[])
+Page::Page(int increment, int min, int max, bool isActivate, int printersLength, Printer printers[])
 {
     this->isActivate = isActivate;
     this->modifyValue = min;
@@ -20,7 +20,7 @@ DisplayPage::DisplayPage(int increment, int min, int max, bool isActivate, int p
     this->printers = printers;
 }
 
-void DisplayPage::displayPageInit(int increment, int min, int max, bool isActivate, int printersLength, Printer printers[])
+void Page::init(int increment, int min, int max, bool isActivate, int printersLength, Printer printers[])
 {
     this->isActivate = isActivate;
     this->modifyValue = min;
@@ -31,14 +31,14 @@ void DisplayPage::displayPageInit(int increment, int min, int max, bool isActiva
     this->printers = printers;
 }
 
-DisplayPage::~DisplayPage()
+Page::~Page()
 {
 }
-void DisplayPage::cleanUp(DisplayController &display)
+void Page::cleanUp(DisplayController &display)
 {
     display.clear();
 }
-void DisplayPage::paint(DisplayController &display, bool isActive)
+void Page::paint(DisplayController &display, bool isActive)
 {
     display.clear();
     for (int i = 0; i < this->printersLength; i++)
@@ -62,21 +62,21 @@ void DisplayPage::paint(DisplayController &display, bool isActive)
     }
 }
 
-void DisplayPage::clockwise()
+void Page::clockwise()
 {
     if (this->modifyValue < this->max)
     {
         this->modifyValue += this->increment;
     }
 }
-void DisplayPage::counterClockwise()
+void Page::counterClockwise()
 {
     if (this->modifyValue > this->min)
     {
         this->modifyValue -= this->increment;
     }
 }
-bool DisplayPage::canActivate()
+bool Page::canActivate()
 {
     return this->isActivate;
 }

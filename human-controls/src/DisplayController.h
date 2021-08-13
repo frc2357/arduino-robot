@@ -10,7 +10,7 @@ class DisplayController : CharacterDisplay
 {
 public:
     DisplayController(unsigned int displayAddress, unsigned int displayLen, unsigned int displayWidth);
-    void displayInit();
+    void init();
     void clear();
     void printRegion(int x, int y, String text);
 
