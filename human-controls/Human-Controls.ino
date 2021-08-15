@@ -6,7 +6,7 @@
 #include "src/DisplayController.h"
 #include "src/DisplayPage.h"
 #include "src/Printer.h"
-#include "src/JoyStickController.h"
+#include "JoyStickController.h"
 
 //Pins
 //LCD connects SDA in analog pin 4 and SCL in analog pin 5
@@ -84,8 +84,6 @@ void loop()
     joystick.update();
     //rotaryKnob.getValue();
     pinDebouncer.update();
-    Serial.println("X: " + String(joystick.getX()));
-    Serial.println("Y: " + String(joystick.getY()));
 }
 
 //Methods for debouncer
