@@ -3,7 +3,7 @@
 MenuController::MenuController(unsigned int encoderPinClk, unsigned int encoderPinDt,
                                unsigned int displayAddress, unsigned int displayLen, unsigned int displayWidth,
                                unsigned int menuSize)
-    : rotaryKnob(encoderPinClk, encoderPinDt), display(displayAddress, displayLen, displayWidth)
+    : rotaryKnob(encoderPinClk, encoderPinDt), display(displayAddress, displayLen, displayWidth), pages({DashPage(), ShotPressurePage(), AnglePage(), DurationPage()})
 {
     this->menuSize = menuSize;
     this->isActive = false;
@@ -13,9 +13,8 @@ MenuController::MenuController(unsigned int encoderPinClk, unsigned int encoderP
     this->lastMenuIndex = 0;
 }
 
-void MenuController::init(Page pages[])
+void MenuController::init()
 {
-    this->pages = pages;
     this->display.init();
     this->pages[menuIndex].paint(display, this->isActive);
     Serial.print("Menu Init");

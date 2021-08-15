@@ -1,5 +1,5 @@
-#ifndef DISPLAYPAGE_H
-#define DISPLAYPAGE_H
+#ifndef PAGE_H
+#define PAGE_H
 #include "Arduino.h"
 #include "DisplayInterface.h"
 #include "RotaryKnobController.h"
@@ -13,8 +13,7 @@ class Page : DisplayInterface
 {
 public:
     Page();
-    Page(int increment, int min, int max, bool isActivate, int printersLength, Printer printers[]);
-    void init(int increment, int min, int max, bool isActivate, int printersLength, Printer printers[]);
+    Page(int increment, int min, int max, bool isActivate, int printersLength);
     ~Page();
     void cleanUp(DisplayController &display);
     void paint(DisplayController &display, bool isActive);
@@ -25,6 +24,6 @@ public:
 private:
     bool isActivate;
     int modifyValue, min, max, increment, printersLength;
-    Printer *printers;
+    Printer printers;
 };
 #endif

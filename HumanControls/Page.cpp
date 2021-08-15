@@ -9,18 +9,9 @@ Page::Page()
     this->max = 0;
 }
 
-Page::Page(int increment, int min, int max, bool isActivate, int printersLength, Printer printers[])
-{
-    this->isActivate = isActivate;
-    this->modifyValue = min;
-    this->min = min;
-    this->max = max;
-    this->increment = increment;
-    this->printersLength = printersLength;
-    this->printers = printers;
+Page::Page(int increment, int min, int max, bool isActivate, int printersLength)
+    : printers({2, 0, "Dash", false})
 }
-
-void Page::init(int increment, int min, int max, bool isActivate, int printersLength, Printer printers[])
 {
     this->isActivate = isActivate;
     this->modifyValue = min;
@@ -28,7 +19,6 @@ void Page::init(int increment, int min, int max, bool isActivate, int printersLe
     this->max = max;
     this->increment = increment;
     this->printersLength = printersLength;
-    this->printers = printers;
 }
 
 Page::~Page()

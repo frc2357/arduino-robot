@@ -12,7 +12,7 @@ public:
     MenuController(unsigned int encoderPinClk, unsigned int encoderPinDt,
                    unsigned int displayAddress, unsigned int displayLen, unsigned int displayWidth,
                    unsigned int menuSize);
-    void init(Page pages[]);
+    void init();
     void menuUpdate();
     void menuPress();
 
@@ -20,7 +20,7 @@ private:
     RotaryKnobController rotaryKnob;
     DisplayController display;
     int rotation, menuIndex, menuSize, lastMenuIndex;
-    Page *pages;
+    Page pages;
     bool isActive;
 };
 #endif

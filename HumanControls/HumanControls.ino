@@ -1,11 +1,12 @@
-#include "Arduino.h"
-#include "FTDebouncer.h"
-#include "src/RotaryKnobController.h"
-#include "src/CharacterDisplay.h"
-#include "src/MenuController.h"
-#include "src/DisplayController.h"
-#include "src/Page.h"
-#include "src/Printer.h"
+#include "CharacterDisplay.h"
+//#include "FTDebouncer.h"
+//#include "RotaryKnobController.h"
+//#include "CharacterDisplay.h"
+//#include "MenuController.h"
+//#include "DisplayController.h"
+//#include "Page.h"
+//#include "Printer.h"
+//#include "CharacterDisplay.h"
 
 //Pins
 #define ENCODER_PIN_CLK 3 //CLK gets degrees for rotary knob
