@@ -10,8 +10,6 @@ Page::Page()
 }
 
 Page::Page(int increment, int min, int max, bool isActivate, int printersLength)
-    : printers({2, 0, "Dash", false})
-}
 {
     this->isActivate = isActivate;
     this->modifyValue = min;
@@ -21,9 +19,6 @@ Page::Page(int increment, int min, int max, bool isActivate, int printersLength)
     this->printersLength = printersLength;
 }
 
-Page::~Page()
-{
-}
 void Page::cleanUp(DisplayController &display)
 {
     display.clear();
@@ -31,7 +26,7 @@ void Page::cleanUp(DisplayController &display)
 void Page::paint(DisplayController &display, bool isActive)
 {
     display.clear();
-    for (int i = 0; i < this->printersLength; i++)
+    /* for (int i = 0; i < this->printersLength; i++)
     {
         Serial.println(this->printers[i].getText());
         if (isActive & isActivate & this->printers[i].isActiveText())
@@ -49,7 +44,9 @@ void Page::paint(DisplayController &display, bool isActive)
                 display.printRegion(this->printers[i].getX(), this->printers[i].getY(), this->printers[i].getText());
             }
         }
-    }
+    }*/
+    display.printRegion(2, 0, "On a page");
+    Serial.println("On a page");
 }
 
 void Page::clockwise()
@@ -69,4 +66,21 @@ void Page::counterClockwise()
 bool Page::canActivate()
 {
     return this->isActivate;
+}
+
+void Page::setNextPage(Page &page)
+{
+    previousPage = &page;
+}
+void Page::setPreviousPage(Page &page)
+{
+    nextPage = &page;
+}
+Page *Page::getNextPage()
+{
+    return nextPage;
+}
+Page *Page::getPreviousPage()
+{
+    return previousPage;
 }

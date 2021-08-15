@@ -3,58 +3,72 @@
 MenuController::MenuController(unsigned int encoderPinClk, unsigned int encoderPinDt,
                                unsigned int displayAddress, unsigned int displayLen, unsigned int displayWidth,
                                unsigned int menuSize)
-    : rotaryKnob(encoderPinClk, encoderPinDt), display(displayAddress, displayLen, displayWidth), pages({DashPage(), ShotPressurePage(), AnglePage(), DurationPage()})
+    : rotaryKnob(encoderPinClk, encoderPinDt), display(displayAddress, displayLen, displayWidth),
+      dashPage(0, 0, 0, false, 0), elevatorPage(0, 0, 0, false, 0),
+      shotPage(0, 0, 0, false, 0), valvePage(0, 0, 0, false, 0)
 {
-    this->menuSize = menuSize;
     this->isActive = false;
 
     this->rotation = 0;
-    this->menuIndex = 0;
-    this->lastMenuIndex = 0;
+
+    //Set previous pages
+    dashPage.setPreviousPage(valvePage);
+    elevatorPage.setPreviousPage(dashPage);
+    shotPage.setPreviousPage(elevatorPage);
+    valvePage.setPreviousPage(shotPage);
+
+    //Set next pages
+    dashPage.setNextPage(elevatorPage);
+    elevatorPage.setNextPage(shotPage);
+    shotPage.setNextPage(valvePage);
+    valvePage.setNextPage(dashPage);
+
+    currentPage = &dashPage;
 }
 
 void MenuController::init()
 {
+    Serial.println("Menu Init");
     this->display.init();
-    this->pages[menuIndex].paint(display, this->isActive);
-    Serial.print("Menu Init");
+    this->currentPage->paint(display, this->isActive);
 }
 
 void MenuController::menuUpdate()
 {
     this->rotation = this->rotaryKnob.getValue();
 
-    if (isActive & this->pages[menuIndex].canActivate())
+    if (isActive & currentPage->canActivate())
     {
         if (this->rotation == 1)
         {
-            this->pages[menuIndex].clockwise();
-            this->pages[menuIndex].paint(display, isActive);
+            this->currentPage->clockwise();
+            this->currentPage->paint(display, isActive);
         }
 
         if (this->rotation == -1)
         {
-            this->pages[menuIndex].counterClockwise();
-            this->pages[menuIndex].paint(display, isActive);
+            this->currentPage->counterClockwise();
+            this->currentPage->paint(display, isActive);
         }
     }
     else
     {
         if (this->rotation == 1)
         {
-            this->menuIndex = ((this->menuIndex + 1) < this->menuSize) ? this->menuIndex + 1 : 0;
+            this->currentPage = this->currentPage->getNextPage();
+            Serial.println("Clocwise");
         }
 
         if (this->rotation == -1)
         {
-            this->menuIndex = ((this->menuIndex - 1) >= 0) ? this->menuIndex - 1 : (menuSize - 1);
+            this->currentPage = this->currentPage->getPreviousPage();
+            Serial.println("CounterClocwise");
         }
 
-        if (menuIndex != lastMenuIndex)
+        if (this->rotation != 0)
         {
-            this->pages[lastMenuIndex].cleanUp(display);
-            lastMenuIndex = menuIndex;
-            this->pages[menuIndex].paint(display, isActive);
+            this->currentPage->cleanUp(display);
+            this->currentPage->paint(display, isActive);
         }
         this->isActive = false;
     }
@@ -63,5 +77,5 @@ void MenuController::menuUpdate()
 void MenuController::menuPress()
 {
     this->isActive = !this->isActive;
-    this->pages[menuIndex].paint(display, isActive);
+    this->currentPage->paint(display, isActive);
 }

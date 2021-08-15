@@ -19,8 +19,12 @@ public:
 private:
     RotaryKnobController rotaryKnob;
     DisplayController display;
-    int rotation, menuIndex, menuSize, lastMenuIndex;
-    Page pages;
+    int rotation;
     bool isActive;
+    Page *currentPage;
+    Page dashPage;
+    Page elevatorPage;
+    Page shotPage;
+    Page valvePage;
 };
 #endif

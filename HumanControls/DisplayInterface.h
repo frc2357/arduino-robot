@@ -1,7 +1,6 @@
 #ifndef DISPLAYINTERFACE_H
 #define DISPLAYINTERFACE_H
 #include "DisplayController.h"
-#include "Printer.h"
 
 class DisplayInterface
 {
