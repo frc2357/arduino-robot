@@ -6,24 +6,27 @@
  * controls the individual motors, solenoids, and devices.
  */
 
+#include <JsonState.h>
 #include "RobotConstants.h"
+#include "StatusLEDs.h"
 #include "Robot.h"
 
-int loopCount = 0;
 RobotPins pins;
 Robot robot(pins);
 
 // Primary Setup
 void setup() {
-  Serial.begin(SERIAL_BAUD_RATE);
-
-  loopCount = 0;
-  robot.Setup();
-  robot.Disable();
+  Serial.begin(USB_BAUDRATE);
+  robot.Init();
 }
 
 // Main Loop
 void loop() {
-  robot.Update(loopCount);
-  loopCount++;
+  robot.Update();
+
+  //double count = jsonState.getDoubleValue(exampleDevice, "count");
+  //jsonState.updateField(exampleDevice, "count", count + 0.5);
+  delay(500);
+
+  robot.Disable();
 }

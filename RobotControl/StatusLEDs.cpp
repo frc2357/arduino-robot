@@ -1,17 +1,17 @@
 #include "StatusLEDs.h"
 
 const String StatusLEDs::blinkPatternTiming[] = {
-  /* OFF */   "-",
+  /* OFF */ "-",
   /* DISABLED */ "*",
-  /* ENABLED */  "**********----------",
-  /* ERROR */  "*-*------",
+  /* ENABLED */ "**********----------",
+  /* ERROR */ "*-*------",
 };
 
 StatusLEDs::StatusLEDs(RobotPins pins) {
   this->pinBuiltin = pins.ledBuiltin;
 }
 
-void StatusLEDs::Setup() {
+void StatusLEDs::Init() {
   pinMode(this->pinBuiltin, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
   this->lastPinValue = LOW;
@@ -45,7 +45,7 @@ StatusLEDs::BlinkPattern StatusLEDs::GetBlinkPattern(RobotStatus status) {
       return StatusLEDs::BlinkPattern::DISABLED;
     case RobotStatus::STATUS_ENABLED:
       return StatusLEDs::BlinkPattern::ENABLED;
-    case RobotStatus::STATUS_SETUP:
+    case RobotStatus::STATUS_INIT:
       return StatusLEDs::BlinkPattern::OFF;
     default:
       return StatusLEDs::BlinkPattern::OFF;

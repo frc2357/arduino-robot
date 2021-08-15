@@ -8,7 +8,7 @@ class StatusLEDs {
   public:
     StatusLEDs(RobotPins pins);
 
-    void Setup();
+    void Init();
 
     void Update(RobotStatus status);
 

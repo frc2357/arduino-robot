@@ -4,6 +4,7 @@
 #include "Arduino.h"
 #include "RobotConstants.h"
 #include "StatusLEDs.h"
+#include "JsonState.h"
 
 class Robot {
   public:
@@ -11,9 +12,9 @@ class Robot {
 
     RobotStatus GetStatus();
 
-    void Setup();
+    void Init();
 
-    void Update(int loopCount);
+    void Update();
 
     void Disable();
 
@@ -23,6 +24,7 @@ class Robot {
     RobotPins pins;
     RobotStatus status;
 
+    JsonState jsonState;
     StatusLEDs statusLEDs;
 };
 
