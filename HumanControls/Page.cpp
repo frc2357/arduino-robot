@@ -2,51 +2,30 @@
 
 Page::Page()
 {
-    this->isActivate = false;
+    this->isActive = false;
     this->modifyValue = 0;
     increment = 0;
     this->min = 0;
     this->max = 0;
 }
 
-Page::Page(int increment, int min, int max, bool isActivate, int printersLength)
+Page::Page(int increment, int min, int max, bool isActive)
 {
-    this->isActivate = isActivate;
+    this->isActive = isActive;
     this->modifyValue = min;
     this->min = min;
     this->max = max;
     this->increment = increment;
-    this->printersLength = printersLength;
 }
 
 void Page::cleanUp(DisplayController &display)
 {
     display.clear();
 }
-void Page::paint(DisplayController &display, bool isActive)
+void Page::paint(DisplayController &display, bool isActivated)
 {
     display.clear();
-    /* for (int i = 0; i < this->printersLength; i++)
-    {
-        Serial.println(this->printers[i].getText());
-        if (isActive & isActivate & this->printers[i].isActiveText())
-        {
-            display.printRegion(this->printers[i].getX(), this->printers[i].getY(), this->printers[i].getText());
-        }
-        else if (this->printers[i].isActiveText() == false)
-        {
-            if (this->printers[i].getText() == "!modifyValue!")
-            {
-                display.printRegion(this->printers[i].getX(), this->printers[i].getY(), String(this->modifyValue));
-            }
-            else
-            {
-                display.printRegion(this->printers[i].getX(), this->printers[i].getY(), this->printers[i].getText());
-            }
-        }
-    }*/
     display.printRegion(2, 0, "On a page");
-    Serial.println("On a page");
 }
 
 void Page::clockwise()
@@ -65,16 +44,21 @@ void Page::counterClockwise()
 }
 bool Page::canActivate()
 {
-    return this->isActivate;
+    return this->isActive;
+}
+
+int Page::getModifyValue()
+{
+    return this->modifyValue;
 }
 
 void Page::setNextPage(Page &page)
 {
-    previousPage = &page;
+    nextPage = &page;
 }
 void Page::setPreviousPage(Page &page)
 {
-    nextPage = &page;
+    previousPage = &page;
 }
 Page *Page::getNextPage()
 {

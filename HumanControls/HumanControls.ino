@@ -20,31 +20,25 @@
 #define MENU_SIZE 4          //Number of menu pages
 #define USB_BAUDRATE 115200
 
-//Lengths of printers inside each Page
-#define DASH_PRINTER_LEN 1
-#define ELEVATOR_PRINTER_LEN 4
-#define SHOT_PRINTER_LEN 4
-#define VALVE_PRINTER_LEN 4
-
 //Min - Max
-#define ANGLE_MIN 0      //Minimum elevator angle
-#define ANGLE_MAX 10     //Maximum elevator angle
-#define PRESSURE_MIN 60  //Minimum shot pressure
-#define PRESSURE_MAX 100 //Maximum shot pressure
-#define DURATION_MIN 0   //Minimum valve duration
-#define DURATION_MAX 10  //Maximum valve duration
+#define ANGLE_INCREMENT 1     //Increment amount for elevator angle
+#define ANGLE_MIN 20          //Minimum elevator angle
+#define ANGLE_MAX 70          //Maximum elevator angle
+#define PRESSURE_INCREMENT 1  //Increment amount for shot pressure
+#define PRESSURE_MIN 60       //Minimum shot pressure
+#define PRESSURE_MAX 120      //Maximum shot pressure
+#define DURATION_INCREMENT 10 //Increment amount for valve duration
+#define DURATION_MIN 100      //Minimum valve duration
+#define DURATION_MAX 300      //Maximum valve duration
 
 FTDebouncer pinDebouncer(30);
 //RotaryKnobController rotaryKnob(ENCODER_PIN_CLK, ENCODER_PIN_DT);
 
-//Printer dashPrinters[DASH_PRINTER_LEN]{{2, 0, "Dash", false}};
-//Printer elevatorPrinters[ELEVATOR_PRINTER_LEN]{{2, 0, "Elevator Angle", false}, {6, 1, "<[", true}, {8, 1, "!modifyValue!", false}, {10, 1, "]>", true}};
-//Printer shotPrinters[SHOT_PRINTER_LEN]{{2, 0, "Shot Pressure", false}, {6, 1, "<[", true}, {8, 1, "!modifyValue!", false}, {10, 1, "]>", true}};
-//Printer valvePrinters[VALVE_PRINTER_LEN]{{2, 0, "Valve Duration", false}, {6, 1, "<[", true}, {8, 1, "!modifyValue!", false}, {10, 1, "]>", true}};
-
 Page pages[MENU_SIZE];
 
-MenuController menuController(ENCODER_PIN_CLK, ENCODER_PIN_DT, DISPLAY_ADDRESS, DISPLAY_LENGTH, DISPLAY_WIDTH, MENU_SIZE);
+MenuController menuController(ENCODER_PIN_CLK, ENCODER_PIN_DT, DISPLAY_ADDRESS, DISPLAY_LENGTH, DISPLAY_WIDTH, MENU_SIZE,
+                              ANGLE_INCREMENT, ANGLE_MIN, ANGLE_MAX, PRESSURE_INCREMENT, PRESSURE_MIN, PRESSURE_MAX,
+                              DURATION_INCREMENT, DURATION_MIN, DURATION_MAX);
 
 void setup()
 {

@@ -2,10 +2,14 @@
 
 MenuController::MenuController(unsigned int encoderPinClk, unsigned int encoderPinDt,
                                unsigned int displayAddress, unsigned int displayLen, unsigned int displayWidth,
-                               unsigned int menuSize)
+                               unsigned int menuSize, unsigned int angleIncrement, unsigned int angleMin,
+                               unsigned int angleMax, unsigned int pressureIncrement, unsigned int pressureMin,
+                               unsigned int pressureMax, unsigned int durationIncrement, unsigned int durationMin,
+                               unsigned int durationMax)
     : rotaryKnob(encoderPinClk, encoderPinDt), display(displayAddress, displayLen, displayWidth),
-      dashPage(0, 0, 0, false, 0), elevatorPage(0, 0, 0, false, 0),
-      shotPage(0, 0, 0, false, 0), valvePage(0, 0, 0, false, 0)
+      dashPage(), elevatorPage(angleIncrement, angleMin, angleMax),
+      shotPage(pressureIncrement, pressureMin, pressureMax),
+      valvePage(durationIncrement, durationMin, durationMax)
 {
     this->isActive = false;
 
@@ -56,13 +60,11 @@ void MenuController::menuUpdate()
         if (this->rotation == 1)
         {
             this->currentPage = this->currentPage->getNextPage();
-            Serial.println("Clocwise");
         }
 
         if (this->rotation == -1)
         {
             this->currentPage = this->currentPage->getPreviousPage();
-            Serial.println("CounterClocwise");
         }
 
         if (this->rotation != 0)
