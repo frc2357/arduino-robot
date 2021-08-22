@@ -22,10 +22,7 @@ void Page::cleanUp(DisplayController &display)
 {
     display.clear();
 }
-void Page::paint(DisplayController &display, boolean isActivated)
-{
-    display.printRegion(0, 0, "On a page");
-}
+
 void Page::clockwise()
 {
     if (this->modifyValue < this->max)

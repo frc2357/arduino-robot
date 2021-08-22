@@ -17,7 +17,6 @@
 #define DISPLAY_ADDRESS 0X27 //I2c address of the lcd display
 #define DISPLAY_LENGTH 16    //Length of the lcd display
 #define DISPLAY_WIDTH 2      //width of the lcd display
-#define MENU_SIZE 4          //Number of menu pages
 #define USB_BAUDRATE 115200
 
 //Min - Max
@@ -33,9 +32,7 @@
 
 FTDebouncer pinDebouncer(30);
 
-Page pages[MENU_SIZE];
-
-MenuController menuController(ENCODER_PIN_CLK, ENCODER_PIN_DT, DISPLAY_ADDRESS, DISPLAY_LENGTH, DISPLAY_WIDTH, MENU_SIZE,
+MenuController menuController(ENCODER_PIN_CLK, ENCODER_PIN_DT, DISPLAY_ADDRESS, DISPLAY_LENGTH, DISPLAY_WIDTH,
                               ANGLE_INCREMENT, ANGLE_MIN, ANGLE_MAX, PRESSURE_INCREMENT, PRESSURE_MIN, PRESSURE_MAX,
                               DURATION_INCREMENT, DURATION_MIN, DURATION_MAX);
 

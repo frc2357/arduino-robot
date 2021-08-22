@@ -18,7 +18,6 @@ public:
                    unsigned int displayAddress,
                    unsigned int displayLen,
                    unsigned int displayWidth,
-                   unsigned int menuSize,
                    unsigned int angleIncrement,
                    unsigned int angleMin,
                    unsigned int angleMax,
