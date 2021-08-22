@@ -1,21 +1,17 @@
 #ifndef ENCODERCONTROLLER_H
 #define ENCODERCONTROLLER_H
 
-#include "MenuInterface.h"
 #include <RotaryEncoder.h>
 
-class RotaryKnobController : public MenuInterface
+class RotaryKnobController
 {
 public:
     RotaryKnobController(unsigned int pinClk, unsigned int pinDt);
     ~RotaryKnobController();
-    void updateRotaryKnob();
-    void menuUp();
-    void menuDown();
-    void menuSelect();
+    int getValue();
 
 private:
-    int pinSw, pos = 0, lastClick = -1;
+    int pos = 0;
     RotaryEncoder *encoder;
 };
 #endif

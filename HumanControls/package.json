@@ -1,0 +1,22 @@
+{
+  "name": "arduino-2357",
+  "version": "0.1.0",
+  "description": "FRC 2357 Arduino libraries and projects",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/frc2357/arduino-2357.git"
+  },
+  "author": "System Meltdown - FRC 2357",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/frc2357/arduino-2357/issues"
+  },
+  "homepage": "https://github.com/frc2357/arduino-2357#readme",
+  "arduinoLibs": [
+    "FTDDebouncer@1.3.2",
+    "RotaryEncoder@1.1.2"
+  ]
+}

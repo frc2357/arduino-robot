@@ -4,6 +4,8 @@ RotaryKnobController::RotaryKnobController(unsigned int pinClk, unsigned int pin
 {
     // Setup a RotaryEncoder with 2 steps per latch for the 2 signal input pins:
     this->encoder = new RotaryEncoder(pinClk, pinDt, RotaryEncoder::LatchMode::TWO03);
+
+    this->pos = 0;
 }
 
 RotaryKnobController::~RotaryKnobController()
@@ -11,37 +13,26 @@ RotaryKnobController::~RotaryKnobController()
     delete (this->encoder);
 }
 
-void RotaryKnobController::updateRotaryKnob()
+int RotaryKnobController::getValue()
 {
     this->encoder->tick();
-
     int newPos = this->encoder->getPosition();
-    //Dial
+    //Dials
     if (pos != newPos && newPos % 2 == 0)
     {
+        pos = newPos;
 
+        //COUNTERCLOCKWISE
         if (this->encoder->getDirection() == RotaryEncoder::Direction::CLOCKWISE)
         {
-            menuDown();
+            return -1;
         }
+
+        //CLOCKWISE
         else if (this->encoder->getDirection() == RotaryEncoder::Direction::NOROTATION)
         {
-            menuUp();
+            return 1;
         }
-
-        pos = newPos;
     }
-}
-
-void RotaryKnobController::menuUp()
-{
-    Serial.println("up");
-}
-void RotaryKnobController::menuDown()
-{
-    Serial.println("down");
-}
-void RotaryKnobController::menuSelect()
-{
-    Serial.println("select");
+    return 0;
 }
