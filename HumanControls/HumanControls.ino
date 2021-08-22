@@ -1,14 +1,19 @@
+#include "LiquidCrystal.h"
+#include <LiquidCrystal_I2C.h>
 #include "Arduino.h"
 #include "FTDebouncer.h"
-#include "src/RotaryKnobController.h"
-#include "src/CharacterDisplay.h"
-#include "src/MenuController.h"
-#include "src/DisplayController.h"
-#include "src/DisplayPage.h"
-#include "src/Printer.h"
+#include "RotaryKnobController.h"
+#include "CharacterDisplay.h"
+#include "MenuController.h"
+#include "DisplayController.h"
+#include "Page.h"
+#include "CharacterDisplay.h"
 #include "JoyStickController.h"
 
 //Pins
+#define ENCODER_PIN_CLK 3 //CLK gets degrees for rotary knob
+#define ENCODER_PIN_DT 4  //DT gets direction for rotary knob
+#define ENCODER_PIN_SW 5  //Gets the button for rotary knob
 //LCD connects SDA in analog pin 4 and SCL in analog pin 5
 #define ENCODER_PIN_CLK 3  //CLK gets degrees for rotary knob
 #define ENCODER_PIN_DT 4   //DT gets direction for rotary knob
@@ -21,8 +26,18 @@
 #define DISPLAY_ADDRESS 0X27 //I2c address of the lcd display
 #define DISPLAY_LENGTH 16    //Length of the lcd display
 #define DISPLAY_WIDTH 2      //width of the lcd display
-#define MENU_SIZE 4          //Number of menu pages
 #define USB_BAUDRATE 115200
+
+//Min - Max
+#define ANGLE_INCREMENT 1     //Increment amount for elevator angle
+#define ANGLE_MIN 20          //Minimum elevator angle
+#define ANGLE_MAX 70          //Maximum elevator angle
+#define PRESSURE_INCREMENT 1  //Increment amount for shot pressure
+#define PRESSURE_MIN 60       //Minimum shot pressure
+#define PRESSURE_MAX 120      //Maximum shot pressure
+#define DURATION_INCREMENT 10 //Increment amount for valve duration
+#define DURATION_MIN 100      //Minimum valve duration
+#define DURATION_MAX 300      //Maximum valve duration
 
 //Joystick deadzones
 #define X_DEAD_ZONE_SIZE 100 //Total size of the x deadzone
@@ -47,16 +62,11 @@
 #define DURATION_MAX 10  //Maximum valve duration
 
 FTDebouncer pinDebouncer(30);
-//RotaryKnobController rotaryKnob(ENCODER_PIN_CLK, ENCODER_PIN_DT);
+
 //Menu Setup
-Printer dashPrinters[DASH_PRINTER_LEN]{{2, 0, "Dash", false}};
-Printer elevatorPrinters[ELEVATOR_PRINTER_LEN]{{2, 0, "Elevator Angle", false}, {6, 1, "<[", true}, {8, 1, "!modifyValue!", false}, {10, 1, "]>", true}};
-Printer shotPrinters[SHOT_PRINTER_LEN]{{2, 0, "Shot Pressure", false}, {6, 1, "<[", true}, {8, 1, "!modifyValue!", false}, {10, 1, "]>", true}};
-Printer valvePrinters[VALVE_PRINTER_LEN]{{2, 0, "Valve Duration", false}, {6, 1, "<[", true}, {8, 1, "!modifyValue!", false}, {10, 1, "]>", true}};
-
-DisplayPage displayPages[MENU_SIZE];
-
-MenuController menuController(ENCODER_PIN_CLK, ENCODER_PIN_DT, DISPLAY_ADDRESS, DISPLAY_LENGTH, DISPLAY_WIDTH, MENU_SIZE);
+MenuController menuController(ENCODER_PIN_CLK, ENCODER_PIN_DT, DISPLAY_ADDRESS, DISPLAY_LENGTH, DISPLAY_WIDTH,
+                              ANGLE_INCREMENT, ANGLE_MIN, ANGLE_MAX, PRESSURE_INCREMENT, PRESSURE_MIN, PRESSURE_MAX,
+                              DURATION_INCREMENT, DURATION_MIN, DURATION_MAX);
 
 //Joystick setup
 JoystickController joystick(JOYSTICK_PIN_VRX, JOYSTICK_PIN_VRY, X_DEAD_ZONE_SIZE, Y_DEAD_ZONE_SIZE, X_MIN, X_MAX, Y_MIN, Y_MAX);
@@ -66,23 +76,13 @@ void setup()
     Serial.begin(USB_BAUDRATE);
     pinDebouncer.addPin(ENCODER_PIN_SW, HIGH, INPUT_PULLUP);
     pinDebouncer.begin();
-
-    displayPages[0].displayPageInit(25, 0, 0, false, DASH_PRINTER_LEN, dashPrinters);
-
-    displayPages[1].displayPageInit(1, ANGLE_MIN, ANGLE_MAX, true, ELEVATOR_PRINTER_LEN, elevatorPrinters);
-
-    displayPages[2].displayPageInit(1, PRESSURE_MIN, PRESSURE_MAX, true, SHOT_PRINTER_LEN, shotPrinters);
-
-    displayPages[3].displayPageInit(1, DURATION_MIN, DURATION_MAX, true, VALVE_PRINTER_LEN, valvePrinters);
-
-    menuController.menuInit(displayPages);
+    menuController.init();
 }
 
 void loop()
 {
     menuController.menuUpdate();
     joystick.update();
-    //rotaryKnob.getValue();
     pinDebouncer.update();
 }
 

@@ -2,7 +2,6 @@
 #define JOYSTICKCONTROLLER_H
 
 #include "Arduino.h"
-#include "CtrlUtil.h"
 
 class JoystickController
 {
