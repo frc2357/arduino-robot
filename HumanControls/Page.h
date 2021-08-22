@@ -14,7 +14,7 @@ public:
     Page();
     Page(int increment, int min, int max, bool isActive);
     void cleanUp(DisplayController &display);
-    void paint(DisplayController &display, bool isActivated);
+    virtual void paint(DisplayController &display, bool isActivated);
     void clockwise();
     void counterClockwise();
     bool canActivate();

@@ -22,11 +22,6 @@ void Page::cleanUp(DisplayController &display)
 {
     display.clear();
 }
-void Page::paint(DisplayController &display, bool isActivated)
-{
-    display.clear();
-    display.printRegion(2, 0, "On a page");
-}
 
 void Page::clockwise()
 {

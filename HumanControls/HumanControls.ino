@@ -32,7 +32,6 @@
 #define DURATION_MAX 300      //Maximum valve duration
 
 FTDebouncer pinDebouncer(30);
-//RotaryKnobController rotaryKnob(ENCODER_PIN_CLK, ENCODER_PIN_DT);
 
 Page pages[MENU_SIZE];
 
@@ -51,7 +50,6 @@ void setup()
 void loop()
 {
     menuController.menuUpdate();
-    //rotaryKnob.getValue();
     pinDebouncer.update();
 }
 

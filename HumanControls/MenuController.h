@@ -13,11 +13,20 @@
 class MenuController
 {
 public:
-    MenuController(unsigned int encoderPinClk, unsigned int encoderPinDt,
-                   unsigned int displayAddress, unsigned int displayLen, unsigned int displayWidth,
-                   unsigned int menuSize, unsigned int angleIncrement, unsigned int angleMin,
-                   unsigned int angleMax, unsigned int pressureIncrement, unsigned int pressureMin,
-                   unsigned int pressureMax, unsigned int durationIncrement, unsigned int durationMin,
+    MenuController(unsigned int encoderPinClk,
+                   unsigned int encoderPinDt,
+                   unsigned int displayAddress,
+                   unsigned int displayLen,
+                   unsigned int displayWidth,
+                   unsigned int menuSize,
+                   unsigned int angleIncrement,
+                   unsigned int angleMin,
+                   unsigned int angleMax,
+                   unsigned int pressureIncrement,
+                   unsigned int pressureMin,
+                   unsigned int pressureMax,
+                   unsigned int durationIncrement,
+                   unsigned int durationMin,
                    unsigned int durationMax);
     void init();
     void menuUpdate();
