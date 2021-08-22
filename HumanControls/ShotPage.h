@@ -1,5 +1,5 @@
-#ifndef Shot_PAGE_H
-#define Shot_pAGE_h
+#ifndef SHOT_PAGE_H
+#define SHOT_PAGE_H
 
 #include "Page.h"
 

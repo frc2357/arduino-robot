@@ -1,5 +1,5 @@
 #ifndef DASH_PAGE_H
-#define DASH_pAGE_h
+#define DASH_PAGE_h
 
 #include "Page.h"
 
