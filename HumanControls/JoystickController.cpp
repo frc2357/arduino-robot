@@ -1,26 +1,32 @@
 #include "JoystickController.h"
 
-JoystickController::JoystickController(unsigned int xPin, unsigned int yPin, unsigned int xDeadZoneSize, unsigned int yDeadZoneSize,
-                                       unsigned int xMin, unsigned int xMax, unsigned int yMin, unsigned int yMax)
+JoystickController::JoystickController(unsigned int xPin,
+                                       unsigned int yPin,
+                                       unsigned int xDeadZoneSize,
+                                       unsigned int yDeadZoneSize,
+                                       unsigned int xMin,
+                                       unsigned int xMax,
+                                       unsigned int yMin,
+                                       unsigned int yMax)
 {
     this->xPin = xPin;
     this->yPin = yPin;
 
-    this->xMin = static_cast<double>(xMin);
-    this->xMax = static_cast<double>(xMax);
+    this->xMin = xMin;
+    this->xMax = xMax;
 
-    this->yMin = static_cast<double>(yMin);
-    this->yMax = static_cast<double>(yMax);
+    this->yMin = yMin;
+    this->yMax = yMax;
 
     this->xCenter = static_cast<double>(this->xMax) / 2;
 
     this->yCenter = static_cast<double>(this->yMax) / 2;
 
-    this->xDeadMin = this->xCenter - (double(xDeadZoneSize) / 2);
-    this->xDeadMax = this->xCenter + (double(xDeadZoneSize) / 2);
+    this->xDeadMin = this->xCenter - (static_cast<double>(xDeadZoneSize) / 2);
+    this->xDeadMax = this->xCenter + (static_cast<double>(xDeadZoneSize) / 2);
 
-    this->yDeadMin = this->yCenter - (double(yDeadZoneSize) / 2);
-    this->yDeadMax = this->yCenter + (double(yDeadZoneSize) / 2);
+    this->yDeadMin = this->yCenter - (static_cast<double>(yDeadZoneSize) / 2);
+    this->yDeadMax = this->yCenter + (static_cast<double>(yDeadZoneSize) / 2);
 
     this->xHalfTotal = this->xCenter - (this->xDeadMax - this->xCenter);
     this->xOffset = this->xCenter + (this->xDeadMax - this->xCenter);

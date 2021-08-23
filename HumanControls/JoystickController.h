@@ -6,8 +6,15 @@
 class JoystickController
 {
 public:
-    JoystickController(unsigned int xPin, unsigned int yPin, unsigned int xDeadZoneSize, unsigned int yDeadZoneSize,
-                       unsigned int xMin, unsigned int xMax, unsigned int yMin, unsigned int yMax); //deadZoneSize is the total proportion of the joystick's range of values to omit
+    //deadZoneSize is the total proportion of the joystick's range of values to omit
+    JoystickController(unsigned int xPin,
+                       unsigned int yPin,
+                       unsigned int xDeadZoneSize,
+                       unsigned int yDeadZoneSize,
+                       unsigned int xMin,
+                       unsigned int xMax,
+                       unsigned int yMin,
+                       unsigned int yMax);
     void update();
     double getX();
     double getY();
@@ -17,7 +24,8 @@ private:
     double calcY(int rawValue);
 
     int xPin, yPin, xMin, xMax, yMin, yMax;
-    double x, y, xDeadMin, xDeadMax, yDeadMin, yDeadMax, xCenter, yCenter, xHalfTotal, xOffset, yHalfTotal, yOffset;
+    double x, y, xDeadMin, xDeadMax, yDeadMin, yDeadMax, xCenter, yCenter,
+        xHalfTotal, xOffset, yHalfTotal, yOffset;
 };
 
 #endif

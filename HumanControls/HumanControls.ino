@@ -11,9 +11,6 @@
 #include "JoyStickController.h"
 
 //Pins
-#define ENCODER_PIN_CLK 3 //CLK gets degrees for rotary knob
-#define ENCODER_PIN_DT 4  //DT gets direction for rotary knob
-#define ENCODER_PIN_SW 5  //Gets the button for rotary knob
 //LCD connects SDA in analog pin 4 and SCL in analog pin 5
 #define ENCODER_PIN_CLK 3  //CLK gets degrees for rotary knob
 #define ENCODER_PIN_DT 4   //DT gets direction for rotary knob
@@ -47,20 +44,6 @@
 #define Y_MIN 0
 #define Y_MAX 1023
 
-//Lengths of printers inside each DisplayPage
-#define DASH_PRINTER_LEN 1
-#define ELEVATOR_PRINTER_LEN 4
-#define SHOT_PRINTER_LEN 4
-#define VALVE_PRINTER_LEN 4
-
-//Min - Max FOR sensors
-#define ANGLE_MIN 0      //Minimum elevator angle
-#define ANGLE_MAX 10     //Maximum elevator angle
-#define PRESSURE_MIN 60  //Minimum shot pressure
-#define PRESSURE_MAX 100 //Maximum shot pressure
-#define DURATION_MIN 0   //Minimum valve duration
-#define DURATION_MAX 10  //Maximum valve duration
-
 FTDebouncer pinDebouncer(30);
 
 //Menu Setup
@@ -69,7 +52,8 @@ MenuController menuController(ENCODER_PIN_CLK, ENCODER_PIN_DT, DISPLAY_ADDRESS, 
                               DURATION_INCREMENT, DURATION_MIN, DURATION_MAX);
 
 //Joystick setup
-JoystickController joystick(JOYSTICK_PIN_VRX, JOYSTICK_PIN_VRY, X_DEAD_ZONE_SIZE, Y_DEAD_ZONE_SIZE, X_MIN, X_MAX, Y_MIN, Y_MAX);
+JoystickController joystick(JOYSTICK_PIN_VRX, JOYSTICK_PIN_VRY, X_DEAD_ZONE_SIZE, Y_DEAD_ZONE_SIZE, X_MIN,
+                            X_MAX, Y_MIN, Y_MAX);
 
 void setup()
 {
