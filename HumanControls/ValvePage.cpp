@@ -4,7 +4,7 @@ ValvePage::ValvePage(int increment, int min, int max) : Page(increment, min, max
 {
 }
 
-void ValvePage::paint(DisplayController &display, bool isActivated)
+void ValvePage::paint(DisplayController &display, bool isActivated, String status)
 {
     Serial.println("isActivated: " + isActivated);
     Serial.println("canActivate " + canActivate());

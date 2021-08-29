@@ -7,11 +7,16 @@
 #include "DisplayController.h"
 #include "Page.h"
 #include "CharacterDisplay.h"
+#include "EnableController.h"
+#include "FireController.h"
 
 //Pins
 #define ENCODER_PIN_CLK 3 //CLK gets degrees for rotary knob
 #define ENCODER_PIN_DT 4  //DT gets direction for rotary knob
 #define ENCODER_PIN_SW 5  //Gets the button for rotary knob
+#define ENABLE_PIN 7      //Digital Pin for the enable button
+#define FIRE_TOGGLE_PIN 8 //Digital Pin for the safety button
+#define FIRE_PIN 9        //Digital Pin for the fire button
 
 //Other constraints
 #define DISPLAY_ADDRESS 0X27 //I2c address of the lcd display
@@ -30,23 +35,38 @@
 #define DURATION_MIN 100      //Minimum valve duration
 #define DURATION_MAX 300      //Maximum valve duration
 
+//Make array of states, diabled, enabled, primed
+//Menu button sets primed state
+//Make isConnected boolean
+
 FTDebouncer pinDebouncer(30);
 
 MenuController menuController(ENCODER_PIN_CLK, ENCODER_PIN_DT, DISPLAY_ADDRESS, DISPLAY_LENGTH, DISPLAY_WIDTH,
                               ANGLE_INCREMENT, ANGLE_MIN, ANGLE_MAX, PRESSURE_INCREMENT, PRESSURE_MIN, PRESSURE_MAX,
                               DURATION_INCREMENT, DURATION_MIN, DURATION_MAX);
 
+EnableController enableController;
+FireController fireController;
+
+String status = "disabled";
+String lastStatus = "";
+
 void setup()
 {
     Serial.begin(USB_BAUDRATE);
     pinDebouncer.addPin(ENCODER_PIN_SW, HIGH, INPUT_PULLUP);
+    pinDebouncer.addPin(ENABLE_PIN, HIGH, INPUT_PULLUP);
+    pinDebouncer.addPin(FIRE_TOGGLE_PIN, HIGH, INPUT_PULLUP);
+    pinDebouncer.addPin(FIRE_PIN, HIGH, INPUT_PULLUP);
     pinDebouncer.begin();
-    menuController.init();
+    menuController.init(status);
 }
 
 void loop()
 {
-    menuController.menuUpdate();
+    setStatus();
+
+    menuController.menuUpdate(status);
     pinDebouncer.update();
 }
 
@@ -56,8 +76,64 @@ void onPinActivated(int pinNr)
     switch (pinNr)
     {
     case ENCODER_PIN_SW:
-        menuController.menuPress();
+        menuController.menuPress(status);
+        break;
+    case ENABLE_PIN:
+        enableController.setIsEnabled(true);
+        break;
+    case FIRE_PIN:
+        //Eventually will use to tell Robot to fire through JSON
+        if (status == "primed")
+        {
+            fireController.initiateFiring(true);
+        }
+        break;
+    case FIRE_TOGGLE_PIN:
+        if (status == "enabled")
+        {
+            fireController.setIsFireToggled(true);
+        }
+        else
+        {
+            fireController.setIsFireToggled(false);
+        }
         break;
     }
 }
-void onPinDeactivated(int pinNr) {}
+
+void onPinDeactivated(int pinNr)
+{
+    switch (pinNr)
+    {
+    case ENABLE_PIN:
+        enableController.setIsEnabled(false);
+        fireController.setIsFireToggled(false);
+        break;
+    }
+}
+
+void setStatus()
+{
+    if (enableController.getIsEnabled())
+    {
+        if (fireController.getIsFireToggled())
+        {
+            status = "primed";
+        }
+        else
+        {
+            status = "enabled";
+        }
+    }
+    else
+    {
+        status = "disabled";
+    }
+
+    if (status != lastStatus)
+    {
+        Serial.println(status);
+        lastStatus = status;
+        menuController.menuRefresh(status);
+    }
+}

@@ -27,9 +27,10 @@ public:
                    unsigned int durationIncrement,
                    unsigned int durationMin,
                    unsigned int durationMax);
-    void init();
-    void menuUpdate();
-    void menuPress();
+    void init(String status);
+    void menuUpdate(String status);
+    void menuRefresh(String status);
+    void menuPress(String status);
 
 private:
     RotaryKnobController rotaryKnob;

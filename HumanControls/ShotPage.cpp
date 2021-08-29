@@ -1,9 +1,10 @@
 #include "ShotPage.h"
+
 ShotPage::ShotPage(int increment, int min, int max) : Page(increment, min, max, true)
 {
 }
 
-void ShotPage::paint(DisplayController &display, bool isActivated)
+void ShotPage::paint(DisplayController &display, bool isActivated, String status)
 {
     display.clear();
     if (canActivate() && isActivated)

@@ -38,14 +38,19 @@ MenuController::MenuController(unsigned int encoderPinClk,
     currentPage = &dashPage;
 }
 
-void MenuController::init()
+void MenuController::init(String status)
 {
     Serial.println("Menu Init");
     this->display.init();
-    this->currentPage->paint(display, this->isActive);
+    this->currentPage->paint(display, this->isActive, status);
 }
 
-void MenuController::menuUpdate()
+void MenuController::menuRefresh(String status)
+{
+    this->currentPage->paint(display, isActive, status);
+}
+
+void MenuController::menuUpdate(String status)
 {
     this->rotation = this->rotaryKnob.getValue();
 
@@ -54,13 +59,13 @@ void MenuController::menuUpdate()
         if (this->rotation == 1)
         {
             this->currentPage->clockwise();
-            this->currentPage->paint(display, isActive);
+            this->currentPage->paint(display, isActive, status);
         }
 
         if (this->rotation == -1)
         {
             this->currentPage->counterClockwise();
-            this->currentPage->paint(display, isActive);
+            this->currentPage->paint(display, isActive, status);
         }
     }
     else
@@ -78,14 +83,14 @@ void MenuController::menuUpdate()
         if (this->rotation != 0)
         {
             this->currentPage->cleanUp(display);
-            this->currentPage->paint(display, isActive);
+            this->currentPage->paint(display, isActive, status);
         }
         this->isActive = false;
     }
 }
 
-void MenuController::menuPress()
+void MenuController::menuPress(String status)
 {
     this->isActive = !this->isActive;
-    this->currentPage->paint(display, isActive);
+    this->currentPage->paint(display, isActive, status);
 }
