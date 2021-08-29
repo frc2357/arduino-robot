@@ -48,12 +48,15 @@ MenuController menuController(ENCODER_PIN_CLK, ENCODER_PIN_DT, DISPLAY_ADDRESS, 
 EnableController enableController;
 FireController fireController;
 
-String status = "disabled";
+bool isConnected = false;
+String statuses[3] = {"disabled", "enabled", "primed"};
+String status = statuses[0];
 String lastStatus = "";
 
 void setup()
 {
     Serial.begin(USB_BAUDRATE);
+    connect();
     pinDebouncer.addPin(ENCODER_PIN_SW, HIGH, INPUT_PULLUP);
     pinDebouncer.addPin(ENABLE_PIN, HIGH, INPUT_PULLUP);
     pinDebouncer.addPin(FIRE_TOGGLE_PIN, HIGH, INPUT_PULLUP);
@@ -83,13 +86,13 @@ void onPinActivated(int pinNr)
         break;
     case FIRE_PIN:
         //Eventually will use to tell Robot to fire through JSON
-        if (status == "primed")
+        if (status == statuses[2])
         {
             fireController.initiateFiring(true);
         }
         break;
     case FIRE_TOGGLE_PIN:
-        if (status == "enabled")
+        if (status == statuses[1])
         {
             fireController.setIsFireToggled(true);
         }
@@ -114,20 +117,27 @@ void onPinDeactivated(int pinNr)
 
 void setStatus()
 {
-    if (enableController.getIsEnabled())
+    if (isConnected)
     {
-        if (fireController.getIsFireToggled())
+        if (enableController.getIsEnabled())
         {
-            status = "primed";
+            if (fireController.getIsFireToggled())
+            {
+                status = statuses[2];
+            }
+            else
+            {
+                status = statuses[1];
+            }
         }
         else
         {
-            status = "enabled";
+            status = statuses[0];
         }
     }
     else
     {
-        status = "disabled";
+        status = "disconeccted";
     }
 
     if (status != lastStatus)
@@ -136,4 +146,10 @@ void setStatus()
         lastStatus = status;
         menuController.menuRefresh(status);
     }
+}
+
+void connect()
+{
+    //Connect to the robot
+    isConnected = true;
 }
