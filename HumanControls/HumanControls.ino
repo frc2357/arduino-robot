@@ -15,7 +15,6 @@
 #define ENCODER_PIN_DT 4  //DT gets direction for rotary knob
 #define ENCODER_PIN_SW 5  //Gets the button for rotary knob
 #define ENABLE_PIN 7      //Digital Pin for the enable button
-#define FIRE_TOGGLE_PIN 8 //Digital Pin for the safety button
 #define FIRE_PIN 9        //Digital Pin for the fire button
 
 //Other constraints
@@ -59,7 +58,6 @@ void setup()
     connect();
     pinDebouncer.addPin(ENCODER_PIN_SW, HIGH, INPUT_PULLUP);
     pinDebouncer.addPin(ENABLE_PIN, HIGH, INPUT_PULLUP);
-    pinDebouncer.addPin(FIRE_TOGGLE_PIN, HIGH, INPUT_PULLUP);
     pinDebouncer.addPin(FIRE_PIN, HIGH, INPUT_PULLUP);
     pinDebouncer.begin();
     menuController.init(status);
@@ -79,7 +77,7 @@ void onPinActivated(int pinNr)
     switch (pinNr)
     {
     case ENCODER_PIN_SW:
-        menuController.menuPress(status);
+        menuController.menuPress(status, statuses, fireController);
         break;
     case ENABLE_PIN:
         enableController.setIsEnabled(true);
@@ -89,16 +87,6 @@ void onPinActivated(int pinNr)
         if (status == statuses[2])
         {
             fireController.initiateFiring(true);
-        }
-        break;
-    case FIRE_TOGGLE_PIN:
-        if (status == statuses[1])
-        {
-            fireController.setIsFireToggled(true);
-        }
-        else
-        {
-            fireController.setIsFireToggled(false);
         }
         break;
     }

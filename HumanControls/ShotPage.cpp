@@ -1,6 +1,6 @@
 #include "ShotPage.h"
 
-ShotPage::ShotPage(int increment, int min, int max) : Page(increment, min, max, true)
+ShotPage::ShotPage(int increment, int min, int max) : Page(increment, min, max, true, Page::PageName::SHOT_PAGE)
 {
 }
 

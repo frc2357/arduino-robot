@@ -1,21 +1,23 @@
 #include "Page.h"
 
-Page::Page()
+Page::Page(Page::PageName name)
 {
     this->isActive = false;
     this->modifyValue = 0;
     increment = 0;
     this->min = 0;
     this->max = 0;
+    this->name = name;
 }
 
-Page::Page(int increment, int min, int max, bool isActive)
+Page::Page(int increment, int min, int max, bool isActive, Page::PageName name)
 {
     this->isActive = isActive;
     this->modifyValue = min;
     this->min = min;
     this->max = max;
     this->increment = increment;
+    this->name = name;
 }
 
 void Page::cleanUp(DisplayController &display)
@@ -54,6 +56,10 @@ void Page::setNextPage(Page &page)
 void Page::setPreviousPage(Page &page)
 {
     previousPage = &page;
+}
+Page::PageName Page::getName()
+{
+    return name;
 }
 Page *Page::getNextPage()
 {

@@ -8,8 +8,16 @@
 class Page : DisplayInterface
 {
 public:
-    Page();
-    Page(int increment, int min, int max, bool isActive);
+    enum class PageName
+    {
+        DASH_PAGE = 0,
+        ELEVATOR_PAGE = 1,
+        SHOT_PAGE = 2,
+        VALVE_PAGE = 3
+    };
+
+    Page(Page::PageName name);
+    Page(int increment, int min, int max, bool isActive, Page::PageName name);
     void cleanUp(DisplayController &display);
     virtual void paint(DisplayController &display, bool isActivated, String Status) = 0;
     void clockwise();
@@ -18,12 +26,14 @@ public:
     int getModifyValue();
     void setNextPage(Page &page);
     void setPreviousPage(Page &page);
+    Page::PageName getName();
     Page *getNextPage();
     Page *getPreviousPage();
 
 private:
     bool isActive;
     int modifyValue, min, max, increment;
+    PageName name;
     Page *previousPage;
     Page *nextPage;
 };

@@ -89,8 +89,19 @@ void MenuController::menuUpdate(String status)
     }
 }
 
-void MenuController::menuPress(String status)
+void MenuController::menuPress(String status, String statuses[], FireController &fireController)
 {
     this->isActive = !this->isActive;
     this->currentPage->paint(display, isActive, status);
+    if (this->currentPage->getName() == dashPage.getName())
+    {
+        if (status == statuses[1])
+        {
+            fireController.setIsFireToggled(true);
+        }
+        else
+        {
+            fireController.setIsFireToggled(false);
+        }
+    }
 }

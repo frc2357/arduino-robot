@@ -1,6 +1,6 @@
 #include "DashPage.h"
 
-DashPage::DashPage() : Page()
+DashPage::DashPage() : Page(Page::PageName::DASH_PAGE)
 {
 }
 

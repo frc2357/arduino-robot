@@ -9,6 +9,7 @@
 #include "ValvePage.h"
 #include "RotaryKnobController.h"
 #include "DisplayController.h"
+#include "FireController.h"
 
 class MenuController
 {
@@ -30,7 +31,7 @@ public:
     void init(String status);
     void menuUpdate(String status);
     void menuRefresh(String status);
-    void menuPress(String status);
+    void menuPress(String status, String statuses[], FireController &FireController);
 
 private:
     RotaryKnobController rotaryKnob;
