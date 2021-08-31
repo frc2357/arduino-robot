@@ -18,11 +18,6 @@ bool FireController::initiateFiring(bool isReady)
     }
 }
 
-void FireController::toggleIsFireToggled()
-{
-    this->isFireToggled = !this->isFireToggled;
-}
-
 void FireController::setIsFireToggled(bool value)
 {
     this->isFireToggled = value;

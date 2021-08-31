@@ -34,10 +34,6 @@
 #define DURATION_MIN 100      //Minimum valve duration
 #define DURATION_MAX 300      //Maximum valve duration
 
-//Make array of states, diabled, enabled, primed
-//Menu button sets primed state
-//Make isConnected boolean
-
 FTDebouncer pinDebouncer(30);
 
 MenuController menuController(ENCODER_PIN_CLK, ENCODER_PIN_DT, DISPLAY_ADDRESS, DISPLAY_LENGTH, DISPLAY_WIDTH,
@@ -65,6 +61,11 @@ void setup()
 
 void loop()
 {
+    if (isConnected == false)
+    {
+        connect();
+    }
+
     setStatus();
 
     menuController.menuUpdate(status);
@@ -84,9 +85,10 @@ void onPinActivated(int pinNr)
         break;
     case FIRE_PIN:
         //Eventually will use to tell Robot to fire through JSON
-        if (status == statuses[2])
+        if (status == statuses[2] && isConnected)
         {
             fireController.initiateFiring(true);
+            fireController.setIsFireToggled(false);
         }
         break;
     }
@@ -105,8 +107,14 @@ void onPinDeactivated(int pinNr)
 
 void setStatus()
 {
+
     if (isConnected)
     {
+        //Check the robot's status and see if it is different then the controllers.
+        //If it is, set the status to the lowest given status. Ex. Robot returns disabled, but controller enabled, so
+        //set both statuses to disabled. Robot status and controller status should always be the same.
+        //Only exception may be due to firing setting status to enabled after firing.
+
         if (enableController.getIsEnabled())
         {
             if (fireController.getIsFireToggled())
@@ -134,6 +142,8 @@ void setStatus()
         lastStatus = status;
         menuController.menuRefresh(status);
     }
+
+    //Enventually will set the robot's status here
 }
 
 void connect()

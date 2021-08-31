@@ -9,7 +9,6 @@ public:
     FireController();
     bool initiateFiring(bool isReady);
     void setIsFireToggled(bool value);
-    void toggleIsFireToggled();
     bool getIsFireToggled();
 
 private:
