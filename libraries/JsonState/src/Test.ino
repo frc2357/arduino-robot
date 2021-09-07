@@ -5,41 +5,44 @@
 
 #define USB_BAUDRATE     115200
 
-JsonEl sensor1Fields[] = { JsonEl("name", "sensor1"), JsonEl("value", 0.25) };
-JsonEl sensor2Fields[] = { JsonEl("name", "sensor2"), JsonEl("value", 5.8) };
-
-JsonEl valuesArray[] = { 0.1, 0.25, 0.5 };
-
-JsonEl stateFields[] = {
-  JsonEl("name", "controller name"),
-  JsonEl("version", "1.0.0"),
-  JsonEl("tick", 0),
-  JsonEl("sensor1", sensor1Fields, sizeof(sensor1Fields) / sizeof(sensor1Fields[0])),
-  JsonEl("sensor2", sensor2Fields, sizeof(sensor2Fields) / sizeof(sensor2Fields[0])),
-  JsonEl("values", valuesArray, sizeof(valuesArray) / sizeof(valuesArray[0])),
+JsonElement sensorValues[] = {
+  Json::Float(25.52),
+  Json::Float(24.78),
+  Json::Float(26.21),
 };
-JsonEl state(stateFields, sizeof(stateFields) / sizeof(stateFields[0]));
 
+JsonElement deviceFields[] = {
+  Json::String("name", "device name"),
+  Json::String("version", "1.0.0"),
+  Json::Boolean("flag", false),
+  Json::Int("tick", 0),
+  Json::Array("sensorValues", sensorValues),
+};
+JsonElement device = Json::Object(deviceFields);
 
-JsonEl array[] = { JsonEl(0.25), JsonEl("test") };
-JsonEl el(array, sizeof(array) / sizeof(array[0]));
-
-JsonEl values("values", valuesArray, sizeof(valuesArray) / sizeof(valuesArray[0]));
+JsonState state(device);
 
 void setup() {
   Serial.begin(USB_BAUDRATE);
 }
 
 void loop() {
-  state.PrintJson(Serial);
+  state.printJson(Serial);
   Serial.println();
-  delay(5000);
 
   if (Serial.available() > 0) {
-    int valuesUpdated = state.UpdateFromJson(Serial.readString());
-    Serial.println(String(valuesUpdated) + " values updated");
+    Serial.println("--- reading input...");
+    String line = Serial.readString();
+    Serial.println("--- updating...");
+    state.updateFromJson(line.c_str());
+    Serial.println("--- updated");
+
+    state.printJson(Serial);
+    Serial.println();
   }
 
-  //Serial.println(state["tick"].AsInt());
-  //state["tick"] = state["tick"].AsInt() + 1;
+  device["tick"] = device["tick"].asInt() + 1;
+  sensorValues[1] = sensorValues[1].asDouble() * 1.001;
+  sensorValues[2] = sensorValues[2].asDouble() * 0.999;
+  delay(1000);
 }
