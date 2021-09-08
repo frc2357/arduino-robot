@@ -37,7 +37,7 @@ size_t JsonState::updateFromJson(const char* json, size_t length, size_t &elemen
   json += whitespaceLength;
   length -= whitespaceLength;
 
-  return m_root.updateFromJson(json, strlen(json), elementsUpdated);
+  return m_root.updateFromJson(json, length, elementsUpdated);
 }
 
 // -----------
@@ -61,7 +61,7 @@ void JsonElement::logError(const char *format, ...) {
 }
 
 JsonElement::JsonElement() {
-  m_key = "\0";
+  m_key = "";
   m_type = NoType;
   m_value.arrayValue = NULL;
   m_length = -1;
@@ -82,7 +82,8 @@ JsonElement::JsonElement(const JsonElement& element) {
 }
 
 JsonElement::~JsonElement() {
-  //logError("Json Elements should only be declared in the root .ino sketch file!");
+  // Note: String, Arrays and Objects do allocate via `new`, but they
+  // should never be destructed because they should be in the root .ino scope
 }
 
 JsonElement& JsonElement::operator[](const size_t index) const {
@@ -93,6 +94,7 @@ JsonElement& JsonElement::operator[](const size_t index) const {
 
   if (index > m_length) {
     logError("Array index '%d' out of bounds.", index);
+    return NotFound;
   }
   return m_value.arrayValue[index];
 }
@@ -336,20 +338,21 @@ size_t JsonElement::updateFromJson(const char* json, size_t length, size_t &elem
 size_t JsonElement::updateFromJsonBoolean(const char *json, size_t length, size_t &elementsUpdated) {
   if (strncasecmp(json, "true", 4) == 0) {
     m_value.booleanValue = true;
+    elementsUpdated++;
     return 4;
   }
   if (strncasecmp(json, "false", 5) == 0) {
     m_value.booleanValue = false;
+    elementsUpdated++;
     return 5;
   }
 
   logError("Expected 'true' or 'false': %s", json);
-  elementsUpdated++;
   return -1;
 }
 
 size_t JsonElement::updateFromJsonInt(const char *json, size_t length, size_t &elementsUpdated) {
-  size_t intLength = JsonUtils::getIntStringLength(json, length);
+  size_t intLength = JsonUtils::getNumberStringLength(json, length, false);
 
   if (intLength == -1) {
     return -1;
@@ -361,10 +364,9 @@ size_t JsonElement::updateFromJsonInt(const char *json, size_t length, size_t &e
 }
 
 size_t JsonElement::updateFromJsonFloat(const char *json, size_t length, size_t &elementsUpdated) {
-  size_t floatLength = JsonUtils::getFloatStringLength(json, length);
+  size_t floatLength = JsonUtils::getNumberStringLength(json, length, true);
 
   if (floatLength == -1) {
-    logError("Expected float: %s", json);
     return -1;
   }
 
@@ -377,7 +379,6 @@ size_t JsonElement::updateFromJsonString(const char *json, size_t length, size_t
   size_t stringLength = JsonUtils::getQuoteStringLength(json, length);
 
   if (stringLength == -1) {
-    logError("Expected quoted string: %s", json);
     return -1;
   }
 
@@ -395,11 +396,6 @@ size_t JsonElement::updateFromJsonArray(const char *json, size_t length, size_t 
   const char *arrayJson = json + 1;
   size_t remainingLength = length - 1;
   size_t arrayIndex = 0;
-
-  // Advance past whitespace before first value
-  size_t whitespaceLength = JsonUtils::countWhitespace(arrayJson, remainingLength);
-  arrayJson += whitespaceLength;
-  remainingLength -= whitespaceLength;
 
   while (remainingLength > 0 && arrayJson[0] != '\0') {
     // Advance past whitespace before element
@@ -423,7 +419,10 @@ size_t JsonElement::updateFromJsonArray(const char *json, size_t length, size_t 
 
     if (arrayJson[0] == ']') {
       // We've reached the end of this array.
-      this->m_length = arrayIndex + 1;
+      if (this->m_length != arrayIndex + 1) {
+        logError("Expected array of size %d instead of %d", this->m_length, arrayIndex + 1);
+        return -1;
+      }
       return (length - remainingLength) + 1;
     }
     if (arrayJson[0] == ',') {
@@ -436,13 +435,11 @@ size_t JsonElement::updateFromJsonArray(const char *json, size_t length, size_t 
 
     // We didn't find the end of the object or a comma, so this is not a well-formed object.
     logError("Expected either ',' or ']': ", arrayJson);
-    this->m_length = arrayIndex + 1;
     return -1;
   }
 
   // If we didn't return from the ']' inside the loop, it's an error.
   logError("Expected array end ']': ", arrayJson);
-  this->m_length = arrayIndex + 1;
   return -1;
 }
 
@@ -455,11 +452,6 @@ size_t JsonElement::updateFromJsonObject(const char *json, size_t length, size_t
   // Advance past open { brace
   const char *objectJson = json + 1;
   size_t remainingLength = length - 1;
-
-  // Advance past whitespace before first value
-  size_t whitespaceLength = JsonUtils::countWhitespace(objectJson, remainingLength);
-  objectJson += whitespaceLength;
-  remainingLength -= whitespaceLength;
 
   while (remainingLength > 0 && objectJson[0] != '\0') {
     // Advance past whitespace before key
@@ -474,7 +466,7 @@ size_t JsonElement::updateFromJsonObject(const char *json, size_t length, size_t
     }
 
     JsonElement &element = JsonUtils::findElementByJsonKey(*this, objectJson, keyLength);
-    if (&element == &JsonElement::NoKey) {
+    if (&element == &JsonElement::NotFound) {
       logError("Failed to find element by key: %s", objectJson);
       return -1;
     }
@@ -635,54 +627,7 @@ size_t JsonUtils::countWhitespace(const char* str, size_t length) {
   return i;
 }
 
-size_t JsonUtils::copyJsonString(char *dest, const char *src, size_t length) {
-  char quoteChar = 0;
-  size_t srcIndex = 0; 
-  size_t destIndex = 0;
-
-  if (src[0] == '"' || src[0] == '\'') {
-    quoteChar = src[0];
-    srcIndex++;
-  }
-
-  for (; srcIndex < length && src[srcIndex] != '\0'; srcIndex++) {
-    dest[destIndex] = src[srcIndex];
-    destIndex++;
-  }
-  dest[destIndex] = '\0';
-  return destIndex;
-}
-
-size_t JsonUtils::getIntStringLength(const char* str, size_t length) {
-  int i = 0;
-  bool hasDigit = false;
-
-  if (str[0] == '-') {
-    // It's a negative number, advance.
-    i = 1;
-  }
-
-  for (; i < length && str[i] != '\0'; i++) {
-    int ch = str[i];
-    if (isDigit(ch)) {
-      hasDigit = true;
-      continue;
-    }
-    if (isWhitespace(ch) || ch == ',' || ch == ']' || ch == '}') {
-      if (hasDigit) {
-        // We reached the end of the number
-        return i;
-      }
-    }
-    // None of the above are true, so this is not a JSON-compatible number.
-    JsonElement::logError("Expected integer: %s", str);
-    return -1;
-  }
-  // We reached the end of the string
-  return i;
-}
-
-size_t JsonUtils::getFloatStringLength(const char* str, size_t length) {
+size_t JsonUtils::getNumberStringLength(const char* str, size_t length, bool isFloat) {
   int i = 0;
   bool hasDigit = false;
   bool isDecimal = false;
@@ -699,11 +644,11 @@ size_t JsonUtils::getFloatStringLength(const char* str, size_t length) {
       hasDigit = true;
       continue;
     }
-    if (ch == '.' && !isDecimal) {
+    if (isFloat && ch == '.' && !isDecimal) {
       isDecimal = true;
       continue;
     }
-    if (ch == 'e' && !isExponential && isDecimal) {
+    if (isFloat && ch == 'e' && !isExponential && isDecimal) {
       isExponential = true;
       continue;
     }
@@ -714,7 +659,7 @@ size_t JsonUtils::getFloatStringLength(const char* str, size_t length) {
       }
     }
     // None of the above are true, so this is not a JSON-compatible number.
-    JsonElement::logError("Expected floating point number: %s", str);
+    JsonElement::logError("Expected number: %s", str);
     return -1;
   }
   // We reached the end of the string
@@ -760,6 +705,7 @@ JsonElement &JsonUtils::findElementByJsonKey(JsonElement &jsonObject, const char
   if (str[0] == '"' || str[0] == '\'') {
     keyEndChar = str[0];
     str++;
+    length--;
   }
 
   while (str[keyLength] != keyEndChar) {

@@ -31,8 +31,6 @@ class JsonElement {
     double asDouble() const;
     const char *asString() const;
 
-    JsonElement &findByKey(const char *key, size_t length) const;
-
     void printJson(int indent, Print &out) const;
 
   protected:
@@ -65,6 +63,8 @@ class JsonElement {
     void printJsonString(int indent, Print &out) const;
     void printJsonArray(int indent, Print &out) const;
     void printJsonObject(int indent, Print &out) const;
+
+    JsonElement &findByKey(const char *key, size_t length) const;
 
     size_t updateFromJson(const char *json, size_t length, size_t &elementsUpdated);
     size_t updateFromJsonBoolean(const char *json, size_t length, size_t &elementsUpdated);
@@ -125,9 +125,7 @@ class JsonUtils {
     static void indentNewline(int times, Print &out);
     static bool isWhitespace(char ch);
     static size_t countWhitespace(const char* str, size_t length);
-    static size_t copyJsonString(char *dest, const char *src, size_t length);
-    static size_t getIntStringLength(const char* str, size_t length);
-    static size_t getFloatStringLength(const char* str, size_t length);
+    static size_t getNumberStringLength(const char* str, size_t length, bool isFloat);
     static size_t getQuoteStringLength(const char* str, size_t length);
     static size_t getObjectKeyStringLength(const char* str, size_t length);
     static JsonElement &findElementByJsonKey(JsonElement &jsonObject, const char* str, size_t length);
