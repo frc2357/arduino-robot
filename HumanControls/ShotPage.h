@@ -8,7 +8,7 @@ class ShotPage : public Page
 {
 public:
     ShotPage(int increment, int min, int max);
-    void paint(DisplayController &display, bool isActivated, String status);
+    void paint(DisplayController &display, bool isActivated, const char *status);
 };
 
 #endif

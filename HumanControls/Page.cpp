@@ -1,6 +1,6 @@
 #include "Page.h"
 
-Page::Page(Page::PageName name)
+Page::Page(Page::PageType name)
 {
     this->isActive = false;
     this->modifyValue = 0;
@@ -10,7 +10,7 @@ Page::Page(Page::PageName name)
     this->name = name;
 }
 
-Page::Page(int increment, int min, int max, bool isActive, Page::PageName name)
+Page::Page(int increment, int min, int max, bool isActive, Page::PageType name)
 {
     this->isActive = isActive;
     this->modifyValue = min;
@@ -57,7 +57,7 @@ void Page::setPreviousPage(Page &page)
 {
     previousPage = &page;
 }
-Page::PageName Page::getName()
+Page::PageType Page::getName()
 {
     return name;
 }

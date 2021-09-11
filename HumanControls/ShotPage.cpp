@@ -1,10 +1,10 @@
 #include "ShotPage.h"
 
-ShotPage::ShotPage(int increment, int min, int max) : Page(increment, min, max, true, Page::PageName::SHOT_PAGE)
+ShotPage::ShotPage(int increment, int min, int max) : Page(increment, min, max, true, Page::PageType::SHOT_PAGE)
 {
 }
 
-void ShotPage::paint(DisplayController &display, bool isActivated, String status)
+void ShotPage::paint(DisplayController &display, bool isActivated, const char *status)
 {
     display.clear();
     if (canActivate() && isActivated)

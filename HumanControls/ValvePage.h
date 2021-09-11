@@ -8,7 +8,7 @@ class ValvePage : public Page
 {
 public:
     ValvePage(int increment, int min, int max);
-    void paint(DisplayController &display, bool isActivated, String status);
+    void paint(DisplayController &display, bool isActivated, const char *status);
 };
 
 #endif

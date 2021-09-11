@@ -1,6 +1,4 @@
-#include "LiquidCrystal.h"
 #include <LiquidCrystal_I2C.h>
-#include "FTDebouncer.h"
 #include "RotaryKnobController.h"
 #include "CharacterDisplay.h"
 #include "MenuController.h"
@@ -9,6 +7,7 @@
 #include "CharacterDisplay.h"
 #include "EnableController.h"
 #include "FireController.h"
+#include "HumanControls.h"
 
 //Pins
 #define ENCODER_PIN_CLK 3 //CLK gets degrees for rotary knob
@@ -21,6 +20,7 @@
 #define DISPLAY_ADDRESS 0X27 //I2c address of the lcd display
 #define DISPLAY_LENGTH 16    //Length of the lcd display
 #define DISPLAY_WIDTH 2      //width of the lcd display
+#define NUM_BUTTONS 3        //Number of buttons to give the debouncer
 #define USB_BAUDRATE 115200
 
 //Min - Max
@@ -34,120 +34,28 @@
 #define DURATION_MIN 100      //Minimum valve duration
 #define DURATION_MAX 300      //Maximum valve duration
 
-FTDebouncer pinDebouncer(30);
-
-MenuController menuController(ENCODER_PIN_CLK, ENCODER_PIN_DT, DISPLAY_ADDRESS, DISPLAY_LENGTH, DISPLAY_WIDTH,
-                              ANGLE_INCREMENT, ANGLE_MIN, ANGLE_MAX, PRESSURE_INCREMENT, PRESSURE_MIN, PRESSURE_MAX,
-                              DURATION_INCREMENT, DURATION_MIN, DURATION_MAX);
-
-EnableController enableController;
-FireController fireController;
-
-bool isConnected = false;
-String statuses[3] = {"disabled", "enabled", "primed"};
-String status = statuses[0];
-String lastStatus = "";
+HumanControls humanControls(ENCODER_PIN_CLK, ENCODER_PIN_DT, DISPLAY_ADDRESS, DISPLAY_LENGTH, DISPLAY_WIDTH,
+                            ANGLE_INCREMENT, ANGLE_MIN, ANGLE_MAX, PRESSURE_INCREMENT, PRESSURE_MIN, PRESSURE_MAX,
+                            DURATION_INCREMENT, DURATION_MIN, DURATION_MAX, NUM_BUTTONS, ENCODER_PIN_SW,
+                            ENABLE_PIN, FIRE_PIN);
 
 void setup()
 {
     Serial.begin(USB_BAUDRATE);
-    connect();
-    pinDebouncer.addPin(ENCODER_PIN_SW, HIGH, INPUT_PULLUP);
-    pinDebouncer.addPin(ENABLE_PIN, HIGH, INPUT_PULLUP);
-    pinDebouncer.addPin(FIRE_PIN, HIGH, INPUT_PULLUP);
-    pinDebouncer.begin();
-    menuController.init(status);
+    humanControls.init();
 }
 
 void loop()
 {
-    if (isConnected == false)
-    {
-        connect();
-    }
 
-    setStatus();
-
-    menuController.menuUpdate(status);
-    pinDebouncer.update();
+    humanControls.update();
 }
 
-//Methods for debouncer
 void onPinActivated(int pinNr)
 {
-    switch (pinNr)
-    {
-    case ENCODER_PIN_SW:
-        menuController.menuPress(status, statuses, fireController);
-        break;
-    case ENABLE_PIN:
-        enableController.setIsEnabled(true);
-        break;
-    case FIRE_PIN:
-        //Eventually will use to tell Robot to fire through JSON
-        if (status == statuses[2] && isConnected)
-        {
-            fireController.initiateFiring(true);
-            fireController.setIsFireToggled(false);
-        }
-        break;
-    }
+    humanControls.onPinActivated(pinNr);
 }
-
 void onPinDeactivated(int pinNr)
 {
-    switch (pinNr)
-    {
-    case ENABLE_PIN:
-        enableController.setIsEnabled(false);
-        fireController.setIsFireToggled(false);
-        break;
-    }
-}
-
-void setStatus()
-{
-
-    if (isConnected)
-    {
-        //Check the robot's status and see if it is different then the controllers.
-        //If it is, set the status to the lowest given status. Ex. Robot returns disabled, but controller enabled, so
-        //set both statuses to disabled. Robot status and controller status should always be the same.
-        //Only exception may be due to firing setting status to enabled after firing.
-
-        if (enableController.getIsEnabled())
-        {
-            if (fireController.getIsFireToggled())
-            {
-                status = statuses[2];
-            }
-            else
-            {
-                status = statuses[1];
-            }
-        }
-        else
-        {
-            status = statuses[0];
-        }
-    }
-    else
-    {
-        status = "disconeccted";
-    }
-
-    if (status != lastStatus)
-    {
-        Serial.println(status);
-        lastStatus = status;
-        menuController.menuRefresh(status);
-    }
-
-    //Enventually will set the robot's status here
-}
-
-void connect()
-{
-    //Connect to the robot
-    isConnected = true;
+    humanControls.onPinDeactivated(pinNr);
 }

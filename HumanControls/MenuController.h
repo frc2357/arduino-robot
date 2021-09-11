@@ -28,10 +28,10 @@ public:
                    unsigned int durationIncrement,
                    unsigned int durationMin,
                    unsigned int durationMax);
-    void init(String status);
-    void menuUpdate(String status);
-    void menuRefresh(String status);
-    void menuPress(String status, String statuses[], FireController &FireController);
+    void init(const char *status);
+    void menuUpdate(const char *status);
+    void menuRefresh(const char *status);
+    void menuPress(const char *status, bool isEnabled, FireController &FireController);
 
 private:
     RotaryKnobController rotaryKnob;

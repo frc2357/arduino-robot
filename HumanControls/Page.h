@@ -8,7 +8,7 @@
 class Page : DisplayInterface
 {
 public:
-    enum class PageName
+    enum class PageType
     {
         DASH_PAGE = 0,
         ELEVATOR_PAGE = 1,
@@ -16,24 +16,24 @@ public:
         VALVE_PAGE = 3
     };
 
-    Page(Page::PageName name);
-    Page(int increment, int min, int max, bool isActive, Page::PageName name);
+    Page(Page::PageType name);
+    Page(int increment, int min, int max, bool isActive, Page::PageType name);
     void cleanUp(DisplayController &display);
-    virtual void paint(DisplayController &display, bool isActivated, String Status) = 0;
+    virtual void paint(DisplayController &display, bool isActivated, const char *status) = 0;
     void clockwise();
     void counterClockwise();
     bool canActivate();
     int getModifyValue();
     void setNextPage(Page &page);
     void setPreviousPage(Page &page);
-    Page::PageName getName();
+    Page::PageType getName();
     Page *getNextPage();
     Page *getPreviousPage();
 
 private:
     bool isActive;
     int modifyValue, min, max, increment;
-    PageName name;
+    PageType name;
     Page *previousPage;
     Page *nextPage;
 };

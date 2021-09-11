@@ -38,19 +38,19 @@ MenuController::MenuController(unsigned int encoderPinClk,
     currentPage = &dashPage;
 }
 
-void MenuController::init(String status)
+void MenuController::init(const char *status)
 {
     Serial.println("Menu Init");
     this->display.init();
     this->currentPage->paint(display, this->isActive, status);
 }
 
-void MenuController::menuRefresh(String status)
+void MenuController::menuRefresh(const char *status)
 {
     this->currentPage->paint(display, isActive, status);
 }
 
-void MenuController::menuUpdate(String status)
+void MenuController::menuUpdate(const char *status)
 {
     this->rotation = this->rotaryKnob.getValue();
 
@@ -89,13 +89,13 @@ void MenuController::menuUpdate(String status)
     }
 }
 
-void MenuController::menuPress(String status, String statuses[], FireController &fireController)
+void MenuController::menuPress(const char *status, bool isEnabled, FireController &fireController)
 {
     this->isActive = !this->isActive;
     this->currentPage->paint(display, isActive, status);
     if (this->currentPage->getName() == dashPage.getName())
     {
-        if (status == statuses[1])
+        if (isEnabled)
         {
             fireController.setIsFireToggled(true);
         }

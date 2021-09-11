@@ -8,7 +8,7 @@ class DashPage : public Page
 {
 public:
     DashPage();
-    void paint(DisplayController &display, bool isActivated, String status);
+    void paint(DisplayController &display, bool isActivated, const char *status);
 };
 
 #endif
