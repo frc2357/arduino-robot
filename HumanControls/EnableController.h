@@ -9,7 +9,7 @@ public:
     void setIsEnabled(bool value);
 
 private:
-    bool isEnabled;
+    bool m_isEnabled;
 };
 
 #endif

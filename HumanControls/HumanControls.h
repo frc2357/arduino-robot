@@ -40,14 +40,14 @@ public:
     static const char *status;
 
 private:
-    int encoderPinSW, enablePin, firePin;
-    bool isConnected;
+    int m_encoderPinSW, m_enablePin, m_firePin;
+    bool m_isConnected;
     static const char *lastStatus;
 
-    MenuController menuController;
-    FTDebouncer pinDebouncer;
-    EnableController enableController;
-    FireController fireController;
+    MenuController m_menuController;
+    FTDebouncer m_pinDebouncer;
+    EnableController m_enableController;
+    FireController m_fireController;
 };
 
 #endif

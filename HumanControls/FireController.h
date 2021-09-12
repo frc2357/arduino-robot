@@ -12,7 +12,7 @@ public:
     bool getIsFireToggled();
 
 private:
-    bool isFireToggled;
+    bool m_isFireToggled;
 };
 
 #endif

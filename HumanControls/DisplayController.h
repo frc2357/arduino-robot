@@ -15,6 +15,6 @@ public:
     void printRegion(int x, int y, String text);
 
 private:
-    LiquidCrystal_I2C lcd;
+    LiquidCrystal_I2C m_lcd;
 };
 #endif

@@ -2,15 +2,15 @@
 
 EnableController::EnableController()
 {
-    this->isEnabled = false;
+    this->m_isEnabled = false;
 }
 
 bool EnableController::getIsEnabled()
 {
-    return this->isEnabled;
+    return this->m_isEnabled;
 }
 
 void EnableController::setIsEnabled(bool value)
 {
-    this->isEnabled = value;
+    this->m_isEnabled = value;
 }

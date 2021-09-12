@@ -24,54 +24,54 @@ HumanControls::HumanControls(unsigned int encoderPinClk,
                              unsigned int encoderPinSW,
                              unsigned int enablePin,
                              unsigned int firePin)
-    : menuController(encoderPinClk, encoderPinDt, displayAddress, displayLen, displayWidth,
-                     angleIncrement, angleMin, angleMax, pressureIncrement, pressureMin,
-                     pressureMax, durationIncrement, durationMin, durationMax),
-      pinDebouncer(numButtons), enableController(), fireController() //,
-                                                                     /*encoderPinSW(encoderPinSW), enablePin(enablePin), firePin(firePin)*/
+    : m_menuController(encoderPinClk, encoderPinDt, displayAddress, displayLen, displayWidth,
+                       angleIncrement, angleMin, angleMax, pressureIncrement, pressureMin,
+                       pressureMax, durationIncrement, durationMin, durationMax),
+      m_pinDebouncer(numButtons), m_enableController(), m_fireController() //,
+                                                                           /*encoderPinSW(encoderPinSW), enablePin(enablePin), firePin(firePin)*/
 {
-    this->encoderPinSW = encoderPinSW;
-    this->enablePin = enablePin;
-    this->firePin = firePin;
-    this->isConnected = false;
+    this->m_encoderPinSW = encoderPinSW;
+    this->m_enablePin = enablePin;
+    this->m_firePin = firePin;
+    this->m_isConnected = false;
 }
 
 void HumanControls::init()
 {
     connect();
-    pinDebouncer.addPin(this->encoderPinSW, HIGH, INPUT_PULLUP);
-    pinDebouncer.addPin(this->enablePin, HIGH, INPUT_PULLUP);
-    pinDebouncer.addPin(this->firePin, HIGH, INPUT_PULLUP);
-    pinDebouncer.begin();
-    menuController.init(status);
+    m_pinDebouncer.addPin(this->m_encoderPinSW, HIGH, INPUT_PULLUP);
+    m_pinDebouncer.addPin(this->m_enablePin, HIGH, INPUT_PULLUP);
+    m_pinDebouncer.addPin(this->m_firePin, HIGH, INPUT_PULLUP);
+    m_pinDebouncer.begin();
+    m_menuController.init(status);
 }
 
 void HumanControls::update()
 {
-    if (isConnected == false)
+    if (m_isConnected == false)
     {
         this->connect();
     }
 
     this->setStatus();
 
-    menuController.menuUpdate(status);
-    pinDebouncer.update();
+    m_menuController.menuUpdate(status);
+    m_pinDebouncer.update();
 }
 
 void HumanControls::setStatus()
 {
 
-    if (this->isConnected)
+    if (this->m_isConnected)
     {
         //Check the robot's status and see if it is different then the controllers.
         //If it is, set the status to the lowest given status. Ex. Robot returns disabled, but controller enabled, so
         //set both statuses to disabled. Robot status and controller status should always be the same.
         //Only exception may be due to firing setting status to enabled after firing.
 
-        if (enableController.getIsEnabled())
+        if (m_enableController.getIsEnabled())
         {
-            if (fireController.getIsFireToggled())
+            if (m_fireController.getIsFireToggled())
             {
                 status = HumanControls::primed;
             }
@@ -94,7 +94,7 @@ void HumanControls::setStatus()
     {
         Serial.println(status);
         lastStatus = status;
-        menuController.menuRefresh(status);
+        m_menuController.menuRefresh(status);
     }
 
     //Enventually will set the robot's status here
@@ -103,35 +103,35 @@ void HumanControls::setStatus()
 //Methods for debouncer
 void HumanControls::onPinActivated(int pinNr)
 {
-    if (pinNr == encoderPinSW)
+    if (pinNr == m_encoderPinSW)
     {
-        menuController.menuPress(status, (status == HumanControls::enabled), fireController);
+        m_menuController.menuPress(status, (status == HumanControls::enabled), m_fireController);
     }
-    else if (pinNr == enablePin)
+    else if (pinNr == m_enablePin)
     {
-        enableController.setIsEnabled(true);
+        m_enableController.setIsEnabled(true);
     }
-    else if (pinNr == firePin)
+    else if (pinNr == m_firePin)
     {
-        if (HumanControls::status == HumanControls::primed && isConnected)
+        if (HumanControls::status == HumanControls::primed && m_isConnected)
         {
-            fireController.initiateFiring(true);
-            fireController.setIsFireToggled(false);
+            m_fireController.initiateFiring(true);
+            m_fireController.setIsFireToggled(false);
         }
     }
 }
 
 void HumanControls::onPinDeactivated(int pinNr)
 {
-    if (pinNr == enablePin)
+    if (pinNr == m_enablePin)
     {
-        enableController.setIsEnabled(false);
-        fireController.setIsFireToggled(false);
+        m_enableController.setIsEnabled(false);
+        m_fireController.setIsFireToggled(false);
     }
 }
 
 void HumanControls::connect()
 {
     //Connect to the robot
-    this->isConnected = true;
+    this->m_isConnected = true;
 }

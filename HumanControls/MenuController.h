@@ -34,14 +34,14 @@ public:
     void menuPress(const char *status, bool isEnabled, FireController &FireController);
 
 private:
-    RotaryKnobController rotaryKnob;
-    DisplayController display;
-    int rotation;
-    bool isActive;
-    Page *currentPage;
-    DashPage dashPage;
-    ElevatorPage elevatorPage;
-    ShotPage shotPage;
-    ValvePage valvePage;
+    RotaryKnobController m_rotaryKnob;
+    DisplayController m_display;
+    int m_rotation;
+    bool m_isActive;
+    Page *m_currentPage;
+    DashPage m_dashPage;
+    ElevatorPage m_elevatorPage;
+    ShotPage m_shotPage;
+    ValvePage m_valvePage;
 };
 #endif

@@ -31,10 +31,10 @@ public:
     Page *getPreviousPage();
 
 private:
-    bool isActive;
-    int modifyValue, min, max, increment;
-    PageType name;
-    Page *previousPage;
-    Page *nextPage;
+    bool m_isActive;
+    int m_modifyValue, m_min, m_max, m_increment;
+    PageType m_name;
+    Page *m_previousPage;
+    Page *m_nextPage;
 };
 #endif
