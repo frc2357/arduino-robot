@@ -67,9 +67,6 @@ void loop()
     pinDebouncer.update();
     xAxis.update();
     yAxis.update();
-
-    Serial.println("X-Axis: " + String(xAxis.getResult()));
-    //Serial.println("Y-Axis: " + String(yAxis.getResult()));
 }
 
 //Methods for debouncer
