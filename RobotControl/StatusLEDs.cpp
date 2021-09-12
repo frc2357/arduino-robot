@@ -1,70 +1,61 @@
 #include "StatusLEDs.h"
+#include "Utils.h"
 
-const String StatusLEDs::blinkPatternTiming[] = {
+const int StatusLEDs::BLINK_TIMING_MILLIS = 100;
+
+const char *StatusLEDs::blinkPatternTiming[] = {
   /* OFF */   "-",
   /* DISABLED */ "*",
   /* ENABLED */  "**********----------",
+  /* PRIMED */  "*****-----",
   /* ERROR */  "*-*------",
 };
 
-StatusLEDs::StatusLEDs(RobotPins pins) {
-  this->pinBuiltin = pins.ledBuiltin;
+StatusLEDs::StatusLEDs(int pinBuiltinLed) {
+  m_pinBuiltinLed = pinBuiltinLed;
 }
 
-void StatusLEDs::Setup() {
-  pinMode(this->pinBuiltin, OUTPUT);
+void StatusLEDs::init() {
+  pinMode(m_pinBuiltinLed, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
-  this->lastPinValue = LOW;
-  this->blinkPattern = StatusLEDs::BlinkPattern::OFF;
-  this->blinkIndex = 0;
-  this->lastStatus = RobotStatus::STATUS_UNKNOWN;
-  this->lastBlinkTime = 0;
+  m_lastPinValue = LOW;
+  m_blinkPattern = StatusLEDs::BlinkPattern::OFF;
+  m_blinkIndex = 0;
+  m_lastBlinkTime = 0;
 }
 
-void StatusLEDs::Update(RobotStatus status) {
+void StatusLEDs::update() {
   int time = millis();
 
-  // Check if the status has changed, and update if so.
-  this->SetBlinkPattern(this->GetBlinkPattern(status));
-
   // If enough time has passed, get the next blink value.
-  if (time - this->lastBlinkTime > BLINK_TIMING_MILLIS) {
-    int pinValue = this->NextLEDValue();
+  if (time - m_lastBlinkTime > BLINK_TIMING_MILLIS) {
+    int pinValue = nextLEDValue();
 
-    if (this->lastPinValue != pinValue) {
-      digitalWrite(this->pinBuiltin, pinValue);
-      this->lastPinValue = pinValue;
+    if (m_lastPinValue != pinValue) {
+      digitalWrite(m_pinBuiltinLed, pinValue);
+      m_lastPinValue = pinValue;
     }
-    this->lastBlinkTime = time;
+    m_lastBlinkTime = time;
   }
 }
 
-StatusLEDs::BlinkPattern StatusLEDs::GetBlinkPattern(RobotStatus status) {
-  switch(status) {
-    case RobotStatus::STATUS_DISABLED:
-      return StatusLEDs::BlinkPattern::DISABLED;
-    case RobotStatus::STATUS_ENABLED:
-      return StatusLEDs::BlinkPattern::ENABLED;
-    case RobotStatus::STATUS_SETUP:
-      return StatusLEDs::BlinkPattern::OFF;
-    default:
-      return StatusLEDs::BlinkPattern::OFF;
+StatusLEDs::BlinkPattern StatusLEDs::getBlinkPattern() {
+  return m_blinkPattern;
+}
+
+void StatusLEDs::setBlinkPattern(BlinkPattern blinkPattern) {
+  if (m_blinkPattern != blinkPattern) {
+    m_blinkPattern = blinkPattern;
+    m_blinkIndex = 0;
+    m_lastBlinkTime = 0;
   }
 }
 
-void StatusLEDs::SetBlinkPattern(BlinkPattern blinkPattern) {
-  if (this->blinkPattern != blinkPattern) {
-    this->blinkPattern = blinkPattern;
-    this->blinkIndex = 0;
-    this->lastBlinkTime = 0;
-  }
-}
-
-int StatusLEDs::NextLEDValue() {
-  String blinkTiming = StatusLEDs::blinkPatternTiming[this->blinkPattern];
-  int value = blinkTiming.charAt(this->blinkIndex) == '*' ? HIGH : LOW;
+int StatusLEDs::nextLEDValue() {
+  const char *blinkTiming = StatusLEDs::blinkPatternTiming[m_blinkPattern];
+  int value = blinkTiming[m_blinkIndex] == '*' ? HIGH : LOW;
 
   // Increment blinkIndex, but loop around to beginning.
-  this->blinkIndex = this->blinkIndex < (blinkTiming.length() - 1) ? this->blinkIndex + 1 : 0;
+  m_blinkIndex = Utils::incrementRingBufferIndex(m_blinkIndex, strlen(blinkTiming) - 1);
   return value;
 }

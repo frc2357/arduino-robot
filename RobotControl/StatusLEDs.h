@@ -1,33 +1,31 @@
 #ifndef STATUSLEDS_H
 #define STATUSLEDS_H
 
-#include "Arduino.h"
-#include "RobotConstants.h"
+#include <Arduino.h>
+#include <JsonEl.h>
 
 class StatusLEDs {
   public:
-    StatusLEDs(RobotPins pins);
+    enum BlinkPattern { OFF = 0, DISABLED = 1, ENABLED = 2, PRIMED = 3, ERROR = 4 };
 
-    void Setup();
+    StatusLEDs(int pinBuiltinLed);
 
-    void Update(RobotStatus status);
+    void init();
+    void update();
+    BlinkPattern getBlinkPattern();
+    void setBlinkPattern(BlinkPattern blinkPattern);
 
   private:
-    const static int BLINK_TIMING_MILLIS = 100;
-    enum BlinkPattern { OFF = 0, DISABLED = 1, ENABLED = 2, ERROR = 3 };
-    const static String blinkPatternTiming[];
+    static const int BLINK_TIMING_MILLIS;
+    static const char *blinkPatternTiming[];
 
-    static BlinkPattern GetBlinkPattern(RobotStatus status);
+    int nextLEDValue();
 
-    void SetBlinkPattern(BlinkPattern blinkPattern);
-    int NextLEDValue();
-
-    int pinBuiltin;
-    BlinkPattern blinkPattern;
-    int blinkIndex;
-    unsigned long lastBlinkTime;
-    int lastPinValue;
-    RobotStatus lastStatus;
+    int m_pinBuiltinLed;
+    BlinkPattern m_blinkPattern;
+    int m_blinkIndex;
+    unsigned long m_lastBlinkTime;
+    int m_lastPinValue;
 };
 
 #endif // STATUSLEDS_H
