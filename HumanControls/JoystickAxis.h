@@ -17,7 +17,7 @@ public:
 private:
     double calcResult(int rawValue);
 
-    int pin;
-    double result, deadZoneSize, range, min;
+    int m_pin;
+    double m_result, m_deadZoneSize, m_range, m_min;
 };
 #endif
