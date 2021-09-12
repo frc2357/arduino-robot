@@ -8,7 +8,7 @@
 #include "DisplayController.h"
 #include "Page.h"
 #include "CharacterDisplay.h"
-#include "JoyStickController.h"
+#include "JoystickAxis.h"
 
 //Pins
 //LCD connects SDA in analog pin 4 and SCL in analog pin 5
@@ -52,8 +52,8 @@ MenuController menuController(ENCODER_PIN_CLK, ENCODER_PIN_DT, DISPLAY_ADDRESS, 
                               DURATION_INCREMENT, DURATION_MIN, DURATION_MAX);
 
 //Joystick setup
-JoystickController joystick(JOYSTICK_PIN_VRX, JOYSTICK_PIN_VRY, X_DEAD_ZONE_SIZE, Y_DEAD_ZONE_SIZE, X_MIN,
-                            X_MAX, Y_MIN, Y_MAX);
+JoystickAxis xAxis(JOYSTICK_PIN_VRX, X_DEAD_ZONE_SIZE, X_MIN, X_MAX);
+JoystickAxis yAxis(JOYSTICK_PIN_VRY, Y_DEAD_ZONE_SIZE, Y_MIN, Y_MAX);
 
 void setup()
 {
@@ -66,8 +66,12 @@ void setup()
 void loop()
 {
     menuController.menuUpdate();
-    joystick.update();
     pinDebouncer.update();
+    xAxis.update();
+    yAxis.update();
+
+    //Serial.println("X-Axis: " + String(xAxis.getResult()));
+    Serial.println("Y-Axis: " + String(yAxis.getResult()));
 }
 
 //Methods for debouncer
