@@ -1,10 +1,10 @@
 #include "HumanControls.h"
 
-static const char *HumanControls::disabled = "disabled";
-static const char *HumanControls::enabled = "enabled";
-static const char *HumanControls::primed = "primed";
-static const char *HumanControls::status = HumanControls::disabled;
-static const char *HumanControls::lastStatus = HumanControls::disabled;
+const char *HumanControls::disabled = "disabled";
+const char *HumanControls::enabled = "enabled";
+const char *HumanControls::primed = "primed";
+const char *HumanControls::status = HumanControls::disabled;
+const char *HumanControls::lastStatus = HumanControls::disabled;
 
 HumanControls::HumanControls(unsigned int encoderPinClk,
                              unsigned int encoderPinDt,
@@ -103,17 +103,17 @@ void HumanControls::setStatus()
 //Methods for debouncer
 void HumanControls::onPinActivated(int pinNr)
 {
-    if (pinNr == enablePin)
+    if (pinNr == encoderPinSW)
     {
         menuController.menuPress(status, (status == HumanControls::enabled), fireController);
     }
-    else if (pinNr == encoderPinSW)
+    else if (pinNr == enablePin)
     {
         enableController.setIsEnabled(true);
     }
     else if (pinNr == firePin)
     {
-        if (HumanControls::status == HumanControls::enabled && isConnected)
+        if (HumanControls::status == HumanControls::primed && isConnected)
         {
             fireController.initiateFiring(true);
             fireController.setIsFireToggled(false);
