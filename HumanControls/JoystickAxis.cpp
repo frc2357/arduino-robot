@@ -7,15 +7,11 @@ JoystickAxis::JoystickAxis(unsigned int pin,
 {
     this->pin = pin;
 
-    this->center = static_cast<double>(max) / 2;
-
-    this->deadMin = this->center - (static_cast<double>(deadZoneSize) / 2);
-    this->deadMax = this->center + (static_cast<double>(deadZoneSize) / 2);
-
-    this->halfTotal = this->center - (this->deadMax - this->center);
-    this->offset = this->center + (this->deadMax - this->center);
-
     this->result = 0;
+
+    this->deadZoneSize = static_cast<double>(deadZoneSize);
+    this->range = static_cast<double>(max - min);
+    this->min = static_cast<double>(min);
 }
 double JoystickAxis::getResult()
 {
@@ -29,19 +25,25 @@ void JoystickAxis::update()
 
 double JoystickAxis::calcResult(int rawValue)
 {
-    double value = static_cast<double>(rawValue);
-    if (value >= this->deadMin && value <= this->deadMax)
+    double value = rawValue;
+
+    if (value >= min && value >= (range + min))
     {
         return 0.0;
     }
 
-    if (value > this->center)
+    if (value >= ((this->range / 2) - (this->deadZoneSize / 2)) && value <= ((this->range / 2) + (this->deadZoneSize / 2)))
     {
-        return (value - this->offset) / this->halfTotal;
+        return 0.0;
     }
-    if (value < this->center)
+
+    if (value > (this->range / 2))
     {
-        return -1 * (1 - (value / this->halfTotal));
+        return (value - ((this->range / 2) + (((this->range / 2) + (this->deadZoneSize / 2)) - (this->range / 2)))) / ((this->range / 2) - (((this->range / 2) + (this->deadZoneSize / 2)) - (this->range / 2)));
+    }
+    if (value < (this->range / 2))
+    {
+        return -1 * (1 - (value / ((this->range / 2) - (((this->range / 2) + (this->deadZoneSize / 2)) - (this->range / 2)))));
     }
 
     return 0.0;

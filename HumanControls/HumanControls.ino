@@ -38,11 +38,9 @@
 
 //Joystick deadzones
 #define X_DEAD_ZONE_SIZE 100 //Total size of the x deadzone
-#define X_MIN 0
-#define X_MAX 1023
+#define MIN 0                //Minimum joystick value that comes from the sensor
+#define MAX 1023             //Maximum joystick value that comes from the sensor
 #define Y_DEAD_ZONE_SIZE 100 //Total size of the y deadzone
-#define Y_MIN 0
-#define Y_MAX 1023
 
 FTDebouncer pinDebouncer(30);
 
@@ -52,8 +50,8 @@ MenuController menuController(ENCODER_PIN_CLK, ENCODER_PIN_DT, DISPLAY_ADDRESS, 
                               DURATION_INCREMENT, DURATION_MIN, DURATION_MAX);
 
 //Joystick setup
-JoystickAxis xAxis(JOYSTICK_PIN_VRX, X_DEAD_ZONE_SIZE, X_MIN, X_MAX);
-JoystickAxis yAxis(JOYSTICK_PIN_VRY, Y_DEAD_ZONE_SIZE, Y_MIN, Y_MAX);
+JoystickAxis xAxis(JOYSTICK_PIN_VRX, X_DEAD_ZONE_SIZE, MIN, MAX);
+JoystickAxis yAxis(JOYSTICK_PIN_VRY, Y_DEAD_ZONE_SIZE, MIN, MAX);
 
 void setup()
 {
@@ -70,8 +68,8 @@ void loop()
     xAxis.update();
     yAxis.update();
 
-    //Serial.println("X-Axis: " + String(xAxis.getResult()));
-    Serial.println("Y-Axis: " + String(yAxis.getResult()));
+    Serial.println("X-Axis: " + String(xAxis.getResult()));
+    //Serial.println("Y-Axis: " + String(yAxis.getResult()));
 }
 
 //Methods for debouncer

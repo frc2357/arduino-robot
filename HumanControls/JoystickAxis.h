@@ -18,7 +18,6 @@ private:
     double calcResult(int rawValue);
 
     int pin;
-    double result, deadMin, deadMax, center,
-        halfTotal, offset;
+    double result, deadZoneSize, range, min;
 };
 #endif
