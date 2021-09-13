@@ -3,14 +3,14 @@
 // ---------
 // JsonState
 // ---------
-JsonState::JsonState(JsonElement& root) : JsonState(root, Serial) {}
-
-JsonState::JsonState(JsonElement& root, Print& errorLog) : m_root(root), m_errorLog(errorLog) {
-  JsonElement::m_errorLog = m_errorLog;
-}
+JsonState::JsonState(JsonElement& root) : m_root(root) {}
 
 JsonState::~JsonState() {
-  m_errorLog.println("[WARNING: JsonState must be created in the root level sketch (.ino) file!]");
+  JSON_LOG_ERROR("[WARNING: JsonState must be created in the root level sketch (.ino) file!]");
+}
+
+JsonElement &JsonState::root() const {
+  return m_root;
 }
 
 void JsonState::printJson(Print &out) const {
@@ -19,6 +19,10 @@ void JsonState::printJson(Print &out) const {
 
 void JsonState::printJson(bool pretty, Print &out) const {
   m_root.printJson(pretty ? 0 : -1, out);
+}
+
+bool JsonState::updateFromJson(String &json) {
+  return updateFromJson(json.c_str());
 }
 
 bool JsonState::updateFromJson(const char* json) {
@@ -44,7 +48,6 @@ size_t JsonState::updateFromJson(const char* json, size_t length, size_t &elemen
 // JsonElement
 // -----------
 JsonElement JsonElement::NotFound;
-JsonElement JsonElement::NoKey;
 
 Print &JsonElement::m_errorLog = Serial;
 
@@ -62,12 +65,12 @@ void JsonElement::logError(const char *format, ...) {
 
 JsonElement::JsonElement() {
   m_key = "";
-  m_type = NoType;
+  m_type = JSON_TYPE_NONE;
   m_value.arrayValue = NULL;
   m_length = -1;
 }
 
-JsonElement::JsonElement(const char *key, JsonElementType type, JsonElementValue value, size_t length) {
+JsonElement::JsonElement(const char *key, char type, JsonElementValue value, size_t length) {
   m_key = key;
   m_type = type;
   m_value = value;
@@ -82,18 +85,19 @@ JsonElement::JsonElement(const JsonElement& element) {
 }
 
 JsonElement::~JsonElement() {
-  // Note: String, Arrays and Objects do allocate via `new`, but they
-  // should never be destructed because they should be in the root .ino scope
+  // Note: Strings do allocate via `new`, but they
+  // should never be destructed because they should
+  // be in the root .ino scope
 }
 
 JsonElement& JsonElement::operator[](const size_t index) const {
-  if (m_type != ArrayType && m_type != ObjectType) {
-    logError("Cannot access subelement of type %s", type());
+  if (m_type != JSON_TYPE_ARRAY && m_type != JSON_TYPE_OBJECT) {
+    JSON_LOG_ERROR("Cannot access subelement of type %s", type());
     return NotFound;
   }
 
   if (index > m_length) {
-    logError("Array index '%d' out of bounds.", index);
+    JSON_LOG_ERROR("Array index '%d' out of bounds.", index);
     return NotFound;
   }
   return m_value.arrayValue[index];
@@ -111,63 +115,63 @@ void JsonElement::operator=(JsonElement& element) {
 }
 
 void JsonElement::operator=(bool value) {
-  if (m_type == BooleanType) {
+  if (m_type == JSON_TYPE_BOOLEAN) {
     m_value.booleanValue = value;
   } else {
-    logError("Cannot assign boolean value to type %s", type());
+    JSON_LOG_ERROR("Cannot assign boolean value to type %s", type());
   }
 }
 
 void JsonElement::operator=(int value) {
-  if (m_type == IntType) {
+  if (m_type == JSON_TYPE_INT) {
     m_value.intValue = value;
-  } else if (m_type == FloatType) {
+  } else if (m_type == JSON_TYPE_FLOAT) {
     m_value.doubleValue = value;
   } else {
-    logError("Cannot assign int value to type %s", type());
+    JSON_LOG_ERROR("Cannot assign int value to type %s", type());
   }
 }
 
 void JsonElement::operator=(float value) {
-  if (m_type == FloatType) {
+  if (m_type == JSON_TYPE_FLOAT) {
     m_value.doubleValue = value;
   } else {
-    logError("Cannot assign float value to type %s", type());
+    JSON_LOG_ERROR("Cannot assign float value to type %s", type());
   }
 }
 
 void JsonElement::operator=(double value) {
-  if (m_type == FloatType) {
+  if (m_type == JSON_TYPE_FLOAT) {
     m_value.doubleValue = value;
   } else {
-    logError("Cannot assign double value to type %s", type());
+    JSON_LOG_ERROR("Cannot assign double value to type %s", type());
   }
 }
 
 void JsonElement::operator=(const char *value) {
-  if (m_type == StringType) {
+  if (m_type == JSON_TYPE_STRING) {
     if (m_length < strlen(value) + 1) {
-      logError("Concatenating incoming string: %s to %d chars", value, m_length - 1);
+      JSON_LOG_ERROR("Concatenating incoming string: %s to %d chars", value, m_length - 1);
     }
     strlcpy(m_value.stringValue, value, m_length);
   } else {
-    logError("Cannot assign string value to type %s", type());
+    JSON_LOG_ERROR("Cannot assign string value to type %s", type());
   }
 }
 
 const char* JsonElement::type() const {
   switch(m_type) {
-    case BooleanType:
+    case JSON_TYPE_BOOLEAN:
       return "boolean";
-    case IntType:
+    case JSON_TYPE_INT:
       return "int";
-    case FloatType:
+    case JSON_TYPE_FLOAT:
       return "float";
-    case StringType:
+    case JSON_TYPE_STRING:
       return "string";
-    case ArrayType:
+    case JSON_TYPE_ARRAY:
       return "array";
-    case ObjectType:
+    case JSON_TYPE_OBJECT:
       return "object";
     default:
       return "(unknown)";
@@ -176,7 +180,7 @@ const char* JsonElement::type() const {
 
 const char* JsonElement::key() const {
   if (m_key[0] == '\0') {
-    return NoKey.m_key;
+    return NotFound.m_key;
   }
   return m_key;
 }
@@ -186,48 +190,48 @@ size_t JsonElement::length() const {
 }
 
 bool JsonElement::asBoolean() const {
-  if (m_type == BooleanType) {
+  if (m_type == JSON_TYPE_BOOLEAN) {
     return m_value.booleanValue;
   }
-  logError("Cannot access type %s as boolean", type());
+  JSON_LOG_ERROR("Cannot access type %s as boolean", type());
   return false;
 }
 
 int JsonElement::asInt() const {
-  if (m_type == IntType) {
+  if (m_type == JSON_TYPE_INT) {
     return m_value.intValue;
   }
-  logError("Cannot access type %s as int", type());
+  JSON_LOG_ERROR("Cannot access type %s as int", type());
   return -1;
 }
 
 float JsonElement::asFloat() const {
-  if (m_type == FloatType) {
+  if (m_type == JSON_TYPE_FLOAT) {
     return (float) m_value.doubleValue;
   }
-  logError("Cannot access type %s as float", type());
+  JSON_LOG_ERROR("Cannot access type %s as float", type());
   return NAN;
 }
 
 double JsonElement::asDouble() const {
-  if (m_type == FloatType) {
+  if (m_type == JSON_TYPE_FLOAT) {
     return m_value.doubleValue;
   }
-  logError("Cannot access type %s as double", type());
+  JSON_LOG_ERROR("Cannot access type %s as double", type());
   return NAN;
 }
 
 const char* JsonElement::asString() const {
-  if (m_type == StringType) {
+  if (m_type == JSON_TYPE_STRING) {
     return m_value.stringValue;
   }
-  logError("Cannot access type %s as string", type());
+  JSON_LOG_ERROR("Cannot access type %s as string", type());
   return "";
 }
 
 JsonElement &JsonElement::findByKey(const char *key, size_t length) const {
-  if (m_type != ObjectType) {
-    logError("Cannot access key of type %s", type());
+  if (m_type != JSON_TYPE_OBJECT) {
+    JSON_LOG_ERROR("Cannot access key of type %s", type());
     return NotFound;
   }
 
@@ -237,23 +241,23 @@ JsonElement &JsonElement::findByKey(const char *key, size_t length) const {
       return el;
     }
   }
-  logError("Key '%s' not found.", key);
+  JSON_LOG_ERROR("Key '%s' not found.", key);
   return NotFound;
 }
 
 void JsonElement::printJson(int indent, Print& out) const {
   switch (m_type) {
-    case BooleanType:
+    case JSON_TYPE_BOOLEAN:
       return printJsonBoolean(indent, out);
-    case IntType:
+    case JSON_TYPE_INT:
       return printJsonInt(indent, out);
-    case FloatType:
+    case JSON_TYPE_FLOAT:
       return printJsonFloat(indent, out);
-    case StringType:
+    case JSON_TYPE_STRING:
       return printJsonString(indent, out);
-    case ArrayType:
+    case JSON_TYPE_ARRAY:
       return printJsonArray(indent, out);
-    case ObjectType:
+    case JSON_TYPE_OBJECT:
       return printJsonObject(indent, out);
     default:
       out.print("\"unknown type\"");
@@ -318,17 +322,17 @@ void JsonElement::printJsonObject(int indent, Print& out) const {
 
 size_t JsonElement::updateFromJson(const char* json, size_t length, size_t &elementsUpdated) {
   switch(m_type) {
-    case BooleanType:
+    case JSON_TYPE_BOOLEAN:
       return updateFromJsonBoolean(json, length, elementsUpdated);
-    case IntType:
+    case JSON_TYPE_INT:
       return updateFromJsonInt(json, length, elementsUpdated);
-    case FloatType:
+    case JSON_TYPE_FLOAT:
       return updateFromJsonFloat(json, length, elementsUpdated);
-    case StringType:
+    case JSON_TYPE_STRING:
       return updateFromJsonString(json, length, elementsUpdated);
-    case ArrayType:
+    case JSON_TYPE_ARRAY:
       return updateFromJsonArray(json, length, elementsUpdated);
-    case ObjectType:
+    case JSON_TYPE_OBJECT:
       return updateFromJsonObject(json, length, elementsUpdated);
     default:
       return 0;
@@ -347,7 +351,7 @@ size_t JsonElement::updateFromJsonBoolean(const char *json, size_t length, size_
     return 5;
   }
 
-  logError("Expected 'true' or 'false': %s", json);
+  JSON_LOG_ERROR("Expected 'true' or 'false': %s", json);
   return -1;
 }
 
@@ -389,7 +393,7 @@ size_t JsonElement::updateFromJsonString(const char *json, size_t length, size_t
 
 size_t JsonElement::updateFromJsonArray(const char *json, size_t length, size_t &elementsUpdated) {
   if (json[0] != '[') {
-    logError("Expected array to start with '[': %s", json);
+    JSON_LOG_ERROR("Expected array to start with '[': %s", json);
     return -1;
   }
 
@@ -420,7 +424,7 @@ size_t JsonElement::updateFromJsonArray(const char *json, size_t length, size_t 
     if (arrayJson[0] == ']') {
       // We've reached the end of this array.
       if (this->m_length != arrayIndex + 1) {
-        logError("Expected array of size %d instead of %d", this->m_length, arrayIndex + 1);
+        JSON_LOG_ERROR("Expected array of size %d instead of %d", this->m_length, arrayIndex + 1);
         return -1;
       }
       return (length - remainingLength) + 1;
@@ -434,18 +438,18 @@ size_t JsonElement::updateFromJsonArray(const char *json, size_t length, size_t 
     }
 
     // We didn't find the end of the object or a comma, so this is not a well-formed object.
-    logError("Expected either ',' or ']': ", arrayJson);
+    JSON_LOG_ERROR("Expected either ',' or ']': ", arrayJson);
     return -1;
   }
 
   // If we didn't return from the ']' inside the loop, it's an error.
-  logError("Expected array end ']': ", arrayJson);
+  JSON_LOG_ERROR("Expected array end ']': ", arrayJson);
   return -1;
 }
 
 size_t JsonElement::updateFromJsonObject(const char *json, size_t length, size_t &elementsUpdated) {
   if (json[0] != '{') {
-    logError("Expected object to start with '{': %s", json);
+    JSON_LOG_ERROR("Expected object to start with '{': %s", json);
     return -1;
   }
 
@@ -467,7 +471,7 @@ size_t JsonElement::updateFromJsonObject(const char *json, size_t length, size_t
 
     JsonElement &element = JsonUtils::findElementByJsonKey(*this, objectJson, keyLength);
     if (&element == &JsonElement::NotFound) {
-      logError("Failed to find element by key: %s", objectJson);
+      JSON_LOG_ERROR("Failed to find element by key: %s", objectJson);
       return -1;
     }
 
@@ -506,102 +510,19 @@ size_t JsonElement::updateFromJsonObject(const char *json, size_t length, size_t
     }
 
     // We didn't find the end of the object or a comma, so this is not a well-formed object.
-    logError("Expected either ',' or '}': ", objectJson);
+    JSON_LOG_ERROR("Expected either ',' or '}': ", objectJson);
     return -1;
   }
 
   // If we didn't return from the '}' inside the loop, it's an error.
-  logError("Expected object end '}': ", objectJson);
+  JSON_LOG_ERROR("Expected object end '}': ", objectJson);
   return -1;
 }
 
 
-// ----
-// Json
-// ----
-JsonElement Json::Boolean(bool value) {
-  return Boolean("", value);
-}
-
-JsonElement Json::Boolean(const char *key, bool value) {
-  JsonElement::JsonElementValue elementValue;
-  elementValue.booleanValue = value;
-  return JsonElement(key, JsonElement::BooleanType, elementValue, -1);
-}
-
-JsonElement Json::Int(int value) {
-  return Int("", value);
-}
-
-JsonElement Json::Int(const char *key, int value) {
-  JsonElement::JsonElementValue elementValue;
-  elementValue.intValue = value;
-  return JsonElement(key, JsonElement::IntType, elementValue, -1);
-}
-
-JsonElement Json::Float(float value) {
-  return Float("", (double)value);
-}
-
-JsonElement Json::Float(double value) {
-  return Float("", value);
-}
-
-JsonElement Json::Float(const char *key, float value) {
-  return Float(key, (double)value);
-}
-
-JsonElement Json::Float(const char *key, double value) {
-  JsonElement::JsonElementValue elementValue;
-  elementValue.doubleValue = value;
-  return JsonElement(key, JsonElement::FloatType, elementValue, -1);
-}
-
-JsonElement Json::String(const char *value) {
-  return String("", value);
-}
-
-JsonElement Json::String(const char *value, size_t length) {
-  return String("", value, length);
-}
-
-JsonElement Json::String(const char *key, const char *value) {
-  return String(key, value, strlen(value) + 1);
-}
-
-JsonElement Json::String(const char *key, const char *value, size_t length) {
-  size_t stringLength = length + 1; // for null-terminated strings
-
-  JsonElement::JsonElementValue elementValue;
-  elementValue.stringValue = new char[stringLength];
-  strlcpy(elementValue.stringValue, value, stringLength);
-  return JsonElement(key, JsonElement::StringType, elementValue, stringLength);
-}
-
-template<size_t S>
-JsonElement Json::Array(JsonElement (&array)[S]) {
-  return Array("", array);
-}
-
-template<size_t S>
-JsonElement Json::Array(const char *key, JsonElement (&array)[S]) {
-  JsonElement::JsonElementValue elementValue;
-  elementValue.arrayValue = array;
-  return JsonElement(key, JsonElement::ArrayType, elementValue, S);
-}
-
-template<size_t S>
-JsonElement Json::Object(JsonElement (&array)[S]) {
-  return Object("", array);
-}
-
-template<size_t S>
-JsonElement Json::Object(const char *key, JsonElement (&array)[S]) {
-  JsonElement::JsonElementValue elementValue;
-  elementValue.arrayValue = array;
-  return JsonElement(key, JsonElement::ObjectType, elementValue, S);
-}
-
+// ---------
+// JsonUtils
+// ---------
 void JsonUtils::indentNewline(int times, Print &out) {
   if (times < 0) {
     return;
@@ -659,7 +580,7 @@ size_t JsonUtils::getNumberStringLength(const char* str, size_t length, bool isF
       }
     }
     // None of the above are true, so this is not a JSON-compatible number.
-    JsonElement::logError("Expected number: %s", str);
+    JSON_LOG_ERROR("Expected number: %s", str);
     return -1;
   }
   // We reached the end of the string
@@ -680,7 +601,7 @@ size_t JsonUtils::getQuoteStringLength(const char* str, size_t length) {
     }
   }
 
-  JsonElement::logError("Expected quote '%c': %s", quoteChar, str);
+  JSON_LOG_ERROR("Expected quote '%c': %s", quoteChar, str);
   return -1;
 }
 
@@ -694,7 +615,7 @@ size_t JsonUtils::getObjectKeyStringLength(const char* str, size_t length) {
       return i;
     }
   }
-  JsonElement::logError("Expected colon ':': %s", str);
+  JSON_LOG_ERROR("Expected colon ':': %s", str);
   return -1;
 }
 
@@ -710,7 +631,7 @@ JsonElement &JsonUtils::findElementByJsonKey(JsonElement &jsonObject, const char
 
   while (str[keyLength] != keyEndChar) {
     if (str[keyLength] == '\0' || keyLength == length) {
-      JsonElement::logError("Expected key end '%c': %s", keyEndChar, str);
+      JSON_LOG_ERROR("Expected key end '%c': %s", keyEndChar, str);
       return JsonElement::NotFound;
     }
     keyLength++;
