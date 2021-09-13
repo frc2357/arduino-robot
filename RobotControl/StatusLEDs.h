@@ -11,21 +11,17 @@ class StatusLEDs {
     StatusLEDs(int pinBuiltinLed);
 
     void init();
-    void update();
+    void update(int tick);
     BlinkPattern getBlinkPattern();
     void setBlinkPattern(BlinkPattern blinkPattern);
 
   private:
-    static const int BLINK_TIMING_MILLIS;
+    static const int UPDATE_TICK_MODULUS;
     static const char *blinkPatternTiming[];
-
-    int nextLEDValue();
 
     int m_pinBuiltinLed;
     BlinkPattern m_blinkPattern;
     int m_blinkIndex;
-    unsigned long m_lastBlinkTime;
-    int m_lastPinValue;
 };
 
 #endif // STATUSLEDS_H

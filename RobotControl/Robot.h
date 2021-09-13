@@ -18,7 +18,6 @@ class Robot {
     Robot(JsonState &state, int pinLedBuiltin);
 
     void init();
-
     void update();
 
   private:
@@ -26,6 +25,7 @@ class Robot {
     void updateFromJson(const char *json);
     int getAverageTickDuration();
     void updateTickDurations(int tickDurationMicros);
+    void setError(const char *format, ...);
 
     JsonState &m_state;
     StatusLEDs m_statusLEDs;

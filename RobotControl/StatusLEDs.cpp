@@ -1,14 +1,14 @@
 #include "StatusLEDs.h"
 #include "Utils.h"
 
-const int StatusLEDs::BLINK_TIMING_MILLIS = 100;
+const int StatusLEDs::UPDATE_TICK_MODULUS = 10;
 
 const char *StatusLEDs::blinkPatternTiming[] = {
-  /* OFF */   "-",
+  /* OFF */      "-",
   /* DISABLED */ "*",
-  /* ENABLED */  "**********----------",
-  /* PRIMED */  "*****-----",
-  /* ERROR */  "*-*------",
+  /* ENABLED */  "------******",
+  /* PRIMED */   "--**",
+  /* ERROR */    "-*-*--------",
 };
 
 StatusLEDs::StatusLEDs(int pinBuiltinLed) {
@@ -17,25 +17,18 @@ StatusLEDs::StatusLEDs(int pinBuiltinLed) {
 
 void StatusLEDs::init() {
   pinMode(m_pinBuiltinLed, OUTPUT);
-  pinMode(LED_BUILTIN, OUTPUT);
-  m_lastPinValue = LOW;
   m_blinkPattern = StatusLEDs::BlinkPattern::OFF;
   m_blinkIndex = 0;
-  m_lastBlinkTime = 0;
 }
 
-void StatusLEDs::update() {
-  int time = millis();
+void StatusLEDs::update(int tick) {
+  if (tick % UPDATE_TICK_MODULUS == 0) {
+    const char *blinkTiming = StatusLEDs::blinkPatternTiming[m_blinkPattern];
+    int value = blinkTiming[m_blinkIndex] == '*' ? HIGH : LOW;
 
-  // If enough time has passed, get the next blink value.
-  if (time - m_lastBlinkTime > BLINK_TIMING_MILLIS) {
-    int pinValue = nextLEDValue();
+    digitalWrite(m_pinBuiltinLed, value);
 
-    if (m_lastPinValue != pinValue) {
-      digitalWrite(m_pinBuiltinLed, pinValue);
-      m_lastPinValue = pinValue;
-    }
-    m_lastBlinkTime = time;
+    m_blinkIndex = Utils::incrementRingBufferIndex(m_blinkIndex, strlen(blinkTiming));
   }
 }
 
@@ -47,15 +40,5 @@ void StatusLEDs::setBlinkPattern(BlinkPattern blinkPattern) {
   if (m_blinkPattern != blinkPattern) {
     m_blinkPattern = blinkPattern;
     m_blinkIndex = 0;
-    m_lastBlinkTime = 0;
   }
-}
-
-int StatusLEDs::nextLEDValue() {
-  const char *blinkTiming = StatusLEDs::blinkPatternTiming[m_blinkPattern];
-  int value = blinkTiming[m_blinkIndex] == '*' ? HIGH : LOW;
-
-  // Increment blinkIndex, but loop around to beginning.
-  m_blinkIndex = Utils::incrementRingBufferIndex(m_blinkIndex, strlen(blinkTiming) - 1);
-  return value;
 }

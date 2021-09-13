@@ -1,5 +1,4 @@
 #include "Robot.h"
-#include "Log.h"
 #include "Utils.h"
 
 const unsigned long Robot::TICK_DURATION_MICROS = 10000;
@@ -27,7 +26,7 @@ void Robot::update() {
   int tick = m_state.root()["tck"].asInt();
   unsigned long tickStartMicros = micros();
 
-  m_statusLEDs.update();
+  m_statusLEDs.update(tick);
 
   m_state.root()["tck"] = tick + 1;
   m_state.root()["up"] = (int)((tickStartMicros / 1000000) - m_initTimeSeconds);
@@ -37,7 +36,7 @@ void Robot::update() {
   updateTickDurations(tickDurationMicros);
 
   if (tickDurationMicros > TICK_DURATION_MICROS) {
-    Log::error("Tick overflow %d us", tickDurationMicros - TICK_DURATION_MICROS);
+    setError("Tick overflow %d us", tickDurationMicros - TICK_DURATION_MICROS);
   }
 
   updateSerial(tick);
@@ -65,13 +64,16 @@ void Robot::updateFromJson(const char *json) {
 
   if (strlen(err) > 0) {
     m_statusLEDs.setBlinkPattern(StatusLEDs::ERROR);
+    m_state.root()["status"] = STATUS_DISABLED;
   } else {
-    if (strcmp(status, STATUS_ENABLED) == 0) {
+    if (strcmp(status, STATUS_DISABLED) == 0) {
       m_statusLEDs.setBlinkPattern(StatusLEDs::DISABLED);
-    } else if (strcmp(status, STATUS_DISABLED) == 0) {
+    } else if (strcmp(status, STATUS_ENABLED) == 0) {
       m_statusLEDs.setBlinkPattern(StatusLEDs::ENABLED);
     } else if (strcmp(status, STATUS_PRIMED) == 0) {
       m_statusLEDs.setBlinkPattern(StatusLEDs::PRIMED);
+    } else {
+      m_statusLEDs.setBlinkPattern(StatusLEDs::OFF);
     }
   }
 }
@@ -87,4 +89,18 @@ int Robot::getAverageTickDuration() {
 void Robot::updateTickDurations(int tickDurationMicros) {
   m_tickDurations[m_tickDurationsIndex] = tickDurationMicros;
   m_tickDurationsIndex = Utils::incrementRingBufferIndex(m_tickDurationsIndex, ROBOT_TICK_DURATION_BUFFER_LEN);
+}
+
+void Robot::setError(const char *format, ...) {
+  va_list args;
+  char message[32];
+  va_start(args, format);
+  vsprintf(message, format, args);
+  va_end(args);
+
+  m_state.root()["err"] = message;
+  m_state.root()["status"] = STATUS_DISABLED;
+
+  Serial.print("ERROR: ");
+  Serial.println(message);
 }
