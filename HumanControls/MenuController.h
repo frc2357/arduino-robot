@@ -9,6 +9,7 @@
 #include "ValvePage.h"
 #include "RotaryKnobController.h"
 #include "DisplayController.h"
+#include "FireController.h"
 
 class MenuController
 {
@@ -27,19 +28,20 @@ public:
                    unsigned int durationIncrement,
                    unsigned int durationMin,
                    unsigned int durationMax);
-    void init();
-    void menuUpdate();
-    void menuPress();
+    void init(const char *status);
+    void menuUpdate(const char *status);
+    void menuRefresh(const char *status);
+    void menuPress(const char *status, bool isEnabled, FireController &FireController);
 
 private:
-    RotaryKnobController rotaryKnob;
-    DisplayController display;
-    int rotation;
-    bool isActive;
-    Page *currentPage;
-    DashPage dashPage;
-    ElevatorPage elevatorPage;
-    ShotPage shotPage;
-    ValvePage valvePage;
+    RotaryKnobController m_rotaryKnob;
+    DisplayController m_display;
+    int m_rotation;
+    bool m_isActive;
+    Page *m_currentPage;
+    DashPage m_dashPage;
+    ElevatorPage m_elevatorPage;
+    ShotPage m_shotPage;
+    ValvePage m_valvePage;
 };
 #endif

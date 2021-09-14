@@ -1,24 +1,24 @@
 #include "DisplayController.h"
 
 DisplayController::DisplayController(unsigned int displayAddress, unsigned int displayLen, unsigned int displayWidth)
-    : lcd(displayAddress, displayLen, displayWidth)
+    : m_lcd(displayAddress, displayLen, displayWidth)
 {
 }
 
 void DisplayController::init()
 {
-    this->lcd.begin();
-    this->lcd.backlight();
-    this->lcd.clear();
+    this->m_lcd.begin();
+    this->m_lcd.backlight();
+    this->m_lcd.clear();
 }
 
 void DisplayController::clear()
 {
-    this->lcd.clear();
+    this->m_lcd.clear();
 }
 
 void DisplayController::printRegion(int x, int y, String text)
 {
-    this->lcd.setCursor(x, y);
-    this->lcd.print(text);
+    this->m_lcd.setCursor(x, y);
+    this->m_lcd.print(text);
 }

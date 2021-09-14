@@ -1,22 +1,26 @@
-#include "LiquidCrystal.h"
 #include <LiquidCrystal_I2C.h>
-#include "FTDebouncer.h"
 #include "RotaryKnobController.h"
 #include "CharacterDisplay.h"
 #include "MenuController.h"
 #include "DisplayController.h"
 #include "Page.h"
 #include "CharacterDisplay.h"
+#include "EnableController.h"
+#include "FireController.h"
+#include "HumanControls.h"
 
 //Pins
 #define ENCODER_PIN_CLK 3 //CLK gets degrees for rotary knob
 #define ENCODER_PIN_DT 4  //DT gets direction for rotary knob
 #define ENCODER_PIN_SW 5  //Gets the button for rotary knob
+#define ENABLE_PIN 7      //Digital Pin for the enable button
+#define FIRE_PIN 9        //Digital Pin for the fire button
 
 //Other constraints
 #define DISPLAY_ADDRESS 0X27 //I2c address of the lcd display
 #define DISPLAY_LENGTH 16    //Length of the lcd display
 #define DISPLAY_WIDTH 2      //width of the lcd display
+#define NUM_BUTTONS 3        //Number of buttons to give the debouncer
 #define USB_BAUDRATE 115200
 
 //Min - Max
@@ -30,34 +34,28 @@
 #define DURATION_MIN 100      //Minimum valve duration
 #define DURATION_MAX 300      //Maximum valve duration
 
-FTDebouncer pinDebouncer(30);
-
-MenuController menuController(ENCODER_PIN_CLK, ENCODER_PIN_DT, DISPLAY_ADDRESS, DISPLAY_LENGTH, DISPLAY_WIDTH,
-                              ANGLE_INCREMENT, ANGLE_MIN, ANGLE_MAX, PRESSURE_INCREMENT, PRESSURE_MIN, PRESSURE_MAX,
-                              DURATION_INCREMENT, DURATION_MIN, DURATION_MAX);
+HumanControls humanControls(ENCODER_PIN_CLK, ENCODER_PIN_DT, DISPLAY_ADDRESS, DISPLAY_LENGTH, DISPLAY_WIDTH,
+                            ANGLE_INCREMENT, ANGLE_MIN, ANGLE_MAX, PRESSURE_INCREMENT, PRESSURE_MIN, PRESSURE_MAX,
+                            DURATION_INCREMENT, DURATION_MIN, DURATION_MAX, NUM_BUTTONS, ENCODER_PIN_SW,
+                            ENABLE_PIN, FIRE_PIN);
 
 void setup()
 {
     Serial.begin(USB_BAUDRATE);
-    pinDebouncer.addPin(ENCODER_PIN_SW, HIGH, INPUT_PULLUP);
-    pinDebouncer.begin();
-    menuController.init();
+    humanControls.init();
 }
 
 void loop()
 {
-    menuController.menuUpdate();
-    pinDebouncer.update();
+
+    humanControls.update();
 }
 
-//Methods for debouncer
 void onPinActivated(int pinNr)
 {
-    switch (pinNr)
-    {
-    case ENCODER_PIN_SW:
-        menuController.menuPress();
-        break;
-    }
+    humanControls.onPinActivated(pinNr);
 }
-void onPinDeactivated(int pinNr) {}
+void onPinDeactivated(int pinNr)
+{
+    humanControls.onPinDeactivated(pinNr);
+}

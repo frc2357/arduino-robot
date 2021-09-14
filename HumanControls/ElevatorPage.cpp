@@ -1,10 +1,10 @@
 #include "ElevatorPage.h"
 
-ElevatorPage::ElevatorPage(int increment, int min, int max) : Page(increment, min, max, true)
+ElevatorPage::ElevatorPage(int increment, int min, int max) : Page(increment, min, max, true, Page::PageType::ELEVATOR_PAGE)
 {
 }
 
-void ElevatorPage::paint(DisplayController &display, bool isActivated)
+void ElevatorPage::paint(DisplayController &display, bool isActivated, const char *status)
 {
     display.clear();
     if (canActivate() && isActivated)
