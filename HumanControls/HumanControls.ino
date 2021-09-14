@@ -37,9 +37,9 @@
 #define DURATION_MAX 300      //Maximum valve duration
 
 //Joystick deadzones
-#define X_DEAD_ZONE_SIZE 100 //Total size of the x deadzone
-#define MIN 0                //Minimum joystick value that comes from the sensor
-#define MAX 1023             //Maximum joystick value that comes from the sensor
+#define x_DEAD_ZONE_SIZE 100 //Total size of the X deadzone
+#define JOYSTICK_MIN 0       //Minimum joystick value that comes from the sensor
+#define JOYSTICK_MAX 1023    //Maximum joystick value that comes from the sensor
 #define Y_DEAD_ZONE_SIZE 100 //Total size of the y deadzone
 
 FTDebouncer pinDebouncer(30);
@@ -50,8 +50,8 @@ MenuController menuController(ENCODER_PIN_CLK, ENCODER_PIN_DT, DISPLAY_ADDRESS, 
                               DURATION_INCREMENT, DURATION_MIN, DURATION_MAX);
 
 //Joystick setup
-JoystickAxis xAxis(JOYSTICK_PIN_VRX, X_DEAD_ZONE_SIZE, MIN, MAX);
-JoystickAxis yAxis(JOYSTICK_PIN_VRY, Y_DEAD_ZONE_SIZE, MIN, MAX);
+JoystickAxis xAxis(JOYSTICK_PIN_VRX, x_DEAD_ZONE_SIZE, JOYSTICK_MIN, JOYSTICK_MAX);
+JoystickAxis yAxis(JOYSTICK_PIN_VRY, Y_DEAD_ZONE_SIZE, JOYSTICK_MIN, JOYSTICK_MAX);
 
 void setup()
 {

@@ -18,6 +18,6 @@ private:
     double calcResult(int rawValue);
 
     int m_pin;
-    double m_result, m_deadZoneSize, m_range, m_min;
+    double m_result, m_range, m_min, m_center, m_halfDeadZoneSize;
 };
 #endif
