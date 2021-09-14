@@ -2,19 +2,13 @@
 
 JoystickAxis::JoystickAxis(unsigned int pin,
                            unsigned int deadZoneSize,
-                           unsigned int min,
                            unsigned int max)
 {
     this->m_pin = pin;
+    this->m_deadZoneSize = deadZoneSize;
+    this->m_max = max;
 
     this->m_result = 0;
-
-    this->m_range = static_cast<double>(max - min);
-    this->m_min = static_cast<double>(min);
-
-    m_center = m_range / 2;
-
-    m_halfDeadZoneSize = static_cast<double>(deadZoneSize) / 2;
 }
 double JoystickAxis::getResult()
 {
@@ -28,37 +22,32 @@ void JoystickAxis::update()
 
 double JoystickAxis::calcResult(int rawValue)
 {
-    double value = rawValue;
+    int value = rawValue;
 
     //General calculations
-    double deadMin = m_center - m_halfDeadZoneSize;
-    double deadMax = m_center - m_halfDeadZoneSize;
-
     //Assumes that this is the raw value the joystick returns when it is untouched
-    double halfCenter = m_center - (deadMax - m_center);
+    int center = m_max / 2;
+    int halfDeadZoneSize = m_deadZoneSize / 2;
 
-    //Offset to ensure a value past the center of the joystick is scalable to the halfCenter
-    double offset = m_center + (deadMax - m_center);
+    int deadMin = center - halfDeadZoneSize;
+    int deadMax = center + halfDeadZoneSize;
 
     //Finalizing result
-    if (value <= m_min || value >= (m_range + m_min))
+    if (value > deadMax)
     {
-        return 0.0;
+        return calcRange(deadMax, m_max, value);
     }
-
-    if (value >= deadMin && value <= deadMax)
+    if (value < deadMin)
     {
-        return 0.0;
-    }
-
-    if (value > m_center)
-    {
-        return (value - offset) / halfCenter;
-    }
-    if (value < m_center)
-    {
-        return -1 * (1 - (value / halfCenter));
+        return -1 * (1 - calcRange(0, deadMin, value));
     }
 
     return 0.0;
+}
+
+double JoystickAxis::calcRange(int min, int max, int current)
+{
+    int halfTotal = max - min;
+
+    return static_cast<double>((current - min)) / halfTotal;
 }

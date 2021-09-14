@@ -37,8 +37,7 @@
 #define DURATION_MAX 300      //Maximum valve duration
 
 //Joystick deadzones
-#define x_DEAD_ZONE_SIZE 100 //Total size of the X deadzone
-#define JOYSTICK_MIN 0       //Minimum joystick value that comes from the sensor
+#define X_DEAD_ZONE_SIZE 100 //Total size of the X deadzone
 #define JOYSTICK_MAX 1023    //Maximum joystick value that comes from the sensor
 #define Y_DEAD_ZONE_SIZE 100 //Total size of the y deadzone
 
@@ -50,8 +49,8 @@ MenuController menuController(ENCODER_PIN_CLK, ENCODER_PIN_DT, DISPLAY_ADDRESS, 
                               DURATION_INCREMENT, DURATION_MIN, DURATION_MAX);
 
 //Joystick setup
-JoystickAxis xAxis(JOYSTICK_PIN_VRX, x_DEAD_ZONE_SIZE, JOYSTICK_MIN, JOYSTICK_MAX);
-JoystickAxis yAxis(JOYSTICK_PIN_VRY, Y_DEAD_ZONE_SIZE, JOYSTICK_MIN, JOYSTICK_MAX);
+JoystickAxis xAxis(JOYSTICK_PIN_VRX, X_DEAD_ZONE_SIZE, JOYSTICK_MAX);
+JoystickAxis yAxis(JOYSTICK_PIN_VRY, Y_DEAD_ZONE_SIZE, JOYSTICK_MAX);
 
 void setup()
 {
@@ -67,6 +66,8 @@ void loop()
     pinDebouncer.update();
     xAxis.update();
     yAxis.update();
+    Serial.println("X Axis: " + String(xAxis.getResult()));
+    //Serial.println("Y Axis: " + String(yAxis.getResult()));
 }
 
 //Methods for debouncer
