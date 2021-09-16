@@ -3,10 +3,21 @@
 
 #include <Arduino.h>
 
+#define JSON_TYPE_NONE      0
+#define JSON_TYPE_BOOLEAN   1
+#define JSON_TYPE_INT       2
+#define JSON_TYPE_FLOAT     3
+#define JSON_TYPE_STRING    4
+#define JSON_TYPE_ARRAY     5
+#define JSON_TYPE_OBJECT    6
+
+// Switch the comments on the macro to enable debugging
+//#define JSON_LOG_ERROR(...) JsonElement::logError(__VA_ARGS__)
+#define JSON_LOG_ERROR(...) do {} while(0)
+
 class JsonElement {
   public:
     static JsonElement NotFound;
-    static JsonElement NoKey;
 
     JsonElement();
     JsonElement(const JsonElement &element);
@@ -34,7 +45,6 @@ class JsonElement {
     void printJson(int indent, Print &out) const;
 
   protected:
-    enum JsonElementType { NoType, BooleanType, IntType, FloatType, StringType, ArrayType, ObjectType };
     static Print &m_errorLog;
 
     static void logError(const char *format, ...);
@@ -48,7 +58,7 @@ class JsonElement {
     };
 
     const char *m_key;
-    JsonElementType m_type;
+    char m_type;
     JsonElementValue m_value;
     size_t m_length;
 
@@ -56,7 +66,7 @@ class JsonElement {
     friend class JsonState;
     friend class JsonUtils;
 
-    JsonElement(const char *key, JsonElementType type, JsonElementValue value, size_t length);
+    JsonElement(const char *key, char type, JsonElementValue value, size_t length);
     void printJsonBoolean(int indent, Print &out) const;
     void printJsonInt(int indent, Print &out) const;
     void printJsonFloat(int indent, Print &out) const;
@@ -77,46 +87,103 @@ class JsonElement {
 
 class Json {
   public:
-    static JsonElement Boolean(bool value);
-    static JsonElement Boolean(const char *key, bool value);
+    static JsonElement Boolean(bool value) {
+      return Boolean("", value);
+    }
 
-    static JsonElement Int(int value);
-    static JsonElement Int(const char *key, int value);
+    static JsonElement Boolean(const char *key, bool value) {
+      JsonElement::JsonElementValue elementValue;
+      elementValue.booleanValue = value;
+      return JsonElement(key, JSON_TYPE_BOOLEAN, elementValue, -1);
+    }
 
-    static JsonElement Float(float value);
-    static JsonElement Float(double value);
-    static JsonElement Float(const char *key, float value);
-    static JsonElement Float(const char *key, double value);
+    static JsonElement Int(int value) {
+      return Int("", value);
+    }
 
-    static JsonElement String(const char *value);
-    static JsonElement String(const char *value, size_t length);
-    static JsonElement String(const char *key, const char *value);
-    static JsonElement String(const char *key, const char *value, size_t length);
+    static JsonElement Int(const char *key, int value) {
+      JsonElement::JsonElementValue elementValue;
+      elementValue.intValue = value;
+      return JsonElement(key, JSON_TYPE_INT, elementValue, -1);
+    }
+
+    static JsonElement Float(float value) {
+      return Float("", (double)value);
+    }
+
+    static JsonElement Float(double value) {
+      return Float("", value);
+    }
+
+    static JsonElement Float(const char *key, float value) {
+      return Float(key, (double)value);
+    }
+
+    static JsonElement Float(const char *key, double value) {
+      JsonElement::JsonElementValue elementValue;
+      elementValue.doubleValue = value;
+      return JsonElement(key, JSON_TYPE_FLOAT, elementValue, -1);
+    }
+
+    static JsonElement String(const char *value) {
+      return String("", value);
+    }
+
+    static JsonElement String(const char *value, size_t length) {
+      return String("", value, length);
+    }
+
+    static JsonElement String(const char *key, const char *value) {
+      return String(key, value, strlen(value) + 1);
+    }
+
+    static JsonElement String(const char *key, const char *value, size_t length) {
+      size_t stringLength = length + 1; // for null-terminated strings
+
+      JsonElement::JsonElementValue elementValue;
+      elementValue.stringValue = new char[stringLength];
+      strlcpy(elementValue.stringValue, value, stringLength);
+      return JsonElement(key, JSON_TYPE_STRING, elementValue, stringLength);
+    }
 
     template<size_t S>
-    static JsonElement Array(JsonElement (&array)[S]);
-    template<size_t S>
-    static JsonElement Array(const char *key, JsonElement (&array)[S]);
+    static JsonElement Array(JsonElement (&array)[S]) {
+      return Array("", array);
+    }
 
     template<size_t S>
-    static JsonElement Object(JsonElement (&fields)[S]);
+    static JsonElement Array(const char *key, JsonElement (&array)[S]) {
+      JsonElement::JsonElementValue elementValue;
+      elementValue.arrayValue = array;
+      return JsonElement(key, JSON_TYPE_ARRAY, elementValue, S);
+    }
+
     template<size_t S>
-    static JsonElement Object(const char *key, JsonElement (&fields)[S]);
+    static JsonElement Object(JsonElement (&fields)[S]) {
+      return Object("", fields);
+    }
+
+    template<size_t S>
+    static JsonElement Object(const char *key, JsonElement (&fields)[S]) {
+      JsonElement::JsonElementValue elementValue;
+      elementValue.arrayValue = fields;
+      return JsonElement(key, JSON_TYPE_OBJECT, elementValue, S);
+    }
 };
 
 class JsonState {
   public:
     JsonState(JsonElement &root);
-    JsonState(JsonElement &root, Print &errorLogger);
     ~JsonState();
 
+    JsonElement &root() const;
     void printJson(Print &out) const;
     void printJson(bool pretty, Print &out) const;
+    bool updateFromJson(String &json);
     bool updateFromJson(const char *json);
     size_t updateFromJson(const char *json, size_t length, size_t &elementsUpdated);
 
   private:
-    Print &m_errorLog;
     JsonElement &m_root;
 };
 
