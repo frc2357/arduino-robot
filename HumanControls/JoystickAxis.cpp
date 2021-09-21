@@ -22,8 +22,6 @@ void JoystickAxis::update()
 
 double JoystickAxis::calcResult(int rawValue)
 {
-    int value = rawValue;
-
     //General calculations
     //Assumes that this is the raw value the joystick returns when it is untouched
     int center = m_max / 2;
@@ -33,13 +31,13 @@ double JoystickAxis::calcResult(int rawValue)
     int deadMax = center + halfDeadZoneSize;
 
     //Finalizing result
-    if (value > deadMax)
+    if (rawValue > deadMax)
     {
-        return calcRange(deadMax, m_max, value);
+        return calcRange(deadMax, m_max, rawValue);
     }
-    if (value < deadMin)
+    if (rawValue < deadMin)
     {
-        return -1 * (1 - calcRange(0, deadMin, value));
+        return -1 * (1 - calcRange(0, deadMin, rawValue));
     }
 
     return 0.0;
