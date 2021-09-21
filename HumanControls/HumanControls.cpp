@@ -23,12 +23,18 @@ HumanControls::HumanControls(unsigned int encoderPinClk,
                              unsigned int numButtons,
                              unsigned int encoderPinSW,
                              unsigned int enablePin,
-                             unsigned int firePin)
+                             unsigned int firePin,
+                             unsigned int joystickPinVRX,
+                             unsigned int xDeadZoneSize,
+                             unsigned int joystickMax,
+                             unsigned int joystickPinVRY,
+                             unsigned int yDeadZoneSize)
     : m_menuController(encoderPinClk, encoderPinDt, displayAddress, displayLen, displayWidth,
                        angleIncrement, angleMin, angleMax, pressureIncrement, pressureMin,
                        pressureMax, durationIncrement, durationMin, durationMax),
-      m_pinDebouncer(numButtons), m_enableController(), m_fireController() //,
-                                                                           /*encoderPinSW(encoderPinSW), enablePin(enablePin), firePin(firePin)*/
+      m_pinDebouncer(numButtons), m_enableController(), m_fireController(),
+      m_leftStick(joystickPinVRX, xDeadZoneSize, joystickMax),
+      m_rightStick(joystickPinVRY, yDeadZoneSize, joystickMax)
 {
     this->m_encoderPinSW = encoderPinSW;
     this->m_enablePin = enablePin;
@@ -57,6 +63,11 @@ void HumanControls::update()
 
     m_menuController.menuUpdate(status);
     m_pinDebouncer.update();
+
+    m_rightStick.update();
+    m_leftStick.update();
+    //Serial.println("Right Stick: " + String(m_rightStick.getResult()));
+    //Serial.println("Left Stick: " + String(m_leftStick.getResult()));
 }
 
 void HumanControls::setStatus()

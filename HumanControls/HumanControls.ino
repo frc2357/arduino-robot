@@ -1,6 +1,4 @@
 #include <LiquidCrystal_I2C.h>
-#include "Arduino.h"
-#include "FTDebouncer.h"
 #include "RotaryKnobController.h"
 #include "CharacterDisplay.h"
 #include "MenuController.h"
@@ -41,14 +39,16 @@
 #define DURATION_MIN 100      //Minimum valve duration
 #define DURATION_MAX 300      //Maximum valve duration
 
+//Joystick deadzones and max
+#define X_DEAD_ZONE_SIZE 100 //Total size of the X deadzone
+#define JOYSTICK_MAX 1023    //Maximum joystick value that comes from the sensor
+#define Y_DEAD_ZONE_SIZE 100 //Total size of the y deadzone
+
 HumanControls humanControls(ENCODER_PIN_CLK, ENCODER_PIN_DT, DISPLAY_ADDRESS, DISPLAY_LENGTH, DISPLAY_WIDTH,
                             ANGLE_INCREMENT, ANGLE_MIN, ANGLE_MAX, PRESSURE_INCREMENT, PRESSURE_MIN, PRESSURE_MAX,
                             DURATION_INCREMENT, DURATION_MIN, DURATION_MAX, NUM_BUTTONS, ENCODER_PIN_SW,
-                            ENABLE_PIN, FIRE_PIN);
-
-//Joystick setup
-JoystickAxis xAxis(JOYSTICK_PIN_VRX, X_DEAD_ZONE_SIZE, JOYSTICK_MAX);
-JoystickAxis yAxis(JOYSTICK_PIN_VRY, Y_DEAD_ZONE_SIZE, JOYSTICK_MAX);
+                            ENABLE_PIN, FIRE_PIN, JOYSTICK_PIN_VRX, X_DEAD_ZONE_SIZE, JOYSTICK_MAX,
+                            JOYSTICK_PIN_VRY, Y_DEAD_ZONE_SIZE);
 
 void setup()
 {
@@ -60,10 +60,6 @@ void loop()
 {
 
     humanControls.update();
-    xAxis.update();
-    yAxis.update();
-    Serial.println("X Axis: " + String(xAxis.getResult()));
-    //Serial.println("Y Axis: " + String(yAxis.getResult()));
 }
 
 void onPinActivated(int pinNr)
