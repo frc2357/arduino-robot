@@ -18,7 +18,5 @@
     "url": "https://github.com/frc2357/arduino-2357/issues"
   },
   "homepage": "https://github.com/frc2357/arduino-2357#readme",
-  "arduinoLibs": [
-    "ArduinoJson@6.18.0"
-  ]
+  "arduinoLibs": []
 }

@@ -14,78 +14,94 @@ MenuController::MenuController(unsigned int encoderPinClk,
                                unsigned int durationIncrement,
                                unsigned int durationMin,
                                unsigned int durationMax)
-    : rotaryKnob(encoderPinClk, encoderPinDt), display(displayAddress, displayLen, displayWidth),
-      dashPage(), elevatorPage(angleIncrement, angleMin, angleMax),
-      shotPage(pressureIncrement, pressureMin, pressureMax),
-      valvePage(durationIncrement, durationMin, durationMax)
+    : m_rotaryKnob(encoderPinClk, encoderPinDt), m_display(displayAddress, displayLen, displayWidth),
+      m_dashPage(), m_elevatorPage(angleIncrement, angleMin, angleMax),
+      m_shotPage(pressureIncrement, pressureMin, pressureMax),
+      m_valvePage(durationIncrement, durationMin, durationMax)
 {
-    this->isActive = false;
+    this->m_isActive = false;
 
-    this->rotation = 0;
+    this->m_rotation = 0;
 
     //Set previous pages
-    dashPage.setPreviousPage(valvePage);
-    elevatorPage.setPreviousPage(dashPage);
-    shotPage.setPreviousPage(elevatorPage);
-    valvePage.setPreviousPage(shotPage);
+    m_dashPage.setPreviousPage(m_valvePage);
+    m_elevatorPage.setPreviousPage(m_dashPage);
+    m_shotPage.setPreviousPage(m_elevatorPage);
+    m_valvePage.setPreviousPage(m_shotPage);
 
     //Set next pages
-    dashPage.setNextPage(elevatorPage);
-    elevatorPage.setNextPage(shotPage);
-    shotPage.setNextPage(valvePage);
-    valvePage.setNextPage(dashPage);
+    m_dashPage.setNextPage(m_elevatorPage);
+    m_elevatorPage.setNextPage(m_shotPage);
+    m_shotPage.setNextPage(m_valvePage);
+    m_valvePage.setNextPage(m_dashPage);
 
-    currentPage = &dashPage;
+    m_currentPage = &m_dashPage;
 }
 
-void MenuController::init()
+void MenuController::init(const char *status)
 {
     Serial.println("Menu Init");
-    this->display.init();
-    this->currentPage->paint(display, this->isActive);
+    this->m_display.init();
+    this->m_currentPage->paint(m_display, this->m_isActive, status);
 }
 
-void MenuController::menuUpdate()
+void MenuController::menuRefresh(const char *status)
 {
-    this->rotation = this->rotaryKnob.getValue();
+    this->m_currentPage->paint(m_display, m_isActive, status);
+}
 
-    if (isActive & currentPage->canActivate())
+void MenuController::menuUpdate(const char *status)
+{
+    this->m_rotation = this->m_rotaryKnob.getValue();
+
+    if (m_isActive & m_currentPage->canActivate())
     {
-        if (this->rotation == 1)
+        if (this->m_rotation == 1)
         {
-            this->currentPage->clockwise();
-            this->currentPage->paint(display, isActive);
+            this->m_currentPage->clockwise();
+            this->m_currentPage->paint(m_display, m_isActive, status);
         }
 
-        if (this->rotation == -1)
+        if (this->m_rotation == -1)
         {
-            this->currentPage->counterClockwise();
-            this->currentPage->paint(display, isActive);
+            this->m_currentPage->counterClockwise();
+            this->m_currentPage->paint(m_display, m_isActive, status);
         }
     }
     else
     {
-        if (this->rotation == 1)
+        if (this->m_rotation == 1)
         {
-            this->currentPage = this->currentPage->getNextPage();
+            this->m_currentPage = this->m_currentPage->getNextPage();
         }
 
-        if (this->rotation == -1)
+        if (this->m_rotation == -1)
         {
-            this->currentPage = this->currentPage->getPreviousPage();
+            this->m_currentPage = this->m_currentPage->getPreviousPage();
         }
 
-        if (this->rotation != 0)
+        if (this->m_rotation != 0)
         {
-            this->currentPage->cleanUp(display);
-            this->currentPage->paint(display, isActive);
+            this->m_currentPage->cleanUp(m_display);
+            this->m_currentPage->paint(m_display, m_isActive, status);
         }
-        this->isActive = false;
+        this->m_isActive = false;
     }
 }
 
-void MenuController::menuPress()
+void MenuController::menuPress(const char *status, bool isEnabled, FireController &fireController)
 {
-    this->isActive = !this->isActive;
-    this->currentPage->paint(display, isActive);
+    this->m_isActive = !this->m_isActive;
+    this->m_currentPage->paint(m_display, m_isActive, status);
+    if (this->m_currentPage->getName() == m_dashPage.getName())
+    {
+        if (isEnabled)
+        {
+            fireController.setIsFireToggled(true);
+        }
+        else
+        {
+            fireController.setIsFireToggled(false);
+        }
+    }
 }

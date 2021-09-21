@@ -1,14 +1,11 @@
 #include "ValvePage.h"
 
-ValvePage::ValvePage(int increment, int min, int max) : Page(increment, min, max, true)
+ValvePage::ValvePage(int increment, int min, int max) : Page(increment, min, max, true, Page::PageType::VALVE_PAGE)
 {
 }
 
-void ValvePage::paint(DisplayController &display, bool isActivated)
+void ValvePage::paint(DisplayController &display, bool isActivated, const char *status)
 {
-    Serial.println("isActivated: " + isActivated);
-    Serial.println("canActivate " + canActivate());
-
     display.clear();
     if (canActivate() && isActivated)
     {

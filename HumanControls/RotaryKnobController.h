@@ -11,7 +11,7 @@ public:
     int getValue();
 
 private:
-    int pos = 0;
-    RotaryEncoder *encoder;
+    int m_pos = 0;
+    RotaryEncoder *m_encoder;
 };
 #endif
