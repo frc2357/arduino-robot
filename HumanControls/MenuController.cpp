@@ -58,13 +58,13 @@ void MenuController::menuUpdate(JsonState &state)
     {
         if (this->m_rotation == 1)
         {
-            this->m_currentPage->clockwise();
+            this->m_currentPage->clockwise(state);
             this->m_currentPage->paint(m_display, m_isActive, state);
         }
 
         if (this->m_rotation == -1)
         {
-            this->m_currentPage->counterClockwise();
+            this->m_currentPage->counterClockwise(state);
             this->m_currentPage->paint(m_display, m_isActive, state);
         }
     }

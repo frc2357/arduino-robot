@@ -18,13 +18,12 @@ public:
     };
 
     Page(Page::PageType name);
-    Page(int increment, int min, int max, bool isActive, Page::PageType name);
+    Page(bool isActive, Page::PageType name);
     void cleanUp(DisplayController &display);
     virtual void paint(DisplayController &display, bool isActivated, JsonState &state) = 0;
-    void clockwise();
-    void counterClockwise();
+    virtual void clockwise(JsonState &state) = 0;
+    virtual void counterClockwise(JsonState &state) = 0;
     bool canActivate();
-    int getModifyValue();
     void setNextPage(Page &page);
     void setPreviousPage(Page &page);
     Page::PageType getName();
@@ -33,7 +32,6 @@ public:
 
 private:
     bool m_isActive;
-    int m_modifyValue, m_min, m_max, m_increment;
     PageType m_name;
     Page *m_previousPage;
     Page *m_nextPage;
