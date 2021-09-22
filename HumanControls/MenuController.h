@@ -2,6 +2,7 @@
 #define MENUCONTROLLER_H
 
 #include "Arduino.h"
+#include <JsonEl.h>
 #include "Page.h"
 #include "DashPage.h"
 #include "ElevatorPage.h"
@@ -28,10 +29,10 @@ public:
                    unsigned int durationIncrement,
                    unsigned int durationMin,
                    unsigned int durationMax);
-    void init(const char *status);
-    void menuUpdate(const char *status);
-    void menuRefresh(const char *status);
-    void menuPress(const char *status, bool isEnabled, FireController &FireController);
+    void init(JsonState &state);
+    void menuUpdate(JsonState &state);
+    void menuRefresh(JsonState &state);
+    void menuPress(JsonState &state, bool isEnabled, FireController &FireController);
 
 private:
     RotaryKnobController m_rotaryKnob;

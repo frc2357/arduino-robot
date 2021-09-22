@@ -3,12 +3,13 @@
 
 #include "Page.h"
 #include "Arduino.h"
+#include <JsonEl.h>
 
 class DashPage : public Page
 {
 public:
     DashPage();
-    void paint(DisplayController &display, bool isActivated, const char *status);
+    void paint(DisplayController &display, bool isActivated, JsonState &state);
 };
 
 #endif

@@ -38,19 +38,19 @@ MenuController::MenuController(unsigned int encoderPinClk,
     m_currentPage = &m_dashPage;
 }
 
-void MenuController::init(const char *status)
+void MenuController::init(JsonState &state)
 {
     Serial.println("Menu Init");
     this->m_display.init();
-    this->m_currentPage->paint(m_display, this->m_isActive, status);
+    this->m_currentPage->paint(m_display, this->m_isActive, state);
 }
 
-void MenuController::menuRefresh(const char *status)
+void MenuController::menuRefresh(JsonState &state)
 {
-    this->m_currentPage->paint(m_display, m_isActive, status);
+    this->m_currentPage->paint(m_display, m_isActive, state);
 }
 
-void MenuController::menuUpdate(const char *status)
+void MenuController::menuUpdate(JsonState &state)
 {
     this->m_rotation = this->m_rotaryKnob.getValue();
 
@@ -59,13 +59,13 @@ void MenuController::menuUpdate(const char *status)
         if (this->m_rotation == 1)
         {
             this->m_currentPage->clockwise();
-            this->m_currentPage->paint(m_display, m_isActive, status);
+            this->m_currentPage->paint(m_display, m_isActive, state);
         }
 
         if (this->m_rotation == -1)
         {
             this->m_currentPage->counterClockwise();
-            this->m_currentPage->paint(m_display, m_isActive, status);
+            this->m_currentPage->paint(m_display, m_isActive, state);
         }
     }
     else
@@ -83,16 +83,16 @@ void MenuController::menuUpdate(const char *status)
         if (this->m_rotation != 0)
         {
             this->m_currentPage->cleanUp(m_display);
-            this->m_currentPage->paint(m_display, m_isActive, status);
+            this->m_currentPage->paint(m_display, m_isActive, state);
         }
         this->m_isActive = false;
     }
 }
 
-void MenuController::menuPress(const char *status, bool isEnabled, FireController &fireController)
+void MenuController::menuPress(JsonState &state, bool isEnabled, FireController &fireController)
 {
     this->m_isActive = !this->m_isActive;
-    this->m_currentPage->paint(m_display, m_isActive, status);
+    this->m_currentPage->paint(m_display, m_isActive, state);
     if (this->m_currentPage->getName() == m_dashPage.getName())
     {
         if (isEnabled)

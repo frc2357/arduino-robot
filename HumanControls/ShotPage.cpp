@@ -4,7 +4,7 @@ ShotPage::ShotPage(int increment, int min, int max) : Page(increment, min, max, 
 {
 }
 
-void ShotPage::paint(DisplayController &display, bool isActivated, const char *status)
+void ShotPage::paint(DisplayController &display, bool isActivated, JsonState &state)
 {
     display.clear();
     if (canActivate() && isActivated)

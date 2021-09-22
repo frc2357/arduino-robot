@@ -4,7 +4,7 @@ ElevatorPage::ElevatorPage(int increment, int min, int max) : Page(increment, mi
 {
 }
 
-void ElevatorPage::paint(DisplayController &display, bool isActivated, const char *status)
+void ElevatorPage::paint(DisplayController &display, bool isActivated, JsonState &state)
 {
     display.clear();
     if (canActivate() && isActivated)

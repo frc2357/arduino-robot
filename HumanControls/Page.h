@@ -1,6 +1,7 @@
 #ifndef PAGE_H
 #define PAGE_H
 #include "Arduino.h"
+#include <JsonEl.h>
 #include "DisplayInterface.h"
 #include "RotaryKnobController.h"
 #include "DisplayController.h"
@@ -19,7 +20,7 @@ public:
     Page(Page::PageType name);
     Page(int increment, int min, int max, bool isActive, Page::PageType name);
     void cleanUp(DisplayController &display);
-    virtual void paint(DisplayController &display, bool isActivated, const char *status) = 0;
+    virtual void paint(DisplayController &display, bool isActivated, JsonState &state) = 0;
     void clockwise();
     void counterClockwise();
     bool canActivate();

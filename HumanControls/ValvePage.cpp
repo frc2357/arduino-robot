@@ -4,7 +4,7 @@ ValvePage::ValvePage(int increment, int min, int max) : Page(increment, min, max
 {
 }
 
-void ValvePage::paint(DisplayController &display, bool isActivated, const char *status)
+void ValvePage::paint(DisplayController &display, bool isActivated, JsonState &state)
 {
     display.clear();
     if (canActivate() && isActivated)

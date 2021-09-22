@@ -1,4 +1,5 @@
 #include <LiquidCrystal_I2C.h>
+#include <JsonEl.h>
 #include "RotaryKnobController.h"
 #include "CharacterDisplay.h"
 #include "MenuController.h"
@@ -44,7 +45,40 @@
 #define JOYSTICK_MAX 1023    //Maximum joystick value that comes from the sensor
 #define Y_DEAD_ZONE_SIZE 100 //Total size of the y deadzone
 
-HumanControls humanControls(ENCODER_PIN_CLK, ENCODER_PIN_DT, DISPLAY_ADDRESS, DISPLAY_LENGTH, DISPLAY_WIDTH,
+// Set up the JSON State for the robot
+JsonElement humanControlFields[] = {
+    Json::Int("id", -1),
+    Json::String("conn", "Disconnected"),
+};
+
+JsonElement eStopFields[] = {
+    Json::Boolean("btn", true),
+};
+
+JsonElement robotStateFields[] = {
+    Json::String("ver", "1.0.0"),
+    Json::Int("tck", 0),
+    Json::Int("avgTck", 0),
+    Json::Int("up", 0),
+    Json::String("status", "Disabled"),
+    Json::Object("hCtrl", humanControlFields),
+    Json::Object("eStop", eStopFields),
+    Json::Float("bat", 0.0),
+    Json::Float("angle", 0.0),
+    Json::Float("tnkPres", 0.0),
+    Json::Float("frPres", 0.0),
+    Json::Int("vlvTm", 0),
+    Json::Float("dVel", 0.0),
+    Json::Float("dRot", 0.0),
+    Json::Boolean("fire", false),
+    Json::Boolean("fill", false),
+    Json::String("err", "", 32),
+};
+JsonElement controllerState = Json::Object(robotStateFields);
+
+JsonState state(controllerState);
+
+HumanControls humanControls(state, ENCODER_PIN_CLK, ENCODER_PIN_DT, DISPLAY_ADDRESS, DISPLAY_LENGTH, DISPLAY_WIDTH,
                             ANGLE_INCREMENT, ANGLE_MIN, ANGLE_MAX, PRESSURE_INCREMENT, PRESSURE_MIN, PRESSURE_MAX,
                             DURATION_INCREMENT, DURATION_MIN, DURATION_MAX, NUM_BUTTONS, ENCODER_PIN_SW,
                             ENABLE_PIN, FIRE_PIN, JOYSTICK_PIN_VRX, X_DEAD_ZONE_SIZE, JOYSTICK_MAX,
