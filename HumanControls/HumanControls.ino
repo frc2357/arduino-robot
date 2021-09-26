@@ -5,16 +5,21 @@
 #include "DisplayController.h"
 #include "Page.h"
 #include "CharacterDisplay.h"
+#include "JoystickAxis.h"
 #include "EnableController.h"
 #include "FireController.h"
 #include "HumanControls.h"
 
 //Pins
-#define ENCODER_PIN_CLK 3 //CLK gets degrees for rotary knob
-#define ENCODER_PIN_DT 4  //DT gets direction for rotary knob
-#define ENCODER_PIN_SW 5  //Gets the button for rotary knob
-#define ENABLE_PIN 7      //Digital Pin for the enable button
-#define FIRE_PIN 9        //Digital Pin for the fire button
+//LCD connects SDA in analog pin 4 and SCL in analog pin 5
+#define ENCODER_PIN_CLK 3  //CLK gets degrees for rotary knob
+#define ENCODER_PIN_DT 4   //DT gets direction for rotary knob
+#define ENCODER_PIN_SW 5   //Gets the button for rotary knob
+#define JOYSTICK_PIN_SW 6  //Button for joystick
+#define JOYSTICK_PIN_VRX 0 //Analog Pin for joystick x
+#define JOYSTICK_PIN_VRY 1 //Analog Pin for joystick y
+#define ENABLE_PIN 7       //Digital Pin for the enable button
+#define FIRE_PIN 9         //Digital Pin for the fire button
 
 //Other constraints
 #define DISPLAY_ADDRESS 0X27 //I2c address of the lcd display
@@ -34,10 +39,16 @@
 #define DURATION_MIN 100      //Minimum valve duration
 #define DURATION_MAX 300      //Maximum valve duration
 
+//Joystick deadzones and max
+#define X_DEAD_ZONE_SIZE 100 //Total size of the X deadzone
+#define JOYSTICK_MAX 1023    //Maximum joystick value that comes from the sensor
+#define Y_DEAD_ZONE_SIZE 100 //Total size of the y deadzone
+
 HumanControls humanControls(ENCODER_PIN_CLK, ENCODER_PIN_DT, DISPLAY_ADDRESS, DISPLAY_LENGTH, DISPLAY_WIDTH,
                             ANGLE_INCREMENT, ANGLE_MIN, ANGLE_MAX, PRESSURE_INCREMENT, PRESSURE_MIN, PRESSURE_MAX,
                             DURATION_INCREMENT, DURATION_MIN, DURATION_MAX, NUM_BUTTONS, ENCODER_PIN_SW,
-                            ENABLE_PIN, FIRE_PIN);
+                            ENABLE_PIN, FIRE_PIN, JOYSTICK_PIN_VRX, X_DEAD_ZONE_SIZE, JOYSTICK_MAX,
+                            JOYSTICK_PIN_VRY, Y_DEAD_ZONE_SIZE);
 
 void setup()
 {

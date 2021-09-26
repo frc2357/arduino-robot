@@ -5,6 +5,7 @@
 #include "FTDebouncer.h"
 #include "EnableController.h"
 #include "FireController.h"
+#include "JoystickAxis.h"
 
 class HumanControls
 {
@@ -26,7 +27,12 @@ public:
                   unsigned int numButtons,
                   unsigned int encoderPinSW,
                   unsigned int enablePin,
-                  unsigned int firePin);
+                  unsigned int firePin,
+                  unsigned int joystickPinVRX,
+                  unsigned int xDeadZoneSize,
+                  unsigned int joystickMax,
+                  unsigned int joystickPinVRY,
+                  unsigned int yDeadZoneSize);
     void init();
     void update();
     void setStatus();
@@ -48,6 +54,7 @@ private:
     FTDebouncer m_pinDebouncer;
     EnableController m_enableController;
     FireController m_fireController;
+    JoystickAxis m_leftStick, m_rightStick;
 };
 
 #endif
