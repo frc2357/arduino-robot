@@ -9,8 +9,7 @@
 #define ROBOT_TICK_DURATION_BUFFER_LEN 5
 
 class Robot {
-  static const unsigned long TICK_DURATION_MICROS;
-  static const unsigned long I2C_UPDATE_TICKS;
+  static const unsigned long TICK_DURATION_MILLIS;
 
   static const char *STATUS_DISABLED;
   static const char *STATUS_ENABLED;
