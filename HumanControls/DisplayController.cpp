@@ -31,7 +31,6 @@ void DisplayController::printRegion(int x, int y, String text)
 
 void DisplayController::printRegion(int x, int y, int code)
 {
-    Serial.println("Attempting to create custom");
     this->m_lcd.setCursor(x, y);
     this->m_lcd.write(code);
 }

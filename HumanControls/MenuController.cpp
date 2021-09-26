@@ -13,7 +13,8 @@ MenuController::MenuController(unsigned int encoderPinClk,
                                unsigned int pressureMax,
                                unsigned int durationIncrement,
                                unsigned int durationMin,
-                               unsigned int durationMax)
+                               unsigned int durationMax,
+                               unsigned int hangTimerDuration)
     : m_rotaryKnob(encoderPinClk, encoderPinDt), m_display(displayAddress, displayLen, displayWidth),
       m_dashPage(), m_elevatorPage(angleIncrement, angleMin, angleMax),
       m_shotPage(pressureIncrement, pressureMin, pressureMax),
@@ -36,6 +37,9 @@ MenuController::MenuController(unsigned int encoderPinClk,
     m_valvePage.setNextPage(m_dashPage);
 
     m_currentPage = &m_dashPage;
+
+    this->m_hangTimerDuration = hangTimerDuration;
+    this->m_time = millis();
 }
 
 void MenuController::init(JsonState &state)
@@ -59,13 +63,11 @@ void MenuController::menuUpdate(JsonState &state)
         if (this->m_rotation == 1)
         {
             this->m_currentPage->clockwise(state);
-            this->m_currentPage->paint(m_display, m_isActive, state);
         }
 
         if (this->m_rotation == -1)
         {
             this->m_currentPage->counterClockwise(state);
-            this->m_currentPage->paint(m_display, m_isActive, state);
         }
     }
     else
@@ -79,13 +81,21 @@ void MenuController::menuUpdate(JsonState &state)
         {
             this->m_currentPage = this->m_currentPage->getPreviousPage();
         }
-
-        if (this->m_rotation != 0)
-        {
-            this->m_currentPage->cleanUp(m_display);
-            this->m_currentPage->paint(m_display, m_isActive, state);
-        }
         this->m_isActive = false;
+    }
+
+    if (this->m_rotation != 0)
+    {
+        this->m_time = millis();
+        this->m_currentPage->cleanUp(m_display);
+        this->m_currentPage->paint(m_display, m_isActive, state);
+    }
+
+    if (this->m_currentPage->getName() != m_dashPage.getName() && millis() > (this->m_time + this->m_hangTimerDuration))
+    {
+        this->m_currentPage = &m_dashPage;
+        this->m_currentPage->cleanUp(m_display);
+        this->m_currentPage->paint(m_display, m_isActive, state);
     }
 }
 

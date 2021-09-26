@@ -23,10 +23,11 @@
 #define FIRE_PIN 9         //Digital Pin for the fire button
 
 //Other constraints
-#define DISPLAY_ADDRESS 0X27 //I2c address of the lcd display
-#define DISPLAY_LENGTH 16    //Length of the lcd display
-#define DISPLAY_WIDTH 2      //width of the lcd display
-#define NUM_BUTTONS 3        //Number of buttons to give the debouncer
+#define DISPLAY_ADDRESS 0X27      //I2c address of the lcd display
+#define DISPLAY_LENGTH 16         //Length of the lcd display
+#define DISPLAY_WIDTH 2           //width of the lcd display
+#define NUM_BUTTONS 3             //Number of buttons to give the debouncer
+#define HANG_TIMER_DURATION 10000 //Amount in milliseconds to stay on a page before going to dash
 #define USB_BAUDRATE 115200
 
 //Min - Max
@@ -80,7 +81,7 @@ JsonState state(controllerState);
 
 HumanControls humanControls(state, ENCODER_PIN_CLK, ENCODER_PIN_DT, DISPLAY_ADDRESS, DISPLAY_LENGTH, DISPLAY_WIDTH,
                             ANGLE_INCREMENT, ANGLE_MIN, ANGLE_MAX, PRESSURE_INCREMENT, PRESSURE_MIN, PRESSURE_MAX,
-                            DURATION_INCREMENT, DURATION_MIN, DURATION_MAX, NUM_BUTTONS, ENCODER_PIN_SW,
+                            DURATION_INCREMENT, DURATION_MIN, DURATION_MAX, HANG_TIMER_DURATION, NUM_BUTTONS, ENCODER_PIN_SW,
                             ENABLE_PIN, FIRE_PIN, JOYSTICK_PIN_VRX, X_DEAD_ZONE_SIZE, JOYSTICK_MAX,
                             JOYSTICK_PIN_VRY, Y_DEAD_ZONE_SIZE);
 

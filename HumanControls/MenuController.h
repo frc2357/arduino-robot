@@ -28,7 +28,8 @@ public:
                    unsigned int pressureMax,
                    unsigned int durationIncrement,
                    unsigned int durationMin,
-                   unsigned int durationMax);
+                   unsigned int durationMax,
+                   unsigned int hangTimerDuration);
     void init(JsonState &state);
     void menuUpdate(JsonState &state);
     void menuRefresh(JsonState &state);
@@ -37,7 +38,8 @@ public:
 private:
     RotaryKnobController m_rotaryKnob;
     DisplayController m_display;
-    int m_rotation;
+    int m_rotation, m_hangTimerDuration;
+    long m_time;
     bool m_isActive;
     Page *m_currentPage;
     DashPage m_dashPage;

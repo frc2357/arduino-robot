@@ -8,7 +8,6 @@ void DashPage::paint(DisplayController &display, bool isActivated, JsonState &st
 {
     display.clear();
 
-    Serial.println(state.root()["hCtrl"]["conn"].asString());
     if (state.root()["hCtrl"]["conn"].asString()[0] == 'A')
     {
         display.printRegion(0, 0, state.root()["status"].asString());

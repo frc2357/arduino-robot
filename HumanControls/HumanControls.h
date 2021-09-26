@@ -27,6 +27,7 @@ public:
                   unsigned int durationIncrement,
                   unsigned int durationMin,
                   unsigned int durationMax,
+                  unsigned int hangTimerDuration,
                   unsigned int numButtons,
                   unsigned int encoderPinSW,
                   unsigned int enablePin,
