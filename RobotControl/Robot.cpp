@@ -2,12 +2,17 @@
 #include "Utils.h"
 
 const unsigned long Robot::TICK_DURATION_MICROS = 10000;
+const unsigned long Robot::I2C_UPDATE_TICKS = 100;
 
 const char *Robot::STATUS_DISABLED = "Disabled";
 const char *Robot::STATUS_ENABLED = "Enabled";
 const char *Robot::STATUS_PRIMED = "Primed";
 
-Robot::Robot(JsonState &state, int pinLedBuiltin) : m_state(state), m_statusLEDs(pinLedBuiltin) {
+Robot::Robot(JsonState &state, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress) :
+  m_state(state),
+  m_statusLEDs(pinLedBuiltin),
+  m_commsI2C(i2cHostAddress, i2cDeviceAddress)
+{
   m_initTimeSeconds = 0;
 }
 
@@ -20,6 +25,7 @@ void Robot::init() {
   }
 
   m_statusLEDs.setBlinkPattern(StatusLEDs::DISABLED);
+  m_commsI2C.init();
 }
 
 void Robot::update() {
@@ -28,18 +34,25 @@ void Robot::update() {
 
   m_statusLEDs.update(tick);
 
+  if (tick % I2C_UPDATE_TICKS == 0) {
+    m_commsI2C.sendState(m_state);
+  }
+
+  // Increment time state variables
   m_state.root()["tck"] = tick + 1;
   m_state.root()["up"] = (int)((tickStartMicros / 1000000) - m_initTimeSeconds);
   m_state.root()["avgTck"] = getAverageTickDuration();
 
-  int tickDurationMicros = (int)(micros() - tickStartMicros);
-  updateTickDurations(tickDurationMicros);
+  long tickDurationMicros = micros() - tickStartMicros;
+  updateTickDurations((int)tickDurationMicros);
 
   if (tickDurationMicros > TICK_DURATION_MICROS) {
-    setError("Tick overflow %d us", tickDurationMicros - TICK_DURATION_MICROS);
+    setError("Tick overflow %ld us", tickDurationMicros);
   }
 
-  updateSerial(tick);
+  // Updating from Serial can take longer than a tick.
+  // So this is outside of the overflow logging.
+  updateSerial();
 
   int timeLeftMicros = TICK_DURATION_MICROS - (micros() - tickStartMicros);
   if (timeLeftMicros > 0) {
@@ -47,7 +60,7 @@ void Robot::update() {
   }
 }
 
-void Robot::updateSerial(int tick) {
+void Robot::updateSerial() {
   if (Serial.available() > 0) {
     String line = Serial.readString();
     updateFromJson(line.c_str());

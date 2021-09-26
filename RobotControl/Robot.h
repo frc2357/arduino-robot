@@ -4,24 +4,26 @@
 #include <Arduino.h>
 #include <JsonEl.h>
 #include "StatusLEDs.h"
+#include "CommsI2C.h"
 
 #define ROBOT_TICK_DURATION_BUFFER_LEN 5
 
 class Robot {
   static const unsigned long TICK_DURATION_MICROS;
+  static const unsigned long I2C_UPDATE_TICKS;
 
   static const char *STATUS_DISABLED;
   static const char *STATUS_ENABLED;
   static const char *STATUS_PRIMED;
 
   public:
-    Robot(JsonState &state, int pinLedBuiltin);
+    Robot(JsonState &state, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress);
 
     void init();
     void update();
 
   private:
-    void updateSerial(int ticks);
+    void updateSerial();
     void updateFromJson(const char *json);
     int getAverageTickDuration();
     void updateTickDurations(int tickDurationMicros);
@@ -29,6 +31,7 @@ class Robot {
 
     JsonState &m_state;
     StatusLEDs m_statusLEDs;
+    CommsI2C m_commsI2C;
     int m_initTimeSeconds;
     int m_tickDurations[ROBOT_TICK_DURATION_BUFFER_LEN];
     size_t m_tickDurationsIndex;
