@@ -1,8 +1,7 @@
 #include "Robot.h"
 #include "Utils.h"
 
-const unsigned long Robot::TICK_DURATION_MICROS = 10000;
-const unsigned long Robot::I2C_UPDATE_TICKS = 100;
+const unsigned long Robot::TICK_DURATION_MILLIS = 100;
 
 const char *Robot::STATUS_DISABLED = "Disabled";
 const char *Robot::STATUS_ENABLED = "Enabled";
@@ -21,7 +20,7 @@ void Robot::init() {
 
   m_tickDurationsIndex = 0;
   for (int i = 0; i < ROBOT_TICK_DURATION_BUFFER_LEN; i++) {
-    m_tickDurations[i] = -1;
+    m_tickDurations[i] = 0;
   }
 
   m_statusLEDs.setBlinkPattern(StatusLEDs::DISABLED);
@@ -30,33 +29,31 @@ void Robot::init() {
 
 void Robot::update() {
   int tick = m_state.root()["tck"].asInt();
-  unsigned long tickStartMicros = micros();
+  unsigned long tickStartMillis = millis();
 
   m_statusLEDs.update(tick);
-
-  if (tick % I2C_UPDATE_TICKS == 0) {
-    m_commsI2C.sendState(m_state);
-  }
+  m_commsI2C.sendState(m_state);
 
   // Increment time state variables
   m_state.root()["tck"] = tick + 1;
-  m_state.root()["up"] = (int)((tickStartMicros / 1000000) - m_initTimeSeconds);
+  m_state.root()["up"] = (int)((tickStartMillis / 1000) - m_initTimeSeconds);
   m_state.root()["avgTck"] = getAverageTickDuration();
 
-  long tickDurationMicros = micros() - tickStartMicros;
-  updateTickDurations((int)tickDurationMicros);
+  int tickDurationMillis = millis() - tickStartMillis;
+  Serial.println(tickDurationMillis);
+  updateTickDurations(tickDurationMillis);
 
-  if (tickDurationMicros > TICK_DURATION_MICROS) {
-    setError("Tick overflow %ld us", tickDurationMicros);
+  if (tickDurationMillis > TICK_DURATION_MILLIS) {
+    setError("Tick overflow %d ms", tickDurationMillis);
   }
 
   // Updating from Serial can take longer than a tick.
   // So this is outside of the overflow logging.
   updateSerial();
 
-  int timeLeftMicros = TICK_DURATION_MICROS - (micros() - tickStartMicros);
-  if (timeLeftMicros > 0) {
-    delay(timeLeftMicros / 1000);
+  int timeLeftMillis = TICK_DURATION_MILLIS - (millis() - tickStartMillis);
+  if (timeLeftMillis > 0) {
+    delay(timeLeftMillis);
   }
 }
 
@@ -99,8 +96,8 @@ int Robot::getAverageTickDuration() {
   return (int)(total / ROBOT_TICK_DURATION_BUFFER_LEN);
 }
 
-void Robot::updateTickDurations(int tickDurationMicros) {
-  m_tickDurations[m_tickDurationsIndex] = tickDurationMicros;
+void Robot::updateTickDurations(int tickDurationMillis) {
+  m_tickDurations[m_tickDurationsIndex] = tickDurationMillis;
   m_tickDurationsIndex = Utils::incrementRingBufferIndex(m_tickDurationsIndex, ROBOT_TICK_DURATION_BUFFER_LEN);
 }
 

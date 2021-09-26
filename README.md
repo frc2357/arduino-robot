@@ -30,7 +30,7 @@ and this is how updates are sent from the controller as well.
 {
   "ver": "1.0.0",          // Software version of the robot
   "tck": 123,              // The current "tick" loop count
-  "avgTck": 90,            // The time in microseconds of the current average tick duration
+  "avgTck": 32,            // The time in milliseconds of the current average tick duration
   "up": 1193,              // The number of seconds since the robot has booted up
   "status": "Enabled",     // Current status of robot ["Disabled", "Enabled", "Primed"]
   "hCtrl": {               // Info about connection to human controls
