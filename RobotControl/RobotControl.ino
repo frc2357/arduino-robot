@@ -12,6 +12,8 @@
 #include "StatusLEDs.h"
 
 #define SERIAL_BAUD_RATE   115200
+#define I2C_HOST_ADDRESS   0x04
+#define I2C_DEVICE_ADDRESS 0x08
 #define PIN_LED_BUILTIN    LED_BUILTIN
 
 // Set up the JSON State for the robot
@@ -47,7 +49,7 @@ JsonElement robotState = Json::Object(robotStateFields);
 
 JsonState state(robotState);
 
-Robot robot(state, PIN_LED_BUILTIN);
+Robot robot(state, PIN_LED_BUILTIN, I2C_HOST_ADDRESS, I2C_DEVICE_ADDRESS);
 
 // Primary Setup
 void setup() {
