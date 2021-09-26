@@ -27,9 +27,6 @@ void CommsI2C::sendState(JsonState &state) {
   beginWrite();
   state.printJson(*this);
   size_t bytesWritten = endWrite();
-  Serial.print("--- ");
-  Serial.print(bytesWritten);
-  Serial.println(" total bytes written ---");
 }
 
 // TODO: Fill out for receiving data
