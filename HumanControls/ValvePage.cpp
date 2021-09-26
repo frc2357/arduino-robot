@@ -10,13 +10,16 @@ ValvePage::ValvePage(int increment, int min, int max) : Page(true, Page::PageTyp
 void ValvePage::paint(DisplayController &display, bool isActivated, JsonState &state)
 {
     display.clear();
+
+    display.printRegion(1, 0, "Valve Duration");
+    display.printRegion(6, 1, String(state.root()["vlvTm"].asInt()));
+    Serial.println(String(state.root()["vlvTm"].asInt()));
+
     if (canActivate() && isActivated)
     {
-        display.printRegion(5, 1, "<[");
-        display.printRegion(10, 1, "]>");
+        display.printRegion(5, 1, 0);
+        display.printRegion(9, 1, 1);
     }
-    display.printRegion(1, 0, "Valve Duration");
-    display.printRegion(7, 1, String(state.root()["vlvTm"].asInt()));
 }
 
 void ValvePage::clockwise(JsonState &state)
@@ -25,11 +28,19 @@ void ValvePage::clockwise(JsonState &state)
     {
         state.root()["vlvTm"] = state.root()["vlvTm"].asInt() + this->m_increment;
     }
+    else
+    {
+        state.root()["vlvTm"] = this->m_max;
+    }
 }
 void ValvePage::counterClockwise(JsonState &state)
 {
     if (state.root()["vlvTm"].asInt() > this->m_min)
     {
-        state.root()["vlvTm"] = state.root()["vlvTm"].asInt() + this->m_increment;
+        state.root()["vlvTm"] = state.root()["vlvTm"].asInt() - this->m_increment;
+    }
+    else
+    {
+        state.root()["vlvTm"] = this->m_min;
     }
 }

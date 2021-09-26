@@ -100,6 +100,7 @@ void HumanControls::setStatus()
     else
     {
         status = HumanControls::STATUS_DISABLED;
+        m_state.root()["hCtrl"]["conn"] = "Disconnected";
     }
 
     if (status != lastStatus)
@@ -147,6 +148,7 @@ void HumanControls::connect()
 {
     //Connect to the robot
     this->m_isConnected = true;
+    m_state.root()["hCtrl"]["conn"] = "Active";
 }
 
 void HumanControls::setError(const char *format, ...)
