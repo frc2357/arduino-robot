@@ -165,7 +165,6 @@ void HumanControls::setError(const char *format, ...)
     vsprintf(message, format, args);
     va_end(args);
 
-    m_state.root()["err"] = message;
     status = HumanControls::STATUS_DISABLED;
     m_state.root()["status"] = HumanControls::STATUS_DISABLED;
 

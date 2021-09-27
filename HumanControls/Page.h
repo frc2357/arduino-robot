@@ -22,9 +22,9 @@ public:
     Page(bool isActive, unsigned int downArrow, unsigned int upArrow,
          unsigned int robotBatChar, unsigned int controllerBatChar, Page::PageType name);
     void cleanUp(DisplayController &display);
-    virtual void paint(DisplayController &display, bool isActivated, JsonState &state) = 0;
-    virtual void clockwise(JsonState &state) = 0;
-    virtual void counterClockwise(JsonState &state) = 0;
+    virtual void paint(DisplayController &display, bool isActivated, JsonElement &object) = 0;
+    virtual void clockwise(JsonElement &object) = 0;
+    virtual void counterClockwise(JsonElement &object) = 0;
     bool canActivate();
     void setNextPage(Page &page);
     void setPreviousPage(Page &page);

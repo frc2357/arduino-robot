@@ -54,12 +54,12 @@ void MenuController::init(JsonState &state, unsigned int downArrow, unsigned int
 {
     Serial.println("Menu Init");
     this->m_display.init(downArrow, upArrow);
-    this->m_currentPage->paint(m_display, this->m_isActive, state);
+    this->m_currentPage->paint(m_display, this->m_isActive, state.root());
 }
 
 void MenuController::menuRefresh(JsonState &state)
 {
-    this->m_currentPage->paint(m_display, m_isActive, state);
+    this->m_currentPage->paint(m_display, m_isActive, state.root());
 }
 
 void MenuController::menuUpdate(JsonState &state)
@@ -70,12 +70,12 @@ void MenuController::menuUpdate(JsonState &state)
     {
         if (this->m_rotation == 1)
         {
-            this->m_currentPage->clockwise(state);
+            this->m_currentPage->clockwise(state.root());
         }
 
         if (this->m_rotation == -1)
         {
-            this->m_currentPage->counterClockwise(state);
+            this->m_currentPage->counterClockwise(state.root());
         }
     }
     else
@@ -96,21 +96,21 @@ void MenuController::menuUpdate(JsonState &state)
     {
         this->m_time = millis();
         this->m_currentPage->cleanUp(m_display);
-        this->m_currentPage->paint(m_display, m_isActive, state);
+        this->m_currentPage->paint(m_display, m_isActive, state.root());
     }
 
     if (this->m_currentPage->getName() != m_dashPage.getName() && millis() > (this->m_time + this->m_hangTimerDuration))
     {
         this->m_currentPage = &m_dashPage;
         this->m_currentPage->cleanUp(m_display);
-        this->m_currentPage->paint(m_display, m_isActive, state);
+        this->m_currentPage->paint(m_display, m_isActive, state.root());
     }
 }
 
 void MenuController::menuPress(JsonState &state, bool isEnabled, FireController &fireController)
 {
     this->m_isActive = !this->m_isActive;
-    this->m_currentPage->paint(m_display, m_isActive, state);
+    this->m_currentPage->paint(m_display, m_isActive, state.root());
     if (this->m_currentPage->getName() == m_dashPage.getName())
     {
         if (isEnabled)

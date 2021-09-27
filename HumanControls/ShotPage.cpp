@@ -9,19 +9,19 @@ ShotPage::ShotPage(int increment, int min, int max, unsigned int downArrow, unsi
     this->m_increment = increment;
 }
 
-void ShotPage::paint(DisplayController &display, bool isActivated, JsonState &state)
+void ShotPage::paint(DisplayController &display, bool isActivated, JsonElement &object)
 {
     display.clear();
 
     display.printRegion(1, 0, "Shot Pressure");
     display.printRegion(8, 1, "C:");
-    display.printRegion(10, 1, String(state.root()["tnkPres"].asFloat()));
-    display.printRegion(1, 1, String(state.root()["frPres"].asFloat()));
+    display.printRegion(10, 1, String(object["tnkPres"].asFloat()));
+    display.printRegion(1, 1, String(object["frPres"].asFloat()));
 
     if (canActivate() && isActivated)
     {
         display.printRegion(0, 1, this->m_downArrow);
-        if (state.root()["frPres"].asFloat() >= 100)
+        if (object["frPres"].asFloat() >= 100)
         {
             display.printRegion(7, 1, this->m_upArrow);
         }
@@ -32,25 +32,27 @@ void ShotPage::paint(DisplayController &display, bool isActivated, JsonState &st
     }
 }
 
-void ShotPage::clockwise(JsonState &state)
+void ShotPage::clockwise(JsonElement &object)
 {
-    if (state.root()["frPres"].asFloat() < this->m_max)
+    JsonElement &frPres = object["frPres"];
+    if (frPres.asFloat() < (this->m_max - this->m_increment))
     {
-        state.root()["frPres"] = state.root()["frPres"].asFloat() + this->m_increment;
+        frPres = frPres.asFloat() + this->m_increment;
     }
     else
     {
-        state.root()["frPres"] = this->m_max;
+        frPres = this->m_max;
     }
 }
-void ShotPage::counterClockwise(JsonState &state)
+void ShotPage::counterClockwise(JsonElement &object)
 {
-    if (state.root()["frPres"].asFloat() > this->m_min)
+    JsonElement &frPres = object["frPres"];
+    if (frPres.asFloat() > (this->m_min + this->m_increment))
     {
-        state.root()["frPres"] = state.root()["frPres"].asFloat() - this->m_increment;
+        frPres = frPres.asFloat() - this->m_increment;
     }
     else
     {
-        state.root()["frPres"] = this->m_min;
+        frPres = this->m_min;
     }
 }

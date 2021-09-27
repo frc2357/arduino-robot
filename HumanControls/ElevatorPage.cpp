@@ -9,12 +9,12 @@ ElevatorPage::ElevatorPage(int increment, int min, int max, unsigned int downArr
     this->m_increment = increment;
 }
 
-void ElevatorPage::paint(DisplayController &display, bool isActivated, JsonState &state)
+void ElevatorPage::paint(DisplayController &display, bool isActivated, JsonElement &object)
 {
     display.clear();
 
     display.printRegion(1, 0, "Elevator Angle");
-    display.printRegion(5, 1, String(state.root()["angle"].asFloat()));
+    display.printRegion(5, 1, String(object["angle"].asFloat()));
 
     if (canActivate() && isActivated)
     {
@@ -23,25 +23,27 @@ void ElevatorPage::paint(DisplayController &display, bool isActivated, JsonState
     }
 }
 
-void ElevatorPage::clockwise(JsonState &state)
+void ElevatorPage::clockwise(JsonElement &object)
 {
-    if (state.root()["angle"].asFloat() < this->m_max)
+    JsonElement &angle = object["angle"];
+    if (angle.asFloat() < (this->m_max - this->m_increment))
     {
-        state.root()["angle"] = state.root()["angle"].asFloat() + this->m_increment;
+        angle = angle.asFloat() + this->m_increment;
     }
     else
     {
-        state.root()["angle"] = this->m_max;
+        angle = this->m_max;
     }
 }
-void ElevatorPage::counterClockwise(JsonState &state)
+void ElevatorPage::counterClockwise(JsonElement &object)
 {
-    if (state.root()["angle"].asFloat() > this->m_min)
+    JsonElement &angle = object["angle"];
+    if (angle.asFloat() > (this->m_min + this->m_increment))
     {
-        state.root()["angle"] = state.root()["angle"].asFloat() - this->m_increment;
+        angle = angle.asFloat() - this->m_increment;
     }
     else
     {
-        state.root()["angle"] = this->m_min;
+        angle = this->m_min;
     }
 }

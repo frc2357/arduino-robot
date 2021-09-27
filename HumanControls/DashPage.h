@@ -3,16 +3,15 @@
 
 #include "Page.h"
 #include "Arduino.h"
-//#include "HumanControls.h"
 #include <JsonEl.h>
 
 class DashPage : public Page
 {
 public:
     DashPage(unsigned int downArrow, unsigned int upArrow, unsigned int robotBatChar, unsigned int controllerBatChar);
-    void paint(DisplayController &display, bool isActivated, JsonState &state);
-    void clockwise(JsonState &state);
-    void counterClockwise(JsonState &state);
+    void paint(DisplayController &display, bool isActivated, JsonElement &object);
+    void clockwise(JsonElement &object);
+    void counterClockwise(JsonElement &object);
 };
 
 #endif
