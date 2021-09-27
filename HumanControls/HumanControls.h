@@ -28,6 +28,10 @@ public:
                   unsigned int durationMin,
                   unsigned int durationMax,
                   unsigned int hangTimerDuration,
+                  unsigned int downArrow,
+                  unsigned int upArrow,
+                  unsigned int robotBatChar,
+                  unsigned int controllerBatChar,
                   unsigned int numButtons,
                   unsigned int encoderPinSW,
                   unsigned int enablePin,
@@ -37,7 +41,7 @@ public:
                   unsigned int joystickMax,
                   unsigned int joystickPinVRY,
                   unsigned int yDeadZoneSize);
-    void init();
+    void init(unsigned int downArrow, unsigned int upArrow);
     void update();
     void setStatus();
     void onPinActivated(int pinNr);

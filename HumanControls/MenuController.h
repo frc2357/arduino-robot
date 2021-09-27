@@ -29,8 +29,12 @@ public:
                    unsigned int durationIncrement,
                    unsigned int durationMin,
                    unsigned int durationMax,
-                   unsigned int hangTimerDuration);
-    void init(JsonState &state);
+                   unsigned int hangTimerDuration,
+                   unsigned int downArrow,
+                   unsigned int upArrow,
+                   unsigned int robotBatChar,
+                   unsigned int controllerBatChar);
+    void init(JsonState &state, unsigned int downArrow, unsigned int upArrow);
     void menuUpdate(JsonState &state);
     void menuRefresh(JsonState &state);
     void menuPress(JsonState &state, bool isEnabled, FireController &FireController);

@@ -14,11 +14,19 @@ MenuController::MenuController(unsigned int encoderPinClk,
                                unsigned int durationIncrement,
                                unsigned int durationMin,
                                unsigned int durationMax,
-                               unsigned int hangTimerDuration)
+                               unsigned int hangTimerDuration,
+                               unsigned int downArrow,
+                               unsigned int upArrow,
+                               unsigned int robotBatChar,
+                               unsigned int controllerBatChar)
     : m_rotaryKnob(encoderPinClk, encoderPinDt), m_display(displayAddress, displayLen, displayWidth),
-      m_dashPage(), m_elevatorPage(angleIncrement, angleMin, angleMax),
-      m_shotPage(pressureIncrement, pressureMin, pressureMax),
-      m_valvePage(durationIncrement, durationMin, durationMax)
+      m_dashPage(downArrow, upArrow, robotBatChar, controllerBatChar),
+      m_elevatorPage(angleIncrement, angleMin, angleMax, downArrow, upArrow, robotBatChar,
+                     controllerBatChar),
+      m_shotPage(pressureIncrement, pressureMin, pressureMax, downArrow, upArrow, robotBatChar,
+                 controllerBatChar),
+      m_valvePage(durationIncrement, durationMin, durationMax, downArrow, upArrow, robotBatChar,
+                  controllerBatChar)
 {
     this->m_isActive = false;
 
@@ -42,10 +50,10 @@ MenuController::MenuController(unsigned int encoderPinClk,
     this->m_time = millis();
 }
 
-void MenuController::init(JsonState &state)
+void MenuController::init(JsonState &state, unsigned int downArrow, unsigned int upArrow)
 {
     Serial.println("Menu Init");
-    this->m_display.init();
+    this->m_display.init(downArrow, upArrow);
     this->m_currentPage->paint(m_display, this->m_isActive, state);
 }
 

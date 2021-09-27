@@ -1,6 +1,6 @@
 #include "ValvePage.h"
 
-ValvePage::ValvePage(int increment, int min, int max) : Page(true, Page::PageType::VALVE_PAGE)
+ValvePage::ValvePage(int increment, int min, int max, unsigned int downArrow, unsigned int upArrow, unsigned int robotBatChar, unsigned int controllerBatChar) : Page(true, downArrow, upArrow, robotBatChar, controllerBatChar, Page::PageType::VALVE_PAGE)
 {
     this->m_min = min;
     this->m_max = max;
@@ -17,8 +17,8 @@ void ValvePage::paint(DisplayController &display, bool isActivated, JsonState &s
 
     if (canActivate() && isActivated)
     {
-        display.printRegion(5, 1, 0);
-        display.printRegion(9, 1, 1);
+        display.printRegion(5, 1, this->m_downArrow);
+        display.printRegion(9, 1, this->m_upArrow);
     }
 }
 

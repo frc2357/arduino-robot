@@ -5,15 +5,15 @@ DisplayController::DisplayController(unsigned int displayAddress, unsigned int d
 {
 }
 
-void DisplayController::init()
+void DisplayController::init(unsigned int downArrow, unsigned int upArrow)
 {
     uint8_t down[8] = {0x4, 0x4, 0x4, 0x4, 0x4, 0x1f, 0xe, 0x4};
     uint8_t up[8] = {0x4, 0xe, 0x1f, 0x4, 0x4, 0x4, 0x4};
 
     this->m_lcd.begin();
     this->m_lcd.backlight();
-    this->m_lcd.createChar(0, down);
-    this->m_lcd.createChar(1, up);
+    this->m_lcd.createChar(downArrow, down);
+    this->m_lcd.createChar(upArrow, up);
 
     this->m_lcd.clear();
 }

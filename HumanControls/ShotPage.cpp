@@ -1,6 +1,8 @@
 #include "ShotPage.h"
 
-ShotPage::ShotPage(int increment, int min, int max) : Page(true, Page::PageType::SHOT_PAGE)
+ShotPage::ShotPage(int increment, int min, int max, unsigned int downArrow, unsigned int upArrow,
+                   unsigned int robotBatChar, unsigned int controllerBatChar)
+    : Page(true, downArrow, upArrow, robotBatChar, controllerBatChar, Page::PageType::SHOT_PAGE)
 {
     this->m_min = min;
     this->m_max = max;
@@ -18,14 +20,14 @@ void ShotPage::paint(DisplayController &display, bool isActivated, JsonState &st
 
     if (canActivate() && isActivated)
     {
-        display.printRegion(0, 1, 0);
+        display.printRegion(0, 1, this->m_downArrow);
         if (state.root()["frPres"].asFloat() >= 100)
         {
-            display.printRegion(7, 1, 1);
+            display.printRegion(7, 1, this->m_upArrow);
         }
         else
         {
-            display.printRegion(6, 1, 1);
+            display.printRegion(6, 1, this->m_upArrow);
         }
     }
 }

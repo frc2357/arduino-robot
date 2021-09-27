@@ -1,6 +1,8 @@
 #include "ElevatorPage.h"
 
-ElevatorPage::ElevatorPage(int increment, int min, int max) : Page(true, Page::PageType::ELEVATOR_PAGE)
+ElevatorPage::ElevatorPage(int increment, int min, int max, unsigned int downArrow,
+                           unsigned int upArrow, unsigned int robotBatChar, unsigned int controllerBatChar)
+    : Page(true, downArrow, upArrow, robotBatChar, controllerBatChar, Page::PageType::ELEVATOR_PAGE)
 {
     this->m_min = min;
     this->m_max = max;
@@ -16,8 +18,8 @@ void ElevatorPage::paint(DisplayController &display, bool isActivated, JsonState
 
     if (canActivate() && isActivated)
     {
-        display.printRegion(4, 1, 0);
-        display.printRegion(10, 1, 1);
+        display.printRegion(4, 1, this->m_upArrow);
+        display.printRegion(10, 1, this->m_downArrow);
     }
 }
 

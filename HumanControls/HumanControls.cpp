@@ -21,6 +21,10 @@ HumanControls::HumanControls(JsonState &state, unsigned int encoderPinClk,
                              unsigned int durationMin,
                              unsigned int durationMax,
                              unsigned int hangTimerDuration,
+                             unsigned int downArrow,
+                             unsigned int upArrow,
+                             unsigned int robotBatChar,
+                             unsigned int controllerBatChar,
                              unsigned int numButtons,
                              unsigned int encoderPinSW,
                              unsigned int enablePin,
@@ -33,7 +37,8 @@ HumanControls::HumanControls(JsonState &state, unsigned int encoderPinClk,
     : m_state(state),
       m_menuController(encoderPinClk, encoderPinDt, displayAddress, displayLen, displayWidth,
                        angleIncrement, angleMin, angleMax, pressureIncrement, pressureMin,
-                       pressureMax, durationIncrement, durationMin, durationMax, hangTimerDuration),
+                       pressureMax, durationIncrement, durationMin, durationMax, hangTimerDuration,
+                       downArrow, upArrow, robotBatChar, controllerBatChar),
       m_pinDebouncer(numButtons), m_enableController(), m_fireController(),
       m_leftStick(joystickPinVRX, xDeadZoneSize, joystickMax),
       m_rightStick(joystickPinVRY, yDeadZoneSize, joystickMax)
@@ -44,14 +49,14 @@ HumanControls::HumanControls(JsonState &state, unsigned int encoderPinClk,
     this->m_isConnected = false;
 }
 
-void HumanControls::init()
+void HumanControls::init(unsigned int downArrow, unsigned int upArrow)
 {
     connect();
     m_pinDebouncer.addPin(this->m_encoderPinSW, HIGH, INPUT_PULLUP);
     m_pinDebouncer.addPin(this->m_enablePin, HIGH, INPUT_PULLUP);
     m_pinDebouncer.addPin(this->m_firePin, HIGH, INPUT_PULLUP);
     m_pinDebouncer.begin();
-    m_menuController.init(m_state);
+    m_menuController.init(m_state, downArrow, upArrow);
 }
 
 void HumanControls::update()

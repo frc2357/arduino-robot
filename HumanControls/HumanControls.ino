@@ -29,6 +29,10 @@
 #define NUM_BUTTONS 3             //Number of buttons to give the debouncer
 #define HANG_TIMER_DURATION 10000 //Amount in milliseconds to stay on a page before going to dash
 #define USB_BAUDRATE 115200
+#define DOWN_ARROW 0              //Custom char code for down arrow
+#define UP_ARROW 1                //Custom char code for up arrow
+#define ROBOT_BATTERY_CHAR 2      //Custom char code for robot battery bar
+#define CONTROLLER_BATTERY_CHAR 3 //Custom char code for controller battery bar
 
 //Min - Max
 #define ANGLE_INCREMENT 1     //Increment amount for elevator angle
@@ -81,14 +85,15 @@ JsonState state(controllerState);
 
 HumanControls humanControls(state, ENCODER_PIN_CLK, ENCODER_PIN_DT, DISPLAY_ADDRESS, DISPLAY_LENGTH, DISPLAY_WIDTH,
                             ANGLE_INCREMENT, ANGLE_MIN, ANGLE_MAX, PRESSURE_INCREMENT, PRESSURE_MIN, PRESSURE_MAX,
-                            DURATION_INCREMENT, DURATION_MIN, DURATION_MAX, HANG_TIMER_DURATION, NUM_BUTTONS, ENCODER_PIN_SW,
+                            DURATION_INCREMENT, DURATION_MIN, DURATION_MAX, HANG_TIMER_DURATION, DOWN_ARROW,
+                            UP_ARROW, ROBOT_BATTERY_CHAR, CONTROLLER_BATTERY_CHAR, NUM_BUTTONS, ENCODER_PIN_SW,
                             ENABLE_PIN, FIRE_PIN, JOYSTICK_PIN_VRX, X_DEAD_ZONE_SIZE, JOYSTICK_MAX,
                             JOYSTICK_PIN_VRY, Y_DEAD_ZONE_SIZE);
 
 void setup()
 {
     Serial.begin(USB_BAUDRATE);
-    humanControls.init();
+    humanControls.init(DOWN_ARROW, UP_ARROW);
 }
 
 void loop()

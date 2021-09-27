@@ -8,7 +8,8 @@
 class ElevatorPage : public Page
 {
 public:
-    ElevatorPage(int increment, int min, int max);
+    ElevatorPage(int increment, int min, int max, unsigned int downArrow, unsigned int upArrow,
+                 unsigned int robotBatChar, unsigned int controllerBatChar);
     void paint(DisplayController &display, bool isActivated, JsonState &state);
     void clockwise(JsonState &state);
     void counterClockwise(JsonState &state);
