@@ -20,6 +20,7 @@
 #define JOYSTICK_PIN_VRX 0 //Analog Pin for joystick x
 #define JOYSTICK_PIN_VRY 1 //Analog Pin for joystick y
 #define ENABLE_PIN 7       //Digital Pin for the enable button
+#define PRIME_PIN 8        //Digital Pin for prime button
 #define FIRE_PIN 9         //Digital Pin for the fire button
 
 //Other constraints
@@ -62,9 +63,9 @@ JsonElement eStopFields[] = {
 
 JsonElement robotStateFields[] = {
     Json::String("ver", "1.0.0"),
-    Json::Int("tck", 0),
-    Json::Int("avgTck", 0),
-    Json::Int("up", 0),
+    Json::Int("tck", 32000),
+    Json::Int("avgTck", 95),
+    Json::Int("up", 12345),
     Json::String("status", "Disabled"),
     Json::Object("hCtrl", humanControlFields),
     Json::Object("eStop", eStopFields),
@@ -87,7 +88,7 @@ HumanControls humanControls(state, ENCODER_PIN_CLK, ENCODER_PIN_DT, DISPLAY_ADDR
                             ANGLE_INCREMENT, ANGLE_MIN, ANGLE_MAX, PRESSURE_INCREMENT, PRESSURE_MIN, PRESSURE_MAX,
                             DURATION_INCREMENT, DURATION_MIN, DURATION_MAX, HANG_TIMER_DURATION, DOWN_ARROW,
                             UP_ARROW, ROBOT_BATTERY_CHAR, CONTROLLER_BATTERY_CHAR, NUM_BUTTONS, ENCODER_PIN_SW,
-                            ENABLE_PIN, FIRE_PIN, JOYSTICK_PIN_VRX, X_DEAD_ZONE_SIZE, JOYSTICK_MAX,
+                            ENABLE_PIN, PRIME_PIN, FIRE_PIN, JOYSTICK_PIN_VRX, X_DEAD_ZONE_SIZE, JOYSTICK_MAX,
                             JOYSTICK_PIN_VRY, Y_DEAD_ZONE_SIZE);
 
 void setup()

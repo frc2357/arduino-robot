@@ -28,6 +28,7 @@ HumanControls::HumanControls(JsonState &state, unsigned int encoderPinClk,
                              unsigned int numButtons,
                              unsigned int encoderPinSW,
                              unsigned int enablePin,
+                             unsigned int primePin,
                              unsigned int firePin,
                              unsigned int joystickPinVRX,
                              unsigned int xDeadZoneSize,
@@ -45,6 +46,7 @@ HumanControls::HumanControls(JsonState &state, unsigned int encoderPinClk,
 {
     this->m_encoderPinSW = encoderPinSW;
     this->m_enablePin = enablePin;
+    this->m_primePin = primePin;
     this->m_firePin = firePin;
     this->m_isConnected = false;
 }
@@ -54,6 +56,7 @@ void HumanControls::init(unsigned int downArrow, unsigned int upArrow)
     connect();
     m_pinDebouncer.addPin(this->m_encoderPinSW, HIGH, INPUT_PULLUP);
     m_pinDebouncer.addPin(this->m_enablePin, HIGH, INPUT_PULLUP);
+    m_pinDebouncer.addPin(this->m_primePin, HIGH, INPUT_PULLUP);
     m_pinDebouncer.addPin(this->m_firePin, HIGH, INPUT_PULLUP);
     m_pinDebouncer.begin();
     m_menuController.init(m_state, downArrow, upArrow);
@@ -68,7 +71,7 @@ void HumanControls::update()
 
     this->setStatus();
 
-    m_menuController.menuUpdate(m_state);
+    m_menuController.menuUpdate(m_state, status == HumanControls::STATUS_ENABLED);
     m_pinDebouncer.update();
 
     m_rightStick.update();
@@ -82,20 +85,27 @@ void HumanControls::setStatus()
 
     if (this->m_isConnected)
     {
-        //Check the robot's status and see if it is different then the controllers.
-        //If it is, set the status to the lowest given status. Ex. Robot returns disabled, but controller enabled, so
-        //set both statuses to disabled. Robot status and controller status should always be the same.
-        //Only exception may be due to firing setting status to enabled after firing.
-
-        if (m_enableController.getIsEnabled())
+        if (strlen(m_state.root()["err"].asString()) == 0)
         {
-            if (m_fireController.getIsFireToggled())
+            //Check the robot's status and see if it is different then the controllers.
+            //If it is, set the status to the lowest given status. Ex. Robot returns disabled, but controller enabled, so
+            //set both statuses to disabled. Robot status and controller status should always be the same.
+            //Only exception may be due to firing setting status to enabled after firing.
+
+            if (m_enableController.getIsEnabled())
             {
-                status = HumanControls::STATUS_PRIMED;
+                if (m_fireController.getIsFireToggled())
+                {
+                    status = HumanControls::STATUS_PRIMED;
+                }
+                else
+                {
+                    status = HumanControls::STATUS_ENABLED;
+                }
             }
             else
             {
-                status = HumanControls::STATUS_ENABLED;
+                status = HumanControls::STATUS_DISABLED;
             }
         }
         else
@@ -125,11 +135,22 @@ void HumanControls::onPinActivated(int pinNr)
 {
     if (pinNr == m_encoderPinSW)
     {
-        m_menuController.menuPress(m_state, (status == HumanControls::STATUS_ENABLED), m_fireController);
+        m_menuController.menuPress(m_state, (status == HumanControls::STATUS_ENABLED));
     }
     else if (pinNr == m_enablePin)
     {
         m_enableController.setIsEnabled(true);
+    }
+    else if (pinNr == m_primePin)
+    {
+        if (status == HumanControls::STATUS_ENABLED)
+        {
+            m_fireController.setIsFireToggled(true);
+        }
+        else
+        {
+            m_fireController.setIsFireToggled(false);
+        }
     }
     else if (pinNr == m_firePin)
     {

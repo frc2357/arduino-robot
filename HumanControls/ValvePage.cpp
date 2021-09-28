@@ -1,6 +1,8 @@
 #include "ValvePage.h"
 
-ValvePage::ValvePage(int increment, int min, int max, unsigned int downArrow, unsigned int upArrow, unsigned int robotBatChar, unsigned int controllerBatChar) : Page(true, downArrow, upArrow, robotBatChar, controllerBatChar, Page::PageType::VALVE_PAGE)
+ValvePage::ValvePage(int increment, int min, int max, unsigned int downArrow, unsigned int upArrow,
+                     unsigned int robotBatChar, unsigned int controllerBatChar)
+    : Page(true, true, downArrow, upArrow, robotBatChar, controllerBatChar, Page::PageType::VALVE_PAGE)
 {
     this->m_min = min;
     this->m_max = max;

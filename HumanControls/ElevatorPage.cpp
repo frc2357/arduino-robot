@@ -2,7 +2,7 @@
 
 ElevatorPage::ElevatorPage(int increment, int min, int max, unsigned int downArrow,
                            unsigned int upArrow, unsigned int robotBatChar, unsigned int controllerBatChar)
-    : Page(true, downArrow, upArrow, robotBatChar, controllerBatChar, Page::PageType::ELEVATOR_PAGE)
+    : Page(true, true, downArrow, upArrow, robotBatChar, controllerBatChar, Page::PageType::ELEVATOR_PAGE)
 {
     this->m_min = min;
     this->m_max = max;
