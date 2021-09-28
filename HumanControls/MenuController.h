@@ -2,6 +2,7 @@
 #define MENUCONTROLLER_H
 
 #include "Arduino.h"
+#include <JsonEl.h>
 #include "Page.h"
 #include "DashPage.h"
 #include "ElevatorPage.h"
@@ -27,16 +28,22 @@ public:
                    unsigned int pressureMax,
                    unsigned int durationIncrement,
                    unsigned int durationMin,
-                   unsigned int durationMax);
-    void init(const char *status);
-    void menuUpdate(const char *status);
-    void menuRefresh(const char *status);
-    void menuPress(const char *status, bool isEnabled, FireController &FireController);
+                   unsigned int durationMax,
+                   unsigned int hangTimerDuration,
+                   unsigned int downArrow,
+                   unsigned int upArrow,
+                   unsigned int robotBatChar,
+                   unsigned int controllerBatChar);
+    void init(JsonState &state, unsigned int downArrow, unsigned int upArrow);
+    void menuUpdate(JsonState &state);
+    void menuRefresh(JsonState &state);
+    void menuPress(JsonState &state, bool isEnabled, FireController &FireController);
 
 private:
     RotaryKnobController m_rotaryKnob;
     DisplayController m_display;
-    int m_rotation;
+    int m_rotation, m_hangTimerDuration;
+    long m_time;
     bool m_isActive;
     Page *m_currentPage;
     DashPage m_dashPage;

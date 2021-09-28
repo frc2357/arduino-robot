@@ -10,9 +10,12 @@ class DisplayController : CharacterDisplay
 {
 public:
     DisplayController(unsigned int displayAddress, unsigned int displayLen, unsigned int displayWidth);
-    void init();
+    void init(unsigned int downArrow, unsigned int upArrow);
     void clear();
     void printRegion(int x, int y, String text);
+    void printRegion(int x, int y, int code);
+    void printBattery(int x, int y, int code, double level);
+    byte isFilled(double level, double threshold);
 
 private:
     LiquidCrystal_I2C m_lcd;

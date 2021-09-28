@@ -1,17 +1,48 @@
 #include "ValvePage.h"
 
-ValvePage::ValvePage(int increment, int min, int max) : Page(increment, min, max, true, Page::PageType::VALVE_PAGE)
+ValvePage::ValvePage(int increment, int min, int max, unsigned int downArrow, unsigned int upArrow, unsigned int robotBatChar, unsigned int controllerBatChar) : Page(true, downArrow, upArrow, robotBatChar, controllerBatChar, Page::PageType::VALVE_PAGE)
 {
+    this->m_min = min;
+    this->m_max = max;
+    this->m_increment = increment;
 }
 
-void ValvePage::paint(DisplayController &display, bool isActivated, const char *status)
+void ValvePage::paint(DisplayController &display, bool isActivated, JsonElement &object)
 {
     display.clear();
+
+    display.printRegion(1, 0, "Valve Duration");
+    display.printRegion(6, 1, String(object["vlvTm"].asInt()));
+    Serial.println(String(object["vlvTm"].asInt()));
+
     if (canActivate() && isActivated)
     {
-        display.printRegion(5, 1, "<[");
-        display.printRegion(10, 1, "]>");
+        display.printRegion(5, 1, this->m_downArrow);
+        display.printRegion(9, 1, this->m_upArrow);
     }
-    display.printRegion(1, 0, "Valve Duration");
-    display.printRegion(7, 1, String(getModifyValue()));
+}
+
+void ValvePage::clockwise(JsonElement &object)
+{
+    JsonElement &vlvTm = object["vlvTm"];
+    if (vlvTm.asInt() < (this->m_max - this->m_increment))
+    {
+        vlvTm = vlvTm.asInt() + this->m_increment;
+    }
+    else
+    {
+        vlvTm = this->m_max;
+    }
+}
+void ValvePage::counterClockwise(JsonElement &object)
+{
+    JsonElement &vlvTm = object["vlvTm"];
+    if (vlvTm.asInt() > (this->m_min + this->m_increment))
+    {
+        vlvTm = vlvTm.asInt() - this->m_increment;
+    }
+    else
+    {
+        vlvTm = this->m_min;
+    }
 }
