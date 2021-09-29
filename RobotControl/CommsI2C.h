@@ -7,6 +7,7 @@
 class CommsI2C : public Stream {
   public:
     static const size_t I2C_MAX_BYTES;
+    static const char *JSON_PREAMBLE;
 
     CommsI2C(int myAddress, int deviceAddress);
 

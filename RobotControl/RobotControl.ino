@@ -26,6 +26,7 @@ JsonElement robotStateFields[] = {
   Json::Int("v", SOFTWARE_VERSION),
   Json::Int("t", 0),
   Json::String("status", "Disabled"),
+  Json::Boolean("hCtl", false),
   Json::Object("eStop", eStopFields),
   Json::Float("b", 0.0),
   Json::Int("ang", 0),

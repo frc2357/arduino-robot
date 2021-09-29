@@ -2,6 +2,7 @@
 #include <Wire.h>
 
 const size_t CommsI2C::I2C_MAX_BYTES = 32;
+const char *CommsI2C::JSON_PREAMBLE = "~~~";
 
 CommsI2C::CommsI2C(int myAddress, int deviceAddress) {
   m_myAddress = myAddress;
@@ -25,9 +26,13 @@ size_t CommsI2C::endWrite() {
 
 void CommsI2C::sendState(JsonState &state) {
   beginWrite();
+  this->print(JSON_PREAMBLE);
+  endWrite();
+
+  beginWrite();
   state.printJson(*this, true);
   state.clearChanged();
-  size_t bytesWritten = endWrite();
+  endWrite();
 }
 
 // TODO: Fill out for receiving data
