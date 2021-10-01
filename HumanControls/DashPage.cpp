@@ -12,17 +12,7 @@ void DashPage::paint(DisplayController &display, bool isActivated, JsonElement &
 
     if (canActivate() && isActivated)
     {
-        for (int i = 0; i < strlen(object["err"].asString()); i++)
-        {
-            if (i < 16)
-            {
-                display.printRegion(i, 0, object["err"].asString()[i]);
-            }
-            else
-            {
-                display.printRegion(i - 16, 1, object["err"].asString()[i]);
-            }
-        }
+        display.printRegion(0, 0, object["err"].asString());
     }
     else
     {

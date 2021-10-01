@@ -1,7 +1,7 @@
 #ifndef CHARACTERDISPLAY_H
 #define CHARACTERDISPLAY_H
 
-#include "Arduino.h"
+#include <Arduino.h>
 
 class CharacterDisplay
 {

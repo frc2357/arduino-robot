@@ -1,18 +1,18 @@
 #ifndef FIRE_CONTROLLER_H
 #define FIRE_CONTROLLER_H
 
-#include "Arduino.h"
+#include <Arduino.h>
 
 class FireController
 {
 public:
     FireController();
     bool initiateFiring(bool isReady);
-    void setIsFireToggled(bool value);
-    bool getIsFireToggled();
+    void setIsPrimed(bool value);
+    bool getIsPrimed();
 
 private:
-    bool m_isFireToggled;
+    bool m_isPrimed;
 };
 
 #endif

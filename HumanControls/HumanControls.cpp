@@ -94,7 +94,7 @@ void HumanControls::setStatus()
 
             if (m_enableController.getIsEnabled())
             {
-                if (m_fireController.getIsFireToggled())
+                if (m_fireController.getIsPrimed())
                 {
                     status = HumanControls::STATUS_PRIMED;
                 }
@@ -145,11 +145,11 @@ void HumanControls::onPinActivated(int pinNr)
     {
         if (status == HumanControls::STATUS_ENABLED)
         {
-            m_fireController.setIsFireToggled(true);
+            m_fireController.setIsPrimed(true);
         }
         else
         {
-            m_fireController.setIsFireToggled(false);
+            m_fireController.setIsPrimed(false);
         }
     }
     else if (pinNr == m_firePin)
@@ -157,7 +157,7 @@ void HumanControls::onPinActivated(int pinNr)
         if (HumanControls::status == HumanControls::STATUS_PRIMED && m_isConnected)
         {
             m_fireController.initiateFiring(true);
-            m_fireController.setIsFireToggled(false);
+            m_fireController.setIsPrimed(false);
         }
     }
 }
@@ -167,7 +167,7 @@ void HumanControls::onPinDeactivated(int pinNr)
     if (pinNr == m_enablePin)
     {
         m_enableController.setIsEnabled(false);
-        m_fireController.setIsFireToggled(false);
+        m_fireController.setIsPrimed(false);
     }
 }
 

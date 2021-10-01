@@ -1,7 +1,7 @@
 #ifndef JOYSTICK_AXIS_H
 #define JOYSTICK_AXIS_H
 
-#include "Arduino.h"
+#include <Arduino.h>
 
 class JoystickAxis
 {

@@ -2,7 +2,7 @@
 #define DISPLAYINTERFACE_H
 
 #include "DisplayController.h"
-#include "Arduino.h"
+#include <Arduino.h>
 #include <JsonEl.h>
 
 class DisplayInterface

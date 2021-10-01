@@ -2,7 +2,7 @@
 #define DEBUG_PAGE_h
 
 #include "Page.h"
-#include "Arduino.h"
+#include <Arduino.h>
 #include <JsonEl.h>
 
 class DebugPage : public Page

@@ -2,7 +2,7 @@
 #define DASH_PAGE_h
 
 #include "Page.h"
-#include "Arduino.h"
+#include <Arduino.h>
 #include <JsonEl.h>
 
 class DashPage : public Page

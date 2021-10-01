@@ -2,7 +2,7 @@
 #define SHOT_PAGE_H
 
 #include "Page.h"
-#include "Arduino.h"
+#include <Arduino.h>
 #include <JsonEl.h>
 
 class ShotPage : public Page
