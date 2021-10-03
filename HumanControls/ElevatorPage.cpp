@@ -16,7 +16,7 @@ void ElevatorPage::paint(DisplayController &display, bool isActivated, JsonEleme
     display.printRegion(1, 0, "Elevator Angle");
     display.printRegion(5, 1, String(object["angle"].asFloat()));
 
-    if (canActivate() && isActivated)
+    if (isActivated)
     {
         display.printRegion(4, 1, this->m_upArrow);
         display.printRegion(10, 1, this->m_downArrow);

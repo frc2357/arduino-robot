@@ -73,7 +73,7 @@ void MenuController::menuUpdate(JsonState &state, bool isEnabled)
 {
     this->m_rotation = this->m_rotaryKnob.getValue();
 
-    if (m_isActive && m_currentPage->canActivate() && isEnabled)
+    if (m_isActive && isEnabled)
     {
         if (this->m_rotation == 1)
         {
@@ -116,9 +116,10 @@ void MenuController::menuUpdate(JsonState &state, bool isEnabled)
 
 void MenuController::menuPress(JsonState &state, bool isEnabled)
 {
-    if (isEnabled || this->m_currentPage->getName() == this->m_dashPage.getName())
+    if ((isEnabled && m_currentPage->canActivate()) || this->m_currentPage->getName() == this->m_dashPage.getName())
     {
         this->m_isActive = !this->m_isActive;
+        this->m_time = millis();
     }
     else
     {

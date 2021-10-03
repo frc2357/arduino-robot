@@ -10,7 +10,7 @@ void DashPage::paint(DisplayController &display, bool isActivated, JsonElement &
 {
     display.clear();
 
-    if (canActivate() && isActivated)
+    if (isActivated)
     {
         display.printRegion(0, 0, object["err"].asString());
     }

@@ -18,7 +18,7 @@ void ShotPage::paint(DisplayController &display, bool isActivated, JsonElement &
     display.printRegion(10, 1, String(object["tnkPres"].asFloat()));
     display.printRegion(1, 1, String(object["frPres"].asFloat()));
 
-    if (canActivate() && isActivated)
+    if (isActivated)
     {
         display.printRegion(0, 1, this->m_downArrow);
         if (object["frPres"].asFloat() >= 100)

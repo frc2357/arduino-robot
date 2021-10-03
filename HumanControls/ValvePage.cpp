@@ -17,7 +17,7 @@ void ValvePage::paint(DisplayController &display, bool isActivated, JsonElement 
     display.printRegion(6, 1, String(object["vlvTm"].asInt()));
     Serial.println(String(object["vlvTm"].asInt()));
 
-    if (canActivate() && isActivated)
+    if (isActivated)
     {
         display.printRegion(5, 1, this->m_downArrow);
         display.printRegion(9, 1, this->m_upArrow);
