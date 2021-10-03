@@ -123,8 +123,12 @@ void JsonElement::operator=(bool value) {
 }
 
 void JsonElement::operator=(int value) {
+  return operator=((long)value);
+}
+
+void JsonElement::operator=(long value) {
   if (m_type == JSON_TYPE_INT) {
-    m_value.intValue = value;
+    m_value.longValue = value;
   } else if (m_type == JSON_TYPE_FLOAT) {
     m_value.doubleValue = value;
   } else {
@@ -133,11 +137,7 @@ void JsonElement::operator=(int value) {
 }
 
 void JsonElement::operator=(float value) {
-  if (m_type == JSON_TYPE_FLOAT) {
-    m_value.doubleValue = value;
-  } else {
-    JSON_LOG_ERROR("Cannot assign float value to type %s", type());
-  }
+  return operator=((double)value);
 }
 
 void JsonElement::operator=(double value) {
@@ -199,7 +199,15 @@ bool JsonElement::asBoolean() const {
 
 int JsonElement::asInt() const {
   if (m_type == JSON_TYPE_INT) {
-    return m_value.intValue;
+    return m_value.longValue;
+  }
+  JSON_LOG_ERROR("Cannot access type %s as int", type());
+  return -1;
+}
+
+long JsonElement::asLong() const {
+  if (m_type == JSON_TYPE_INT) {
+    return m_value.longValue;
   }
   JSON_LOG_ERROR("Cannot access type %s as int", type());
   return -1;
@@ -269,7 +277,7 @@ void JsonElement::printJsonBoolean(int indent, Print& out) const {
 }
 
 void JsonElement::printJsonInt(int indent, Print& out) const {
-  out.print(m_value.intValue);
+  out.print(m_value.longValue);
 }
 
 void JsonElement::printJsonFloat(int indent, Print& out) const {
@@ -362,7 +370,7 @@ size_t JsonElement::updateFromJsonInt(const char *json, size_t length, size_t &e
     return -1;
   }
 
-  m_value.intValue = atoi(json);
+  m_value.longValue = atol(json);
   elementsUpdated++;
   return intLength;
 }

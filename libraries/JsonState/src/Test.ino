@@ -41,7 +41,7 @@ void loop() {
     Serial.println();
   }
 
-  device["tick"] = device["tick"].asInt() + 1;
+  device["tick"] = device["tick"].asLong() + 1;
   sensorValues[1] = sensorValues[1].asDouble() * 1.001;
   sensorValues[2] = sensorValues[2].asDouble() * 0.999;
   delay(1000);

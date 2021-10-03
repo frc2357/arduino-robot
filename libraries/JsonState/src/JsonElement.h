@@ -28,6 +28,7 @@ class JsonElement {
     void operator=(JsonElement &element);
     void operator=(bool value);
     void operator=(int value);
+    void operator=(long value);
     void operator=(float value);
     void operator=(double value);
     void operator=(const char *value);
@@ -38,6 +39,7 @@ class JsonElement {
 
     bool asBoolean() const;
     int asInt() const;
+    long asLong() const;
     float asFloat() const;
     double asDouble() const;
     const char *asString() const;
@@ -51,7 +53,7 @@ class JsonElement {
 
     union JsonElementValue {
       bool booleanValue;
-      int intValue;
+      long longValue;
       double doubleValue;
       char *stringValue;
       JsonElement *arrayValue;
@@ -97,26 +99,18 @@ class Json {
       return JsonElement(key, JSON_TYPE_BOOLEAN, elementValue, -1);
     }
 
-    static JsonElement Int(int value) {
+    static JsonElement Int(long value) {
       return Int("", value);
     }
 
-    static JsonElement Int(const char *key, int value) {
+    static JsonElement Int(const char *key, long value) {
       JsonElement::JsonElementValue elementValue;
-      elementValue.intValue = value;
+      elementValue.longValue = value;
       return JsonElement(key, JSON_TYPE_INT, elementValue, -1);
-    }
-
-    static JsonElement Float(float value) {
-      return Float("", (double)value);
     }
 
     static JsonElement Float(double value) {
       return Float("", value);
-    }
-
-    static JsonElement Float(const char *key, float value) {
-      return Float(key, (double)value);
     }
 
     static JsonElement Float(const char *key, double value) {
