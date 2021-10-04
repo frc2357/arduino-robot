@@ -36,6 +36,8 @@ class JsonElement {
     const char *type() const;
     const char *key() const;
     size_t length() const;
+    bool hasChanged() const;
+    void clearChanged();
 
     bool asBoolean() const;
     int asInt() const;
@@ -45,6 +47,7 @@ class JsonElement {
     const char *asString() const;
 
     void printJson(int indent, Print &out) const;
+    void printJson(int indent, Print &out, bool onlyChanged) const;
 
   protected:
     static Print &m_errorLog;
@@ -63,6 +66,7 @@ class JsonElement {
     char m_type;
     JsonElementValue m_value;
     size_t m_length;
+    bool m_hasChanged;
 
     friend class Json;
     friend class JsonState;
@@ -73,8 +77,8 @@ class JsonElement {
     void printJsonInt(int indent, Print &out) const;
     void printJsonFloat(int indent, Print &out) const;
     void printJsonString(int indent, Print &out) const;
-    void printJsonArray(int indent, Print &out) const;
-    void printJsonObject(int indent, Print &out) const;
+    void printJsonArray(int indent, Print &out, bool onlyChanged) const;
+    void printJsonObject(int indent, Print &out, bool onlyChanged) const;
 
     JsonElement &findByKey(const char *key, size_t length) const;
 
@@ -172,7 +176,11 @@ class JsonState {
 
     JsonElement &root() const;
     void printJson(Print &out) const;
+    void printJson(Print &out, bool onlyChanged) const;
     void printJson(bool pretty, Print &out) const;
+    void printJson(bool pretty, Print &out, bool onlyChanged) const;
+    bool hasChanged();
+    void clearChanged();
     bool updateFromJson(String &json);
     bool updateFromJson(const char *json);
     size_t updateFromJson(const char *json, size_t length, size_t &elementsUpdated);

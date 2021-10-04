@@ -14,11 +14,27 @@ JsonElement &JsonState::root() const {
 }
 
 void JsonState::printJson(Print &out) const {
-  printJson(false, out);
+  printJson(false, out, false);
+}
+
+void JsonState::printJson(Print &out, bool onlyChanged) const {
+  printJson(false, out, onlyChanged);
 }
 
 void JsonState::printJson(bool pretty, Print &out) const {
-  m_root.printJson(pretty ? 0 : -1, out);
+  printJson(pretty, out, false);
+}
+
+void JsonState::printJson(bool pretty, Print &out, bool onlyChanged) const {
+  m_root.printJson(pretty ? 0 : -1, out, onlyChanged);
+}
+
+bool JsonState::hasChanged() {
+  return m_root.hasChanged();
+}
+
+void JsonState::clearChanged() {
+  m_root.clearChanged();
 }
 
 bool JsonState::updateFromJson(String &json) {
@@ -68,6 +84,7 @@ JsonElement::JsonElement() {
   m_type = JSON_TYPE_NONE;
   m_value.arrayValue = NULL;
   m_length = -1;
+  m_hasChanged = false;
 }
 
 JsonElement::JsonElement(const char *key, char type, JsonElementValue value, size_t length) {
@@ -75,6 +92,7 @@ JsonElement::JsonElement(const char *key, char type, JsonElementValue value, siz
   m_type = type;
   m_value = value;
   m_length = length;
+  m_hasChanged = false;
 }
 
 JsonElement::JsonElement(const JsonElement& element) {
@@ -82,6 +100,7 @@ JsonElement::JsonElement(const JsonElement& element) {
   m_type = element.m_type;
   m_value = element.m_value;
   m_length = element.m_length;
+  m_hasChanged = element.m_hasChanged;
 }
 
 JsonElement::~JsonElement() {
@@ -112,11 +131,13 @@ void JsonElement::operator=(JsonElement& element) {
   m_type = element.m_type;
   m_value = element.m_value;
   m_length = element.m_length;
+  m_hasChanged = element.m_hasChanged;
 }
 
 void JsonElement::operator=(bool value) {
   if (m_type == JSON_TYPE_BOOLEAN) {
     m_value.booleanValue = value;
+    m_hasChanged = true;
   } else {
     JSON_LOG_ERROR("Cannot assign boolean value to type %s", type());
   }
@@ -129,8 +150,10 @@ void JsonElement::operator=(int value) {
 void JsonElement::operator=(long value) {
   if (m_type == JSON_TYPE_INT) {
     m_value.longValue = value;
+    m_hasChanged = true;
   } else if (m_type == JSON_TYPE_FLOAT) {
     m_value.doubleValue = value;
+    m_hasChanged = true;
   } else {
     JSON_LOG_ERROR("Cannot assign int value to type %s", type());
   }
@@ -143,6 +166,7 @@ void JsonElement::operator=(float value) {
 void JsonElement::operator=(double value) {
   if (m_type == JSON_TYPE_FLOAT) {
     m_value.doubleValue = value;
+    m_hasChanged = true;
   } else {
     JSON_LOG_ERROR("Cannot assign double value to type %s", type());
   }
@@ -154,6 +178,7 @@ void JsonElement::operator=(const char *value) {
       JSON_LOG_ERROR("Concatenating incoming string: %s to %d chars", value, m_length - 1);
     }
     strlcpy(m_value.stringValue, value, m_length);
+    m_hasChanged = true;
   } else {
     JSON_LOG_ERROR("Cannot assign string value to type %s", type());
   }
@@ -187,6 +212,35 @@ const char* JsonElement::key() const {
 
 size_t JsonElement::length() const {
   return m_length;
+}
+
+bool JsonElement::hasChanged() const {
+  switch(m_type) {
+    case JSON_TYPE_ARRAY:
+    case JSON_TYPE_OBJECT:
+      for (int i = 0; i < m_length; i++) {
+        JsonElement& el = (*this)[i];
+        if (el.hasChanged()) {
+          return true;
+        }
+      }
+      return false;
+    default:
+      return m_hasChanged;
+  }
+}
+
+void JsonElement::clearChanged() {
+  switch(m_type) {
+    case JSON_TYPE_ARRAY:
+    case JSON_TYPE_OBJECT:
+      for (int i = 0; i < m_length; i++) {
+        JsonElement& el = (*this)[i];
+        el.clearChanged();
+      }
+    default:
+      m_hasChanged = false;
+  }
 }
 
 bool JsonElement::asBoolean() const {
@@ -254,6 +308,11 @@ JsonElement &JsonElement::findByKey(const char *key, size_t length) const {
 }
 
 void JsonElement::printJson(int indent, Print& out) const {
+  printJson(indent, out, false);
+}
+
+void JsonElement::printJson(int indent, Print& out, bool onlyChanged) const {
+
   switch (m_type) {
     case JSON_TYPE_BOOLEAN:
       return printJsonBoolean(indent, out);
@@ -264,9 +323,9 @@ void JsonElement::printJson(int indent, Print& out) const {
     case JSON_TYPE_STRING:
       return printJsonString(indent, out);
     case JSON_TYPE_ARRAY:
-      return printJsonArray(indent, out);
+      return printJsonArray(indent, out, onlyChanged);
     case JSON_TYPE_OBJECT:
-      return printJsonObject(indent, out);
+      return printJsonObject(indent, out, onlyChanged);
     default:
       out.print("\"unknown type\"");
   }
@@ -290,14 +349,18 @@ void JsonElement::printJsonString(int indent, Print& out) const {
   out.print("\"");
 }
 
-void JsonElement::printJsonArray(int indent, Print& out) const {
+void JsonElement::printJsonArray(int indent, Print& out, bool onlyChanged) const {
+  if (onlyChanged && !hasChanged()) {
+    return;
+  }
+
   int childIndent = indent >= 0 ? indent + 1 : -1;
 
   out.print("[");
   for (size_t i = 0; i < m_length; i++) {
     JsonElement& element = m_value.arrayValue[i];
     JsonUtils::indentNewline(childIndent, out);
-    element.printJson(childIndent, out);
+    element.printJson(childIndent, out, onlyChanged);
     if (i < m_length - 1) {
       out.print(',');
     }
@@ -306,12 +369,26 @@ void JsonElement::printJsonArray(int indent, Print& out) const {
   out.print("]");
 }
 
-void JsonElement::printJsonObject(int indent, Print& out) const {
+void JsonElement::printJsonObject(int indent, Print& out, bool onlyChanged) const {
+  if (onlyChanged && !hasChanged()) {
+    return;
+  }
+
   int childIndent = indent >= 0 ? indent + 1 : -1;
+  int elementsWritten = 0;
 
   out.print("{");
   for (size_t i = 0; i < m_length; i++) {
     JsonElement& element = m_value.arrayValue[i];
+
+    if (onlyChanged && !element.hasChanged()) {
+      continue;
+    }
+
+    if (elementsWritten > 0) {
+      out.print(',');
+    }
+
     JsonUtils::indentNewline(childIndent, out);
     out.print("\"");
     out.print(element.key());
@@ -319,10 +396,8 @@ void JsonElement::printJsonObject(int indent, Print& out) const {
     if (indent >= 0) {
       out.print(" ");
     }
-    element.printJson(childIndent, out);
-    if (i < m_length - 1) {
-      out.print(',');
-    }
+    element.printJson(childIndent, out, onlyChanged);
+    elementsWritten++;
   }
   JsonUtils::indentNewline(indent, out);
   out.print("}");
@@ -349,12 +424,12 @@ size_t JsonElement::updateFromJson(const char* json, size_t length, size_t &elem
 
 size_t JsonElement::updateFromJsonBoolean(const char *json, size_t length, size_t &elementsUpdated) {
   if (strncasecmp(json, "true", 4) == 0) {
-    m_value.booleanValue = true;
+    operator=(true);
     elementsUpdated++;
     return 4;
   }
   if (strncasecmp(json, "false", 5) == 0) {
-    m_value.booleanValue = false;
+    operator=(false);
     elementsUpdated++;
     return 5;
   }
@@ -370,7 +445,7 @@ size_t JsonElement::updateFromJsonInt(const char *json, size_t length, size_t &e
     return -1;
   }
 
-  m_value.longValue = atol(json);
+  operator=(atol(json));
   elementsUpdated++;
   return intLength;
 }
@@ -382,7 +457,7 @@ size_t JsonElement::updateFromJsonFloat(const char *json, size_t length, size_t 
     return -1;
   }
 
-  m_value.doubleValue = atof(json);
+  operator=(atof(json));
   elementsUpdated++;
   return floatLength;
 }
@@ -395,6 +470,7 @@ size_t JsonElement::updateFromJsonString(const char *json, size_t length, size_t
   }
 
   strlcpy(m_value.stringValue, &json[1], stringLength -1);
+  m_hasChanged = true;
   elementsUpdated++;
   return stringLength;
 }
