@@ -1,13 +1,8 @@
 #include <Wire.h>
-#include <RHReliableDatagram.h>
 #include <RH_RF95.h>
 #include <SPI.h>
-#include <Speck.h>
-#include <RHEncryptedDriver.h>
 
-#include "I2CBufferStack.h"
-
-#define SOFTWARE_VERSION   "0.1.0"
+#define SOFTWARE_VERSION   1
 
 #define SERIAL_BAUD_RATE   115200
 #define I2C_DEVICE_ADDRESS 0x08
@@ -32,13 +27,7 @@
 const char *JSON_PREAMBLE = "~~~";
 
 // Singleton instance of the radio driver
-RH_RF95 raw_driver(RFM95_CS, RFM95_INT);
-Speck myCipher;
-unsigned char encryptkey[16] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
-RHEncryptedDriver driver(raw_driver, myCipher);
-
-// Class to manage message delivery and receipt, using the driver declared above
-RHReliableDatagram manager(driver, ROBOT_ADDRESS);
+RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
 char message[] = "Test Message";
 char radioBuffer[RH_RF95_MAX_MESSAGE_LEN];
@@ -52,73 +41,40 @@ void setup()
   digitalWrite(LED_BUILTIN, LOW);
 
   Serial.begin(SERIAL_BAUD_RATE);
-  while (!Serial) {} // Wait for serial port to be available
+  if (Serial) {
+    Serial.print("--- Robot Comms v");
+    Serial.print(SOFTWARE_VERSION);
+    Serial.println(" ---");
+  }
 
-  Serial.print("--- Robot Comms v");
-  Serial.print(SOFTWARE_VERSION);
-  Serial.println(" ---");
-
-  if (!manager.init()) {
+  if (!rf95.init()) {
     Serial.println("init failed");
     while (1) {}
   }
 
-  manager.setRetries(RADIO_ACK_RETRIES);
-  manager.setTimeout(RADIO_ACK_TIMEOUT);
-
-  if (!raw_driver.setFrequency(RF95_FREQ)) {
+  if (!rf95.setFrequency(RF95_FREQ)) {
     Serial.println("setFrequency failed");
     while (1) {}
   }
 
-  myCipher.setKey(encryptkey, sizeof(encryptkey));
-
-  raw_driver.setTxPower(RF95_POWER, false);
+  rf95.setTxPower(RF95_POWER, false);
 
   Wire.begin(I2C_DEVICE_ADDRESS);
   Wire.onReceive(receiveEvent);
   Serial.println("--- Init Complete ---");
 }
 
-void loop()
-{
-  //uint8_t len = sizeof(buf);
-  //uint8_t from;
-
-  /*
-  if (manager.available())
-  {
-    Serial.println("Robot received a message");
-    // Wait for a message addressed to us from the client
-
-    if (manager.recvfromAckTimeout(buf, &len, 2000, &from))
-    {
-      Serial.println(String(from));
-
-      // Send a reply back to the originator client
-      if (!manager.sendtoWait((uint8_t*)message, strlen(message) + 1, CONTROLLER_ADDRESS))
-        connect();
-    }
-  }
-  */
-}
+void loop() {}
 
 bool isPreamble(const char *data) {
   return strncmp(data, JSON_PREAMBLE, strlen(JSON_PREAMBLE)) == 0;
 }
 
-boolean sendRadioMessage(uint8_t* message, uint8_t length, uint8_t address) {
+void sendRadioMessage(uint8_t* message, uint8_t length, uint8_t address) {
   digitalWrite(LED_BUILTIN, HIGH);
-  bool success = manager.sendtoWait(message, length, address);
-  if (success) {
-    isControllerConnected = true;
-    digitalWrite(LED_BUILTIN, LOW);
-    return true;
-  } else {
-    isControllerConnected = false;
-    digitalWrite(LED_BUILTIN, LOW);
-    return false;
-  }
+  rf95.send(message, length);
+  rf95.waitPacketSent();
+  digitalWrite(LED_BUILTIN, LOW);
 }
 
 void receiveEvent(int howMany) {
