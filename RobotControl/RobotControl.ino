@@ -11,6 +11,7 @@
 #include "Robot.h"
 #include "StatusLEDs.h"
 
+#define SOFTWARE_VERSION   "1"
 #define SERIAL_BAUD_RATE   115200
 #define I2C_HOST_ADDRESS   0x04
 #define I2C_DEVICE_ADDRESS 0x08
@@ -27,7 +28,7 @@ JsonElement eStopFields[] = {
 };
 
 JsonElement robotStateFields[] = {
-  Json::String("ver", "1.0.0"),
+  Json::String("ver", SOFTWARE_VERSION),
   Json::Int("tck", 0),
   Json::Int("avgTck", 0),
   Json::Int("up", 0),
@@ -54,7 +55,13 @@ Robot robot(state, PIN_LED_BUILTIN, I2C_HOST_ADDRESS, I2C_DEVICE_ADDRESS);
 // Primary Setup
 void setup() {
   Serial.begin(SERIAL_BAUD_RATE);
+  if (Serial) {
+    Serial.print("----------- RobotControl v");
+    Serial.print(SOFTWARE_VERSION);
+    Serial.println(" -----------");
+  }
   robot.init();
+  Serial.print("----------- Init complete -----------");
 }
 
 // Main Loop
