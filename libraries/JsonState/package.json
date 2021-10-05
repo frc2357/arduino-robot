@@ -1,6 +1,6 @@
 {
   "name": "json-state",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "FRC 2357 Arduino JSON State",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

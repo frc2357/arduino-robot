@@ -28,6 +28,7 @@ class JsonElement {
     void operator=(JsonElement &element);
     void operator=(bool value);
     void operator=(int value);
+    void operator=(long value);
     void operator=(float value);
     void operator=(double value);
     void operator=(const char *value);
@@ -35,14 +36,18 @@ class JsonElement {
     const char *type() const;
     const char *key() const;
     size_t length() const;
+    bool hasChanged() const;
+    void clearChanged();
 
     bool asBoolean() const;
     int asInt() const;
+    long asLong() const;
     float asFloat() const;
     double asDouble() const;
     const char *asString() const;
 
     void printJson(int indent, Print &out) const;
+    void printJson(int indent, Print &out, bool onlyChanged) const;
 
   protected:
     static Print &m_errorLog;
@@ -51,7 +56,7 @@ class JsonElement {
 
     union JsonElementValue {
       bool booleanValue;
-      int intValue;
+      long longValue;
       double doubleValue;
       char *stringValue;
       JsonElement *arrayValue;
@@ -61,6 +66,7 @@ class JsonElement {
     char m_type;
     JsonElementValue m_value;
     size_t m_length;
+    bool m_hasChanged;
 
     friend class Json;
     friend class JsonState;
@@ -71,8 +77,8 @@ class JsonElement {
     void printJsonInt(int indent, Print &out) const;
     void printJsonFloat(int indent, Print &out) const;
     void printJsonString(int indent, Print &out) const;
-    void printJsonArray(int indent, Print &out) const;
-    void printJsonObject(int indent, Print &out) const;
+    void printJsonArray(int indent, Print &out, bool onlyChanged) const;
+    void printJsonObject(int indent, Print &out, bool onlyChanged) const;
 
     JsonElement &findByKey(const char *key, size_t length) const;
 
@@ -97,26 +103,18 @@ class Json {
       return JsonElement(key, JSON_TYPE_BOOLEAN, elementValue, -1);
     }
 
-    static JsonElement Int(int value) {
+    static JsonElement Int(long value) {
       return Int("", value);
     }
 
-    static JsonElement Int(const char *key, int value) {
+    static JsonElement Int(const char *key, long value) {
       JsonElement::JsonElementValue elementValue;
-      elementValue.intValue = value;
+      elementValue.longValue = value;
       return JsonElement(key, JSON_TYPE_INT, elementValue, -1);
-    }
-
-    static JsonElement Float(float value) {
-      return Float("", (double)value);
     }
 
     static JsonElement Float(double value) {
       return Float("", value);
-    }
-
-    static JsonElement Float(const char *key, float value) {
-      return Float(key, (double)value);
     }
 
     static JsonElement Float(const char *key, double value) {
@@ -178,7 +176,11 @@ class JsonState {
 
     JsonElement &root() const;
     void printJson(Print &out) const;
+    void printJson(Print &out, bool onlyChanged) const;
     void printJson(bool pretty, Print &out) const;
+    void printJson(bool pretty, Print &out, bool onlyChanged) const;
+    bool hasChanged();
+    void clearChanged();
     bool updateFromJson(String &json);
     bool updateFromJson(const char *json);
     size_t updateFromJson(const char *json, size_t length, size_t &elementsUpdated);
