@@ -28,28 +28,25 @@ void Robot::init() {
 }
 
 void Robot::update() {
-  int tick = m_state.root()["tck"].asInt();
+  int tick = m_state.root()["t"].asInt();
   unsigned long tickStartMillis = millis();
 
   m_statusLEDs.update(tick);
   m_commsI2C.sendState(m_state);
 
   // Increment time state variables
-  m_state.root()["tck"] = tick + 1;
-  m_state.root()["up"] = (int)((tickStartMillis / 1000) - m_initTimeSeconds);
-  m_state.root()["avgTck"] = getAverageTickDuration();
+  m_state.root()["t"] = tick + 1;
 
   int tickDurationMillis = millis() - tickStartMillis;
+  // TODO: Remove after timing is solved
   Serial.println(tickDurationMillis);
   updateTickDurations(tickDurationMillis);
 
-  if (tickDurationMillis > TICK_DURATION_MILLIS) {
-    setError("Tick overflow %d ms", tickDurationMillis);
-  }
-
-  // Updating from Serial can take longer than a tick.
-  // So this is outside of the overflow logging.
   updateSerial();
+
+  if (tickDurationMillis > TICK_DURATION_MILLIS) {
+    setError("Tick %d ms", tickDurationMillis);
+  }
 
   int timeLeftMillis = TICK_DURATION_MILLIS - (millis() - tickStartMillis);
   if (timeLeftMillis > 0) {

@@ -25,7 +25,8 @@ size_t CommsI2C::endWrite() {
 
 void CommsI2C::sendState(JsonState &state) {
   beginWrite();
-  state.printJson(*this);
+  state.printJson(*this, true);
+  state.clearChanged();
   size_t bytesWritten = endWrite();
 }
 

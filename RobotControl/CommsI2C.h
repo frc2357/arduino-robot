@@ -2,7 +2,7 @@
 #define COMMSI2C_H
 
 #include <Arduino.h>
-#include <JsonEl.h>
+#include <JsonElement.h>
 
 class CommsI2C : public Stream {
   public:
