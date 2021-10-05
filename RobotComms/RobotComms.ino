@@ -7,22 +7,11 @@
 #define SERIAL_BAUD_RATE   115200
 #define I2C_DEVICE_ADDRESS 0x08
 
-#define ROBOT_STATE_MAXLEN 300
-
 // Defines for the 900MHz radio
 #define RFM95_CS   8
-#define RFM95_RST  4
 #define RFM95_INT  3
 #define RF95_FREQ  915.0
 #define RF95_POWER 23
-
-#define RADIO_ACK_RETRIES  1
-#define RADIO_ACK_TIMEOUT  100
-
-#define CONTROLLER_ADDRESS 1
-#define ROBOT_ADDRESS 2
-
-#define I2C_BUFFER_COUNT 12
 
 const char *JSON_PREAMBLE = "~~~";
 
@@ -70,7 +59,7 @@ bool isPreamble(const char *data) {
   return strncmp(data, JSON_PREAMBLE, strlen(JSON_PREAMBLE)) == 0;
 }
 
-void sendRadioMessage(uint8_t* message, uint8_t length, uint8_t address) {
+void sendRadioMessage(uint8_t* message, uint8_t length) {
   digitalWrite(LED_BUILTIN, HIGH);
   rf95.send(message, length);
   rf95.waitPacketSent();
@@ -90,7 +79,7 @@ void receiveEvent(int howMany) {
   if (isPreamble(buffer)) {
     if (radioBufferIndex >= 0) {
       radioBuffer[radioBufferIndex + 1] = '\0';
-      sendRadioMessage((uint8_t*)radioBuffer, strlen(radioBuffer) + 1, CONTROLLER_ADDRESS);
+      sendRadioMessage((uint8_t*)radioBuffer, strlen(radioBuffer) + 1);
     }
 
     radioBufferIndex = 0;

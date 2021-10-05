@@ -2,14 +2,8 @@
 
 //for feather m0
 #define RFM95_CS 8
-#define RFM95_RST 4
 #define RFM95_INT 3
 #define RF95_FREQ 915.0
-
-#define CONTROLLER_ADDRESS 1
-#define ROBOT_ADDRESS 2
-
-#define RECEIVE_TIMEOUT 1000
 
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
