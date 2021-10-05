@@ -6,7 +6,7 @@
  * controls the individual motors, solenoids, and devices.
  */
 
-#include <JsonEl.h>
+#include <JsonElement.h>
 #include "Utils.h"
 #include "Robot.h"
 #include "StatusLEDs.h"
