@@ -1,5 +1,5 @@
 #include <LiquidCrystal_I2C.h>
-#include <JsonEl.h>
+#include <JsonElement.h>
 #include "RotaryKnobController.h"
 #include "CharacterDisplay.h"
 #include "MenuController.h"

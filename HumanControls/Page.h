@@ -1,7 +1,7 @@
 #ifndef PAGE_H
 #define PAGE_H
 #include <Arduino.h>
-#include <JsonEl.h>
+#include <JsonElement.h>
 #include "DisplayInterface.h"
 #include "RotaryKnobController.h"
 #include "DisplayController.h"
