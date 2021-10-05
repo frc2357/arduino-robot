@@ -1,13 +1,14 @@
 #ifndef MENUCONTROLLER_H
 #define MENUCONTROLLER_H
 
-#include "Arduino.h"
+#include <Arduino.h>
 #include <JsonEl.h>
 #include "Page.h"
 #include "DashPage.h"
 #include "ElevatorPage.h"
 #include "ShotPage.h"
 #include "ValvePage.h"
+#include "DebugPage.h"
 #include "RotaryKnobController.h"
 #include "DisplayController.h"
 #include "FireController.h"
@@ -35,9 +36,9 @@ public:
                    unsigned int robotBatChar,
                    unsigned int controllerBatChar);
     void init(JsonState &state, unsigned int downArrow, unsigned int upArrow);
-    void menuUpdate(JsonState &state);
+    void menuUpdate(JsonState &state, bool isEnabled);
     void menuRefresh(JsonState &state);
-    void menuPress(JsonState &state, bool isEnabled, FireController &FireController);
+    void menuPress(JsonState &state, bool isEnabled);
 
 private:
     RotaryKnobController m_rotaryKnob;
@@ -49,6 +50,7 @@ private:
     DashPage m_dashPage;
     ElevatorPage m_elevatorPage;
     ShotPage m_shotPage;
+    DebugPage m_debugPage;
     ValvePage m_valvePage;
 };
 #endif

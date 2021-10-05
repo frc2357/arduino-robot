@@ -1,21 +1,10 @@
 #include "Page.h"
 
-Page::Page(unsigned int downArrow, unsigned int upArrow, unsigned int robotBatChar,
-           unsigned int controllerBatChar, Page::PageType name)
-{
-    this->m_isActive = false;
-    this->m_name = name;
-
-    this->m_downArrow = downArrow;
-    this->m_upArrow = upArrow;
-    this->m_robotBatChar = robotBatChar;
-    this->m_controllerBatChar = controllerBatChar;
-}
-
-Page::Page(bool isActive, unsigned int downArrow, unsigned int upArrow, unsigned int robotBatChar,
+Page::Page(bool isActive, bool applyHang, unsigned int downArrow, unsigned int upArrow, unsigned int robotBatChar,
            unsigned int controllerBatChar, Page::PageType name)
 {
     this->m_isActive = isActive;
+    this->m_applyHang = applyHang;
     this->m_name = name;
 
     this->m_downArrow = downArrow;
@@ -32,6 +21,11 @@ void Page::cleanUp(DisplayController &display)
 bool Page::canActivate()
 {
     return this->m_isActive;
+}
+
+bool Page::applyHang()
+{
+    return this->m_applyHang;
 }
 
 void Page::setNextPage(Page &page)

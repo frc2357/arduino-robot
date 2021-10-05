@@ -34,6 +34,7 @@ public:
                   unsigned int controllerBatChar,
                   unsigned int numButtons,
                   unsigned int encoderPinSW,
+                  unsigned int primePin,
                   unsigned int enablePin,
                   unsigned int firePin,
                   unsigned int joystickPinVRX,
@@ -56,7 +57,7 @@ public:
 private:
     void setError(const char *format, ...);
 
-    int m_encoderPinSW, m_enablePin, m_firePin;
+    int m_encoderPinSW, m_enablePin, m_primePin, m_firePin;
     bool m_isConnected;
     static const char *lastStatus;
 

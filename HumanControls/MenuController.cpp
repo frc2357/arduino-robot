@@ -26,23 +26,26 @@ MenuController::MenuController(unsigned int encoderPinClk,
       m_shotPage(pressureIncrement, pressureMin, pressureMax, downArrow, upArrow, robotBatChar,
                  controllerBatChar),
       m_valvePage(durationIncrement, durationMin, durationMax, downArrow, upArrow, robotBatChar,
-                  controllerBatChar)
+                  controllerBatChar),
+      m_debugPage(downArrow, upArrow, robotBatChar, controllerBatChar)
 {
     this->m_isActive = false;
 
     this->m_rotation = 0;
 
     //Set previous pages
-    m_dashPage.setPreviousPage(m_valvePage);
+    m_dashPage.setPreviousPage(m_debugPage);
     m_elevatorPage.setPreviousPage(m_dashPage);
     m_shotPage.setPreviousPage(m_elevatorPage);
     m_valvePage.setPreviousPage(m_shotPage);
+    m_debugPage.setPreviousPage(m_valvePage);
 
     //Set next pages
     m_dashPage.setNextPage(m_elevatorPage);
     m_elevatorPage.setNextPage(m_shotPage);
     m_shotPage.setNextPage(m_valvePage);
-    m_valvePage.setNextPage(m_dashPage);
+    m_valvePage.setNextPage(m_debugPage);
+    m_debugPage.setNextPage(m_dashPage);
 
     m_currentPage = &m_dashPage;
 
@@ -59,14 +62,18 @@ void MenuController::init(JsonState &state, unsigned int downArrow, unsigned int
 
 void MenuController::menuRefresh(JsonState &state)
 {
+    if (this->m_currentPage->getName() != this->m_dashPage.getName())
+    {
+        m_isActive = false;
+    }
     this->m_currentPage->paint(m_display, m_isActive, state.root());
 }
 
-void MenuController::menuUpdate(JsonState &state)
+void MenuController::menuUpdate(JsonState &state, bool isEnabled)
 {
     this->m_rotation = this->m_rotaryKnob.getValue();
 
-    if (m_isActive & m_currentPage->canActivate())
+    if (m_isActive && isEnabled)
     {
         if (this->m_rotation == 1)
         {
@@ -89,7 +96,6 @@ void MenuController::menuUpdate(JsonState &state)
         {
             this->m_currentPage = this->m_currentPage->getPreviousPage();
         }
-        this->m_isActive = false;
     }
 
     if (this->m_rotation != 0)
@@ -99,27 +105,25 @@ void MenuController::menuUpdate(JsonState &state)
         this->m_currentPage->paint(m_display, m_isActive, state.root());
     }
 
-    if (this->m_currentPage->getName() != m_dashPage.getName() && millis() > (this->m_time + this->m_hangTimerDuration))
+    if (this->m_currentPage->applyHang() && millis() > (this->m_time + this->m_hangTimerDuration))
     {
         this->m_currentPage = &m_dashPage;
+        this->m_isActive = false;
         this->m_currentPage->cleanUp(m_display);
         this->m_currentPage->paint(m_display, m_isActive, state.root());
     }
 }
 
-void MenuController::menuPress(JsonState &state, bool isEnabled, FireController &fireController)
+void MenuController::menuPress(JsonState &state, bool isEnabled)
 {
-    this->m_isActive = !this->m_isActive;
-    this->m_currentPage->paint(m_display, m_isActive, state.root());
-    if (this->m_currentPage->getName() == m_dashPage.getName())
+    if ((isEnabled && m_currentPage->canActivate()) || this->m_currentPage->getName() == this->m_dashPage.getName())
     {
-        if (isEnabled)
-        {
-            fireController.setIsFireToggled(true);
-        }
-        else
-        {
-            fireController.setIsFireToggled(false);
-        }
+        this->m_isActive = !this->m_isActive;
+        this->m_time = millis();
     }
+    else
+    {
+        this->m_isActive = false;
+    }
+    this->m_currentPage->paint(m_display, m_isActive, state.root());
 }

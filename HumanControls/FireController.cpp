@@ -2,12 +2,12 @@
 
 FireController::FireController()
 {
-    this->m_isFireToggled = false;
+    this->m_isPrimed = false;
 }
 
 bool FireController::initiateFiring(bool isReady)
 {
-    if (isReady && this->m_isFireToggled)
+    if (isReady && this->m_isPrimed)
     {
         Serial.println("FIRE");
         return true;
@@ -18,12 +18,12 @@ bool FireController::initiateFiring(bool isReady)
     }
 }
 
-void FireController::setIsFireToggled(bool value)
+void FireController::setIsPrimed(bool value)
 {
-    this->m_isFireToggled = value;
+    this->m_isPrimed = value;
 }
 
-bool FireController::getIsFireToggled()
+bool FireController::getIsPrimed()
 {
-    return this->m_isFireToggled;
+    return this->m_isPrimed;
 }

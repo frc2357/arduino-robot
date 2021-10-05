@@ -2,7 +2,7 @@
 
 ShotPage::ShotPage(int increment, int min, int max, unsigned int downArrow, unsigned int upArrow,
                    unsigned int robotBatChar, unsigned int controllerBatChar)
-    : Page(true, downArrow, upArrow, robotBatChar, controllerBatChar, Page::PageType::SHOT_PAGE)
+    : Page(true, true, downArrow, upArrow, robotBatChar, controllerBatChar, Page::PageType::SHOT_PAGE)
 {
     this->m_min = min;
     this->m_max = max;
@@ -18,7 +18,7 @@ void ShotPage::paint(DisplayController &display, bool isActivated, JsonElement &
     display.printRegion(10, 1, String(object["tnkPres"].asFloat()));
     display.printRegion(1, 1, String(object["frPres"].asFloat()));
 
-    if (canActivate() && isActivated)
+    if (isActivated)
     {
         display.printRegion(0, 1, this->m_downArrow);
         if (object["frPres"].asFloat() >= 100)

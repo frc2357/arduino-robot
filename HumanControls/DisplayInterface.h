@@ -2,7 +2,7 @@
 #define DISPLAYINTERFACE_H
 
 #include "DisplayController.h"
-#include "Arduino.h"
+#include <Arduino.h>
 #include <JsonEl.h>
 
 class DisplayInterface
@@ -13,6 +13,7 @@ public:
     virtual void clockwise(JsonElement &object) = 0;
     virtual void counterClockwise(JsonElement &object) = 0;
     virtual bool canActivate() = 0;
+    virtual bool applyHang() = 0;
 };
 
 #endif

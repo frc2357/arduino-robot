@@ -1,6 +1,8 @@
 #include "ValvePage.h"
 
-ValvePage::ValvePage(int increment, int min, int max, unsigned int downArrow, unsigned int upArrow, unsigned int robotBatChar, unsigned int controllerBatChar) : Page(true, downArrow, upArrow, robotBatChar, controllerBatChar, Page::PageType::VALVE_PAGE)
+ValvePage::ValvePage(int increment, int min, int max, unsigned int downArrow, unsigned int upArrow,
+                     unsigned int robotBatChar, unsigned int controllerBatChar)
+    : Page(true, true, downArrow, upArrow, robotBatChar, controllerBatChar, Page::PageType::VALVE_PAGE)
 {
     this->m_min = min;
     this->m_max = max;
@@ -15,7 +17,7 @@ void ValvePage::paint(DisplayController &display, bool isActivated, JsonElement 
     display.printRegion(6, 1, String(object["vlvTm"].asInt()));
     Serial.println(String(object["vlvTm"].asInt()));
 
-    if (canActivate() && isActivated)
+    if (isActivated)
     {
         display.printRegion(5, 1, this->m_downArrow);
         display.printRegion(9, 1, this->m_upArrow);
