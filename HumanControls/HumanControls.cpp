@@ -76,8 +76,10 @@ void HumanControls::update()
 
     m_rightStick.update();
     m_leftStick.update();
-    //Serial.println("Right Stick: " + String(m_rightStick.getResult()));
-    //Serial.println("Left Stick: " + String(m_leftStick.getResult()));
+    m_state.root()["x"] = m_leftStick.getResult();
+    m_state.root()["y"] = m_rightStick.getResult();
+    Serial.println("vel: " + String(m_rightStick.getResult()));
+    //Serial.println("turn: " + String(m_leftStick.getResult()));
 }
 
 void HumanControls::setStatus()
@@ -116,7 +118,7 @@ void HumanControls::setStatus()
     else
     {
         status = HumanControls::STATUS_DISABLED;
-        m_state.root()["hCtrl"]["conn"] = "Disconnected";
+        m_state.root()["hCtl"]["conn"] = false;
     }
 
     if (status != lastStatus)
@@ -175,7 +177,7 @@ void HumanControls::connect()
 {
     //Connect to the robot
     this->m_isConnected = true;
-    m_state.root()["hCtrl"]["conn"] = "Active";
+    m_state.root()["hCtl"]["conn"] = true;
 }
 
 void HumanControls::setError(const char *format, ...)

@@ -14,8 +14,7 @@ void ValvePage::paint(DisplayController &display, bool isActivated, JsonElement 
     display.clear();
 
     display.printRegion(1, 0, "Valve Duration");
-    display.printRegion(6, 1, String(object["vlvTm"].asInt()));
-    Serial.println(String(object["vlvTm"].asInt()));
+    display.printRegion(6, 1, String(object["vlv"].asInt()));
 
     if (isActivated)
     {
@@ -26,7 +25,7 @@ void ValvePage::paint(DisplayController &display, bool isActivated, JsonElement 
 
 void ValvePage::clockwise(JsonElement &object)
 {
-    JsonElement &vlvTm = object["vlvTm"];
+    JsonElement &vlvTm = object["vlv"];
     if (vlvTm.asInt() < (this->m_max - this->m_increment))
     {
         vlvTm = vlvTm.asInt() + this->m_increment;
@@ -38,7 +37,7 @@ void ValvePage::clockwise(JsonElement &object)
 }
 void ValvePage::counterClockwise(JsonElement &object)
 {
-    JsonElement &vlvTm = object["vlvTm"];
+    JsonElement &vlvTm = object["vlv"];
     if (vlvTm.asInt() > (this->m_min + this->m_increment))
     {
         vlvTm = vlvTm.asInt() - this->m_increment;

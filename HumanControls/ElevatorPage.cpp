@@ -14,21 +14,21 @@ void ElevatorPage::paint(DisplayController &display, bool isActivated, JsonEleme
     display.clear();
 
     display.printRegion(1, 0, "Elevator Angle");
-    display.printRegion(5, 1, String(object["angle"].asFloat()));
+    display.printRegion(7, 1, String(object["ang"].asInt()));
 
     if (isActivated)
     {
-        display.printRegion(4, 1, this->m_upArrow);
-        display.printRegion(10, 1, this->m_downArrow);
+        display.printRegion(6, 1, this->m_upArrow);
+        display.printRegion(9, 1, this->m_downArrow);
     }
 }
 
 void ElevatorPage::clockwise(JsonElement &object)
 {
-    JsonElement &angle = object["angle"];
-    if (angle.asFloat() < (this->m_max - this->m_increment))
+    JsonElement &angle = object["ang"];
+    if (angle.asInt() < (this->m_max - this->m_increment))
     {
-        angle = angle.asFloat() + this->m_increment;
+        angle = angle.asInt() + this->m_increment;
     }
     else
     {
@@ -37,10 +37,10 @@ void ElevatorPage::clockwise(JsonElement &object)
 }
 void ElevatorPage::counterClockwise(JsonElement &object)
 {
-    JsonElement &angle = object["angle"];
-    if (angle.asFloat() > (this->m_min + this->m_increment))
+    JsonElement &angle = object["ang"];
+    if (angle.asInt() > (this->m_min + this->m_increment))
     {
-        angle = angle.asFloat() - this->m_increment;
+        angle = angle.asInt() - this->m_increment;
     }
     else
     {
