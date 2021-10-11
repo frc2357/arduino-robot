@@ -57,6 +57,9 @@ void MenuController::init(JsonState &state, unsigned int downArrow, unsigned int
 {
     Serial.println("Menu Init");
     this->m_display.init(downArrow, upArrow);
+    state.root()["vlv"] = this->m_valvePage.rangeFilter(state.root()["vlv"].asInt());
+    state.root()["ang"] = this->m_elevatorPage.rangeFilter(state.root()["ang"].asInt());
+    state.root()["fPr"] = this->m_shotPage.rangeFilter(state.root()["fPr"].asInt());
     this->m_currentPage->paint(m_display, this->m_isActive, state.root());
 }
 

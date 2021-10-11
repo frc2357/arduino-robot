@@ -24,3 +24,8 @@ void DebugPage::counterClockwise(JsonElement &object)
 {
     return;
 }
+
+int DebugPage::rangeFilter(int value)
+{
+    return 0;
+}

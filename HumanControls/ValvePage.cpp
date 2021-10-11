@@ -26,24 +26,25 @@ void ValvePage::paint(DisplayController &display, bool isActivated, JsonElement 
 void ValvePage::clockwise(JsonElement &object)
 {
     JsonElement &vlvTm = object["vlv"];
-    if (vlvTm.asInt() < (this->m_max - this->m_increment))
-    {
-        vlvTm = vlvTm.asInt() + this->m_increment;
-    }
-    else
-    {
-        vlvTm = this->m_max;
-    }
+    vlvTm = vlvTm.asInt() + this->m_increment;
+    vlvTm = rangeFilter(vlvTm.asInt());
 }
 void ValvePage::counterClockwise(JsonElement &object)
 {
     JsonElement &vlvTm = object["vlv"];
-    if (vlvTm.asInt() > (this->m_min + this->m_increment))
+    vlvTm = vlvTm.asInt() - this->m_increment;
+    vlvTm = rangeFilter(vlvTm.asInt());
+}
+
+int ValvePage::rangeFilter(int value)
+{
+    if (value < this->m_min)
     {
-        vlvTm = vlvTm.asInt() - this->m_increment;
+        return this->m_min;
     }
-    else
+    else if (value > this->m_max)
     {
-        vlvTm = this->m_min;
+        return this->m_max;
     }
+    return value;
 }

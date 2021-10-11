@@ -55,3 +55,8 @@ void DashPage::counterClockwise(JsonElement &object)
 {
     return;
 }
+
+int DashPage::rangeFilter(int value)
+{
+    return 0;
+}

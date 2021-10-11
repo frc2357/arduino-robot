@@ -13,6 +13,7 @@ public:
     void paint(DisplayController &display, bool isActivated, JsonElement &object);
     void clockwise(JsonElement &object);
     void counterClockwise(JsonElement &object);
+    int rangeFilter(int value);
 
 private:
     int m_min, m_max, m_increment;

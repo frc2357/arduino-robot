@@ -26,24 +26,25 @@ void ElevatorPage::paint(DisplayController &display, bool isActivated, JsonEleme
 void ElevatorPage::clockwise(JsonElement &object)
 {
     JsonElement &angle = object["ang"];
-    if (angle.asInt() < (this->m_max - this->m_increment))
-    {
-        angle = angle.asInt() + this->m_increment;
-    }
-    else
-    {
-        angle = this->m_max;
-    }
+    angle = angle.asInt() + this->m_increment;
+    angle = rangeFilter(angle.asInt());
 }
 void ElevatorPage::counterClockwise(JsonElement &object)
 {
     JsonElement &angle = object["ang"];
-    if (angle.asInt() > (this->m_min + this->m_increment))
+    angle = angle.asInt() - this->m_increment;
+    angle = rangeFilter(angle.asInt());
+}
+
+int ElevatorPage::rangeFilter(int value)
+{
+    if (value < this->m_min)
     {
-        angle = angle.asInt() - this->m_increment;
+        return this->m_min;
     }
-    else
+    else if (value > this->m_max)
     {
-        angle = this->m_min;
+        return this->m_max;
     }
+    return value;
 }

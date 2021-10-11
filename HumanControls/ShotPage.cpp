@@ -37,24 +37,25 @@ void ShotPage::paint(DisplayController &display, bool isActivated, JsonElement &
 void ShotPage::clockwise(JsonElement &object)
 {
     JsonElement &frPres = object["fPr"];
-    if (frPres.asInt() < (this->m_max - this->m_increment))
-    {
-        frPres = frPres.asInt() + this->m_increment;
-    }
-    else
-    {
-        frPres = this->m_max;
-    }
+    frPres = frPres.asInt() + this->m_increment;
+    frPres = rangeFilter(frPres.asInt());
 }
 void ShotPage::counterClockwise(JsonElement &object)
 {
     JsonElement &frPres = object["fPr"];
-    if (frPres.asInt() > (this->m_min + this->m_increment))
+    frPres = frPres.asInt() - this->m_increment;
+    frPres = rangeFilter(frPres.asInt());
+}
+
+int ShotPage::rangeFilter(int value)
+{
+    if (value < this->m_min)
     {
-        frPres = frPres.asInt() - this->m_increment;
+        return this->m_min;
     }
-    else
+    else if (value > this->m_max)
     {
-        frPres = this->m_min;
+        return this->m_max;
     }
+    return value;
 }

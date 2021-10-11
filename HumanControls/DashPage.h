@@ -12,6 +12,7 @@ public:
     void paint(DisplayController &display, bool isActivated, JsonElement &object);
     void clockwise(JsonElement &object);
     void counterClockwise(JsonElement &object);
+    int rangeFilter(int value);
 };
 
 #endif
