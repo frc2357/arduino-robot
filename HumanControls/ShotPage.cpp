@@ -14,45 +14,48 @@ void ShotPage::paint(DisplayController &display, bool isActivated, JsonElement &
     display.clear();
 
     display.printRegion(1, 0, "Shot Pressure");
-    display.printRegion(8, 1, "C:");
-    display.printRegion(10, 1, String(object["tnkPres"].asFloat()));
-    display.printRegion(1, 1, String(object["frPres"].asFloat()));
+    display.printRegion(0, 1, "F:");
+
+    display.printRegion(3, 1, String(object["fPr"].asInt()));
+    display.printRegion(11, 1, "T:");
+    display.printRegion(13, 1, String(object["tPr"].asInt()));
 
     if (isActivated)
     {
-        display.printRegion(0, 1, this->m_downArrow);
-        if (object["frPres"].asFloat() >= 100)
+        display.printRegion(2, 1, this->m_downArrow);
+        if (object["fPr"].asInt() >= 100)
         {
-            display.printRegion(7, 1, this->m_upArrow);
+            display.printRegion(6, 1, this->m_upArrow);
         }
         else
         {
-            display.printRegion(6, 1, this->m_upArrow);
+            display.printRegion(5, 1, this->m_upArrow);
         }
     }
 }
 
 void ShotPage::clockwise(JsonElement &object)
 {
-    JsonElement &frPres = object["frPres"];
-    if (frPres.asFloat() < (this->m_max - this->m_increment))
-    {
-        frPres = frPres.asFloat() + this->m_increment;
-    }
-    else
-    {
-        frPres = this->m_max;
-    }
+    JsonElement &frPres = object["fPr"];
+    frPres = frPres.asInt() + this->m_increment;
+    frPres = rangeFilter(frPres.asInt());
 }
 void ShotPage::counterClockwise(JsonElement &object)
 {
-    JsonElement &frPres = object["frPres"];
-    if (frPres.asFloat() > (this->m_min + this->m_increment))
+    JsonElement &frPres = object["fPr"];
+    frPres = frPres.asInt() - this->m_increment;
+    frPres = rangeFilter(frPres.asInt());
+}
+
+int ShotPage::rangeFilter(int value)
+{
+    if (value < this->m_min)
     {
-        frPres = frPres.asFloat() - this->m_increment;
+        return this->m_min;
     }
-    else
+    else if (value > this->m_max)
     {
-        frPres = this->m_min;
+        return this->m_max;
     }
+    return value;
 }

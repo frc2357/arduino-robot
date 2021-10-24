@@ -1,5 +1,5 @@
 #include <LiquidCrystal_I2C.h>
-#include <JsonEl.h>
+#include <JsonElement.h>
 #include "RotaryKnobController.h"
 #include "CharacterDisplay.h"
 #include "MenuController.h"
@@ -10,6 +10,9 @@
 #include "EnableController.h"
 #include "FireController.h"
 #include "HumanControls.h"
+
+//Version
+#define SOFTWARE_VERSION 1
 
 //Pins
 //LCD connects SDA in analog pin 4 and SCL in analog pin 5
@@ -52,33 +55,26 @@
 #define Y_DEAD_ZONE_SIZE 100 //Total size of the y deadzone
 
 // Set up the JSON State for the robot
-JsonElement humanControlFields[] = {
-    Json::Int("id", -1),
-    Json::String("conn", "Disconnected"),
-};
-
 JsonElement eStopFields[] = {
     Json::Boolean("btn", true),
 };
 
 JsonElement robotStateFields[] = {
-    Json::String("ver", "1.0.0"),
-    Json::Int("tck", 32000),
-    Json::Int("avgTck", 95),
-    Json::Int("up", 12345),
+    Json::Int("v", SOFTWARE_VERSION),
+    Json::Int("t", 0),
     Json::String("status", "Disabled"),
-    Json::Object("hCtrl", humanControlFields),
+    Json::Boolean("hCtl", false),
     Json::Object("eStop", eStopFields),
-    Json::Float("bat", 0.85),
-    Json::Float("angle", 20.0),
-    Json::Float("tnkPres", 0.0),
-    Json::Float("frPres", 60.336),
-    Json::Int("vlvTm", 100),
-    Json::Float("dVel", 0.0),
-    Json::Float("dRot", 0.0),
+    Json::Float("b", 0.5),
+    Json::Int("ang", 0),
+    Json::Int("tPr", 0),
+    Json::Int("fPr", 0),
+    Json::Int("vlv", 0),
+    Json::Float("x", 0.0),
+    Json::Float("y", 0.0),
     Json::Boolean("fire", false),
     Json::Boolean("fill", false),
-    Json::String("err", "", 32),
+    Json::String("err", "", 16),
 };
 JsonElement controllerState = Json::Object(robotStateFields);
 

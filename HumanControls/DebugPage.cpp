@@ -10,16 +10,10 @@ void DebugPage::paint(DisplayController &display, bool isActivated, JsonElement 
 {
     display.clear();
     display.printRegion(0, 0, "v:");
-    display.printRegion(2, 0, object["ver"].asString());
-
-    display.printRegion(8, 0, "up:");
-    display.printRegion(11, 0, String(object["up"].asInt()));
+    display.printRegion(2, 0, String(object["v"].asInt()));
 
     display.printRegion(0, 1, "t:");
-    display.printRegion(2, 1, String(object["tck"].asInt()));
-
-    display.printRegion(9, 1, "avg:");
-    display.printRegion(13, 1, String(object["avgTck"].asInt()));
+    display.printRegion(2, 1, String(object["t"].asInt()));
 }
 
 void DebugPage::clockwise(JsonElement &object)
@@ -29,4 +23,9 @@ void DebugPage::clockwise(JsonElement &object)
 void DebugPage::counterClockwise(JsonElement &object)
 {
     return;
+}
+
+int DebugPage::rangeFilter(int value)
+{
+    return 0;
 }
