@@ -19,36 +19,27 @@ This is a project to control a t-shirt cannon robot using 3 Arduinos:
 
 ### To build individual project
 
-## JSON State
+## Binary State Object
 
-There's a JSON State object that represents the current state of the robot,
-and this is how updates are sent from the controller as well.
+In order to keep radio messages as small as possible, we are using a binary packed C Struct.
 
-### Full status of the robot with examples and explanations:
+Full status messages are sent regularly from the robot to the controller.
+The robot is considered the single source of truth for the full state.
+The controller can send a full state as well, and the robot will attempt to change its
+state to match the desired state from the controller, then return a full state message to confirm.
 
 ```
 {
-  "ver": "1.0.0",          // Software version of the robot
-  "tck": 123,              // The current "tick" loop count
-  "avgTck": 32,            // The time in milliseconds of the current average tick duration
-  "up": 1193,              // The number of seconds since the robot has booted up
-  "status": "Enabled",     // Current status of robot ["Disabled", "Enabled", "Primed"]
-  "hCtrl": {               // Info about connection to human controls
-    "id": 123,             // Id of the human controller
-    "conn": "Active",      // ["Disconnected", "Active"]
-  },
-  "eStop": {               // List of possible e-stop buttons
-    "btn": false,          // Wired in to the robot's arduino
-  },
-  "bat": 0.95              // 0.0=dead, 1.0=full charge
-  "angle": 0.5,            // 0.0=lowest, 1.0=highest
-  "tnkPres": 25.2,         // Current shot tank pressure (in PSI)
-  "frPres": 30.5,          // Target shot tank pressure to fire (in PSI)
-  "vlvTm": 110,            // Amount of time the valve opens for firing a shot
-  "dVel": 0.5,             // -1.0=full reverse, 1.0=full ahead
-  "dRot": 0.25,            // -1.0=full counter-clockwise, 1.0=full clockwise
-  "fire": false,           // Controller sets to true to fire, robot clears to false afterward
-  "fill": false,           // True if the shot tank is filling up
-  "err": "it broke",       // error message or "" if none (max length: 32)
+  uint:2 message_type;           // 0=From robot, 1=From controller, 2=no op from controller, 3=drive x/y from controller
+  uint:5 message_index;          // Count up from 0, then roll over from 31 back to 0
+  uint:3 status;                 // 0=disabled, 1=enabled, 2=adjusting (cannot prime or fire), 3=primed, 4=firing
+  uint:2 error;                  // 0=no error, 1=e-stop, 2=no controller, 3=other (check logs)
+  uint:8 controller_drive_left;  // Specific to motor controller
+  uint:8 controller_drive_left;  // Specific to motor controller
+  uint:2 battery_voltage;        // 0= <20, 1= 20-22, 2= 22-24,3= 24+
+  uint:7 angle;                  // 0=down, 127=up
+  uint:7 tank_pressure;          // In PSI: 0-127
+  uint:7 firing_pressure;        // In PSI: 0-127
+  uint:5 firing_time;            // 0=100ms, 20=300ms
 }
 ```
