@@ -1,4 +1,4 @@
-#include <RFM95C.h>
+#include "RFM95C.h"
 
 // interrupt handler and related code must be in RAM on ESP8266,
 // according to issue #46.
@@ -13,7 +13,7 @@
 // Interrupt vectors for the 3 Arduino interrupt pins
 // Each interrupt can be handled by a different instance of RFM_95C, allowing you to have
 // 2 or more LORAs per Arduino
-RFM_95C *RFM_95C::_deviceForInterrupt[RFM_95C_NUM_INTERRUPTS] = {0, 0, 0};
+RFM_95C *RFM_95C::_deviceForInterrupt[RFM_95C_NUM_INTERRUPTS] = {0, 0};
 uint8_t RFM_95C::_interruptCount = 0; // Index into _deviceForInterrupt for next device
 
 // These are indexed by the values of ModemConfigChoice
@@ -162,6 +162,7 @@ void RFM_95C::handleInterrupt()
     //    if (_mode == RHModeRx && irq_flags & (RFM_95C_RX_TIMEOUT | RFM_95C_PAYLOAD_CRC_ERROR))
     {
         _rxBad++;
+        Serial.println("CRC Error")
     }
     else if (_mode == RHModeRx && irq_flags & RFM_95C_RX_DONE)
     {
@@ -235,15 +236,9 @@ void INTERRUPT_ATTR RFM_95C::isr2()
 // Check whether the latest received message is complete and uncorrupted
 void RFM_95C::validateRxBuf()
 {
-    if (_bufLen < 4)
-        return; // Too short to be a real message
     // Extract the expected length of the message
-    _rxHeaderId = _buf[0];
-    if (_bufLen == _rxHeaderId)
-    {
-        _rxGood++;
-        _rxBufValid = true;
-    }
+    _rxGood++;
+    _rxBufValid = true;
 }
 
 bool RFM_95C::available()
@@ -269,7 +264,6 @@ bool RFM_95C::recv(uint8_t *buf, uint8_t *len)
     if (buf && len)
     {
         ATOMIC_BLOCK_START;
-        // Skip the 4 headers that are at the beginning of the rxBuf
         if (*len > _bufLen - RFM_95C_HEADER_LEN)
             *len = _bufLen - RFM_95C_HEADER_LEN;
         memcpy(buf, _buf + RFM_95C_HEADER_LEN, *len);
@@ -292,8 +286,6 @@ bool RFM_95C::send(const uint8_t *data, uint8_t len)
 
     // Position at the beginning of the FIFO
     spiWrite(RFM_95C_REG_0D_FIFO_ADDR_PTR, 0);
-    // The headers
-    spiWrite(RFM_95C_REG_00_FIFO, _txHeaderId);
     // The message data
     spiBurstWrite(RFM_95C_REG_00_FIFO, data, len);
     spiWrite(RFM_95C_REG_22_PAYLOAD_LENGTH, len + RFM_95C_HEADER_LEN);
