@@ -6,7 +6,6 @@
 // level messaging abilities.
 // It is designed to work with the other example Feather9x_RX
 
-#include <RHDatagram.h>
 #include "RFM95C.h"
 #include <SPI.h>
 
@@ -60,16 +59,4 @@ void loop()
     raw_driver.waitPacketSent();
 
     Serial.println("Packet sent in" + String(millis() - time));
-
-    // Serial.println("Controller received a message");
-    //  Wait for a message addressed to us from the client
-
-    // if (manager.recvfrom(buf, &len, &from))
-    // {
-    //     Serial.print("got request from : 0x");
-    //     Serial.print(from, HEX);
-    //     Serial.print(": ");
-    //     Serial.println((char *)buf);
-    //     // Send a reply back to the originator client
-    // }
 }
