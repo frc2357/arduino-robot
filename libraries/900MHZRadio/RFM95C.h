@@ -27,7 +27,7 @@
 
 // The length of the headers we add.
 // The headers are inside the LORA's payload
-#define RFM_95C_HEADER_LEN 1
+#define RFM_95C_HEADER_LEN 0
 
 // This is the maximum message length that can be supported by this driver.
 // Can be pre-defined to a smaller size (to save SRAM) prior to including this header
@@ -256,7 +256,7 @@
 /// - the excellent Rocket Scream Mini Ultra Pro with the RFM95W
 ///   http://www.rocketscream.com/blog/product/mini-ultra-pro-with-radio/
 /// - Lora1276 module from NiceRF http://www.nicerf.com/product_view.aspx?id=99
-/// - Adafruit Feather M0 with RFM95
+/// - Adafruit  M0 with RFM95
 /// - The very fine Talk2 Whisper Node LoRa boards https://wisen.com.au/store/products/whisper-node-lora
 ///   an Arduino compatible board, which include an on-board RFM95/96 LoRa Radio (Semtech SX1276), external antenna,
 ///   run on 2xAAA batteries and support low power operations. RF95 examples work without modification.
