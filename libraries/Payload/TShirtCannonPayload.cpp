@@ -5,28 +5,50 @@ const int TShirtCannonPayload::PAYLOAD_LENGTH = 7;
 uint8_t *TShirtCannonPayload::buildTransmission()
 {
 
-    uint8_t transmission[7] = {};
+    uint8_t *transmission = (uint8_t *)m_payload;
     return transmission;
 }
 
 boolean TShirtCannonPayload::readMessage(uint8_t *message)
 {
+    m_payload = (Payload *)message;
     return false;
 }
 
 void TShirtCannonPayload::print()
-{ /*
-     Serial.println();
-     Serial.println("Message Type: " + char(m_payload.messageType));
-     Serial.println("Message Index: " + static_cast<char>(m_payload.messageIndex));
-     Serial.println("Status: " + static_cast<char>(m_payload.status));
-     Serial.println("Error: " + static_cast<char>(m_payload.error));
-     Serial.println("Left Drive: " + static_cast<char>(m_payload.controllerDriveLeft));
-     Serial.println("Right Drive: " + static_cast<char>(m_payload.controllerDriveRight));
-     Serial.println("Battery Voltage: " + static_cast<char>(m_payload.battery_voltage));
-     Serial.println("Angle: " + static_cast<char>(m_payload.angle));
-     Serial.println("Tank Pressure: " + static_cast<char>(m_payload.tank_pressure));
-     Serial.println("Firing Pressure: " + static_cast<char>(m_payload.firing_pressure));
-     Serial.println("Firing Time: " + static_cast<char>(m_payload.firing_time));
-     Serial.println();*/
+{
+    Serial.println();
+    Serial.print("Message Type: ");
+    Serial.println(m_payload->messageType);
+
+    Serial.print("Message Index: ");
+    Serial.println(m_payload->messageIndex);
+
+    Serial.print("Status: ");
+    Serial.print(m_payload->status);
+
+    Serial.print("Error: ");
+    Serial.println(m_payload->error);
+
+    Serial.print("Left Drive: ");
+    Serial.println(m_payload->controllerDriveLeft);
+
+    Serial.print("Right Drive: ");
+    Serial.println(m_payload->controllerDriveRight);
+
+    Serial.print("Battery Voltage: ");
+    Serial.println(m_payload->batteryVoltage);
+
+    Serial.print("Angle: ");
+    Serial.println(m_payload->angle);
+
+    Serial.print("Tank Pressure: ");
+    Serial.println(m_payload->tankPressure);
+
+    Serial.print("Firing Pressure: ");
+    Serial.println(m_payload->firingPressure);
+
+    Serial.print("Firing Time: ");
+    Serial.println(m_payload->firingTime);
+    Serial.println();
 }
