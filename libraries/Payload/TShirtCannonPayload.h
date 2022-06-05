@@ -21,13 +21,13 @@ private:
         uint8_t tankPressure : 7;         // In PSI: 0-127
         uint8_t firingPressure : 7;       // In PSI: 0-127
         uint8_t firingTime : 5;           // 0=100ms, 20=300ms
-    };
+    } __attribute__((__packed__));
 
 public:
     uint8_t *buildTransmission();
     boolean readMessage(uint8_t *message);
     void print();
 
-    Payload m_payload;
+    Payload *m_payload;
 };
 #endif
