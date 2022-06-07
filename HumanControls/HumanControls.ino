@@ -15,16 +15,16 @@
 #define SOFTWARE_VERSION 1
 
 //Pins
-//LCD connects SDA in analog pin 4 and SCL in analog pin 5
-#define ENCODER_PIN_CLK 3  //CLK gets degrees for rotary knob
-#define ENCODER_PIN_DT 4   //DT gets direction for rotary knob
-#define ENCODER_PIN_SW 5   //Gets the button for rotary knob
-#define JOYSTICK_PIN_SW 6  //Button for joystick
 #define JOYSTICK_PIN_VRX 0 //Analog Pin for joystick x
 #define JOYSTICK_PIN_VRY 1 //Analog Pin for joystick y
-#define ENABLE_PIN 7       //Digital Pin for the enable button
-#define PRIME_PIN 8        //Digital Pin for prime button
-#define FIRE_PIN 9         //Digital Pin for the fire button
+#define ENCODER_PIN_CLK 2  //CLK gets degrees for rotary knob
+#define ENCODER_PIN_DT 3   //DT gets direction for rotary knob
+#define ENCODER_PIN_SW 5   //Gets the button for rotary knob
+#define ENABLE_PIN 10      //Digital Pin for the enable button
+#define PRIME_PIN 11       //Digital Pin for prime button
+#define FIRE_PIN 12        //Digital Pin for the fire button
+#define I2C_SDA 20         //I2C used by LCD
+#define I2C_SCL 21         //I2C used by LCD
 
 //Other constraints
 #define DISPLAY_ADDRESS 0X27      //I2c address of the lcd display
