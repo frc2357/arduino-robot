@@ -6,23 +6,23 @@ const int TShirtCannonPayload::DATA_LENGTH = 11;
 
 TShirtCannonPayload::TShirtCannonPayload()
 {
-    m_messageType = 0;
-    m_messageIndex = 0;
-    m_status = 0;
-    m_error = 0;
-    m_controllerDriveLeft = 0;
-    m_controllerDriveRight = 0;
+    m_messageType = 3;
+    m_messageIndex = 31;
+    m_status = 7;
+    m_error = 3;
+    m_controllerDriveLeft = 255;
+    m_controllerDriveRight = 255;
     m_batteryVoltage = 3;
-    m_angle = 0;
-    m_tankPressure = 0;
-    m_firingPressure = 0;
-    m_firingTime = 0;
+    m_angle = 127;
+    m_tankPressure = 127;
+    m_firingPressure = 127;
+    m_firingTime = 31;
 }
 
 uint8_t TShirtCannonPayload::buildTransmission()
 {
-    uint8_t sizes[PAYLOAD_LENGTH];
-    uint8_t data[11];
+    uint8_t sizes[DATA_LENGTH];
+    uint8_t data[DATA_LENGTH];
     data[0] = m_messageType;
     sizes[0] = 2;
     data[1] = m_messageIndex;
@@ -64,13 +64,13 @@ uint8_t TShirtCannonPayload::buildTransmission()
         }
     }
 
-    Serial.println(transmission[0]);
-    Serial.println(transmission[1]);
-    Serial.println(transmission[2]);
-    Serial.println(transmission[3]);
-    Serial.println(transmission[4]);
-    Serial.println(transmission[5]);
-    Serial.println(transmission[6]);
+    Serial.println(transmission[0], BIN);
+    Serial.println(transmission[1], BIN);
+    Serial.println(transmission[2], BIN);
+    Serial.println(transmission[3], BIN);
+    Serial.println(transmission[4], BIN);
+    Serial.println(transmission[5], BIN);
+    Serial.println(transmission[6], BIN);
 
 
     return transmission;
