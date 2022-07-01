@@ -1,6 +1,5 @@
 #include "TShirtCannonPayload.h"
 
-
 const int TShirtCannonPayload::PAYLOAD_LENGTH = 7;
 const int TShirtCannonPayload::DATA_LENGTH = 11;
 
@@ -19,51 +18,43 @@ TShirtCannonPayload::TShirtCannonPayload()
     m_firingTime = 31;
 }
 
-uint8_t TShirtCannonPayload::buildTransmission()
+uint8_t *TShirtCannonPayload::buildTransmission()
 {
-    uint8_t sizes[DATA_LENGTH];
     uint8_t data[DATA_LENGTH];
     data[0] = m_messageType;
-    sizes[0] = 2;
     data[1] = m_messageIndex;
-    sizes[1] = 5;
     data[2] = m_status;
-    sizes[2] = 3;
     data[3] = m_error;
-    sizes[3] = 2;
     data[4] = m_controllerDriveLeft;
-    sizes[4] = 8;
     data[5] = m_controllerDriveRight;
-    sizes[5] = 8;
     data[6] = m_batteryVoltage;
-    sizes[6] = 2;
     data[7] = m_angle;
-    sizes[7] = 7;
     data[8] = m_tankPressure;
-    sizes[8] = 7;
     data[9] = m_firingPressure;
-    sizes[9] = 7;
     data[10] = m_firingTime;
-    sizes[10] = 5;
 
     uint8_t transmission[PAYLOAD_LENGTH];
 
     int bitPos = 0;
     int elem = 0;
-    for (int i = 0;i < DATA_LENGTH;i++) {
-        uint8_t x = data[i];
+    for (int i = 0; i < DATA_LENGTH; i++)
+    {
+        uint8_t attrVal = data[i];
 
-        for (int j = 0;j < sizes[i];j++) {
-            bitWrite(transmission[elem], bitPos, x & 1);
+        for (int j = 0; j < getAttributeSize(static_cast<AttributeSize>(i)); j++)
+        {
+            bitWrite(transmission[elem], bitPos, attrVal & 1);
             bitPos++;
-            x >>= 1;
-            if (bitPos >= 8) {
+            attrVal >>= 1;
+            if (bitPos >= 8)
+            {
                 elem++;
                 bitPos = 0;
             }
         }
     }
 
+    Serial.println("Data:");
     Serial.println(transmission[0], BIN);
     Serial.println(transmission[1], BIN);
     Serial.println(transmission[2], BIN);
@@ -72,13 +63,35 @@ uint8_t TShirtCannonPayload::buildTransmission()
     Serial.println(transmission[5], BIN);
     Serial.println(transmission[6], BIN);
 
-
     return transmission;
 }
 
 boolean TShirtCannonPayload::readMessage(uint8_t *message)
 {
     return false;
+}
+
+uint8_t TShirtCannonPayload::getAttributeSize(AttributeSize attr)
+{
+    switch (attr)
+    {
+    case AttributeSize::BATTERY_VOLTAGE:
+    case AttributeSize::MESSAGE_TYPE:
+    case AttributeSize::ERROR:
+        return 2;
+    case AttributeSize::STATUS:
+        return 3;
+    case AttributeSize::MESSAGE_INDEX:
+    case AttributeSize::FIRING_TIME:
+        return 5;
+    case AttributeSize::ANGLE:
+    case AttributeSize::TANK_PRESSURE:
+    case AttributeSize::FIRING_PRESSURE:
+        return 7;
+    case AttributeSize::CONTROLLER_DRIVE_LEFT:
+    case AttributeSize::CONTROLLER_DRIVE_RIGHT:
+        return 8;
+    }
 }
 
 void TShirtCannonPayload::print()

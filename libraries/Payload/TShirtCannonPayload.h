@@ -7,8 +7,9 @@ class TShirtCannonPayload
 {
 
 private:
+    // Attributes in the payload
     static const int PAYLOAD_LENGTH; // Length of payload in bytes
-    static const int DATA_LENGTH;   
+    static const int DATA_LENGTH;
     uint8_t m_messageType;          // 0=From robot, 1=From controller, 2=no op from controller, 3=drive x/y from controller
     uint8_t m_messageIndex;         // Count up from 0, then roll over from 31 back to 0
     uint8_t m_status;               // 0=disabled, 1=enabled, 2=adjusting (cannot prime or fire), 3=primed, 4=firing
@@ -21,12 +22,28 @@ private:
     uint8_t m_firingPressure;       // In PSI: 0-127
     uint8_t m_firingTime;           // 0=100ms, 20=300ms
 
-
 public:
-    TShirtCannonPayload();
-    uint8_t buildTransmission();
-    boolean readMessage(uint8_t *message);
-    void print();
+    // Enum to handle payload attribute sizes
+    enum AttributeSize
+    {
+        MESSAGE_TYPE,
+        MESSAGE_INDEX,
+        STATUS,
+        ERROR,
+        CONTROLLER_DRIVE_LEFT,
+        CONTROLLER_DRIVE_RIGHT,
+        BATTERY_VOLTAGE,
+        ANGLE,
+        TANK_PRESSURE,
+        FIRING_PRESSURE,
+        FIRING_TIME,
+        LAST
+    };
 
+    TShirtCannonPayload();
+    uint8_t *buildTransmission();
+    boolean readMessage(uint8_t *message);
+    uint8_t getAttributeSize(AttributeSize attr);
+    void print();
 };
 #endif
