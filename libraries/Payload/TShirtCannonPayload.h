@@ -2,8 +2,9 @@
 #define T_SHIRT_CANNON_PAYLOAD
 
 #include <Arduino.h>
+#include "PayloadInterface.h"
 
-class TShirtCannonPayload
+class TShirtCannonPayload : PayloadInterface
 {
 
 private:
