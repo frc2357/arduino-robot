@@ -42,8 +42,8 @@ public:
     };
 
     TShirtCannonPayload();
-    uint8_t *buildTransmission();
-    boolean readMessage(uint8_t *message);
+    bool buildTransmission(uint8_t *transmission, uint8_t len);
+    bool readMessage(uint8_t *message, uint8_t len);
     uint8_t getAttributeSize(AttributeSize attr);
     void print();
 };

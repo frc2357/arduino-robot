@@ -18,8 +18,15 @@ TShirtCannonPayload::TShirtCannonPayload()
     m_firingTime = 31;
 }
 
-uint8_t *TShirtCannonPayload::buildTransmission()
+bool TShirtCannonPayload::buildTransmission(uint8_t *transmission, uint8_t len)
 {
+
+    if (len < PAYLOAD_LENGTH)
+    {
+        Serial.println("Message is not long enough to hold data.");
+        return false;
+    }
+
     uint8_t data[DATA_LENGTH];
     data[0] = m_messageType;
     data[1] = m_messageIndex;
@@ -33,14 +40,13 @@ uint8_t *TShirtCannonPayload::buildTransmission()
     data[9] = m_firingPressure;
     data[10] = m_firingTime;
 
-    uint8_t transmission[PAYLOAD_LENGTH];
+    Serial.println(data[0], BIN);
 
     int bitPos = 0;
     int elem = 0;
     for (int i = 0; i < DATA_LENGTH; i++)
     {
         uint8_t attrVal = data[i];
-
         for (int j = 0; j < getAttributeSize(static_cast<AttributeSize>(i)); j++)
         {
             bitWrite(transmission[elem], bitPos, attrVal & 1);
@@ -63,20 +69,67 @@ uint8_t *TShirtCannonPayload::buildTransmission()
     Serial.println(transmission[5], BIN);
     Serial.println(transmission[6], BIN);
 
-    return transmission;
+    return true;
 }
 
-boolean TShirtCannonPayload::readMessage(uint8_t *message)
+bool TShirtCannonPayload::readMessage(uint8_t *message, uint8_t len)
 {
-    return false;
+
+    uint8_t data[DATA_LENGTH];
+
+    if (len < PAYLOAD_LENGTH)
+    {
+        Serial.println("Message is not long enough to fill in data.");
+        return false;
+    }
+
+    int bitPos = 0;
+    int elem = 0;
+
+    uint8_t attrVal = message[0];
+    for (int i = 0; i < DATA_LENGTH; i++)
+    {
+        Serial.print("i: ");
+        Serial.println(i);
+        for (int j = 0; j < getAttributeSize(static_cast<AttributeSize>(i)); j++)
+        {
+            Serial.print("Before write ");
+            Serial.println(data[i], BIN);
+            bitWrite(data[i], j, attrVal & 1);
+            Serial.print("After write ");
+            Serial.println(data[i], BIN);
+            attrVal >>= 1;
+            bitPos++;
+            if (bitPos >= 8)
+            {
+                bitPos = 0;
+                elem++;
+                attrVal = message[elem];
+            }
+        }
+    }
+
+    m_messageType = data[0];
+    m_messageIndex = data[1];
+    m_status = data[2];
+    m_error = data[3];
+    m_controllerDriveLeft = data[4];
+    m_controllerDriveRight = data[5];
+    m_batteryVoltage = data[6];
+    m_angle = data[7];
+    m_tankPressure = data[8];
+    m_firingPressure = data[9];
+    m_firingTime = data[10];
+
+    return true;
 }
 
 uint8_t TShirtCannonPayload::getAttributeSize(AttributeSize attr)
 {
     switch (attr)
     {
-    case AttributeSize::BATTERY_VOLTAGE:
     case AttributeSize::MESSAGE_TYPE:
+    case AttributeSize::BATTERY_VOLTAGE:
     case AttributeSize::ERROR:
         return 2;
     case AttributeSize::STATUS:
@@ -96,38 +149,38 @@ uint8_t TShirtCannonPayload::getAttributeSize(AttributeSize attr)
 
 void TShirtCannonPayload::print()
 {
-    // Serial.println();
-    // Serial.print("Message Type: ");
-    // Serial.println(m_payload->messageType, BIN);
+    Serial.println();
+    Serial.print("Message Type: ");
+    Serial.println(m_messageType, BIN);
 
-    // Serial.print("Message Index: ");
-    // Serial.println(m_payload->messageIndex, BIN);
+    Serial.print("Message Index: ");
+    Serial.println(m_messageIndex, BIN);
 
-    // Serial.print("Status: ");
-    // Serial.println(m_payload->status, BIN);
+    Serial.print("Status: ");
+    Serial.println(m_status, BIN);
 
-    // Serial.print("Error: ");
-    // Serial.println(m_payload->error, BIN);
+    Serial.print("Error: ");
+    Serial.println(m_error, BIN);
 
-    // Serial.print("Left Drive: ");
-    // Serial.println(m_payload->controllerDriveLeft, BIN);
+    Serial.print("Left Drive: ");
+    Serial.println(m_controllerDriveLeft, BIN);
 
-    // Serial.print("Right Drive: ");
-    // Serial.println(m_payload->controllerDriveRight, BIN);
+    Serial.print("Right Drive: ");
+    Serial.println(m_controllerDriveRight, BIN);
 
-    // Serial.print("Battery Voltage: ");
-    // Serial.println(m_payload->batteryVoltage, BIN);
+    Serial.print("Battery Voltage: ");
+    Serial.println(m_batteryVoltage, BIN);
 
-    // Serial.print("Angle: ");
-    // Serial.println(m_payload->angle, BIN);
+    Serial.print("Angle: ");
+    Serial.println(m_angle, BIN);
 
-    // Serial.print("Tank Pressure: ");
-    // Serial.println(m_payload->tankPressure, BIN);
+    Serial.print("Tank Pressure: ");
+    Serial.println(m_tankPressure, BIN);
 
-    // Serial.print("Firing Pressure: ");
-    // Serial.println(m_payload->firingPressure, BIN);
+    Serial.print("Firing Pressure: ");
+    Serial.println(m_firingPressure, BIN);
 
-    // Serial.print("Firing Time: ");
-    // Serial.println(m_payload->firingTime, BIN);
-    // Serial.println();
+    Serial.print("Firing Time: ");
+    Serial.println(m_firingTime, BIN);
+    Serial.println();
 }
