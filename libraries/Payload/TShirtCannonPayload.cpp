@@ -60,15 +60,6 @@ bool TShirtCannonPayload::buildTransmission(uint8_t *transmission, uint8_t len)
         }
     }
 
-    Serial.println("Data:");
-    Serial.println(transmission[0], BIN);
-    Serial.println(transmission[1], BIN);
-    Serial.println(transmission[2], BIN);
-    Serial.println(transmission[3], BIN);
-    Serial.println(transmission[4], BIN);
-    Serial.println(transmission[5], BIN);
-    Serial.println(transmission[6], BIN);
-
     return true;
 }
 
@@ -76,6 +67,7 @@ bool TShirtCannonPayload::readMessage(uint8_t *message, uint8_t len)
 {
 
     uint8_t data[DATA_LENGTH];
+    memset(data, 0, sizeof(data));
 
     if (len < PAYLOAD_LENGTH)
     {
@@ -93,11 +85,7 @@ bool TShirtCannonPayload::readMessage(uint8_t *message, uint8_t len)
         Serial.println(i);
         for (int j = 0; j < getAttributeSize(static_cast<AttributeSize>(i)); j++)
         {
-            Serial.print("Before write ");
-            Serial.println(data[i], BIN);
             bitWrite(data[i], j, attrVal & 1);
-            Serial.print("After write ");
-            Serial.println(data[i], BIN);
             attrVal >>= 1;
             bitPos++;
             if (bitPos >= 8)
