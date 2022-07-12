@@ -5,17 +5,17 @@ const int TShirtCannonPayload::DATA_LENGTH = 11;
 
 TShirtCannonPayload::TShirtCannonPayload()
 {
-    m_messageType = 3;
-    m_messageIndex = 31;
-    m_status = 7;
-    m_error = 3;
-    m_controllerDriveLeft = 255;
-    m_controllerDriveRight = 255;
-    m_batteryVoltage = 3;
-    m_angle = 127;
-    m_tankPressure = 127;
-    m_firingPressure = 127;
-    m_firingTime = 31;
+    m_messageType = 0;
+    m_messageIndex = 0;
+    m_status = 0;
+    m_error = 0;
+    m_controllerDriveLeft = 0;
+    m_controllerDriveRight = 0;
+    m_batteryVoltage = 0;
+    m_angle = 0;
+    m_tankPressure = 0;
+    m_firingPressure = 0;
+    m_firingTime = 0;
 }
 
 bool TShirtCannonPayload::buildTransmission(uint8_t *transmission, uint8_t len)
