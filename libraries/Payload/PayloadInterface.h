@@ -4,8 +4,8 @@
 class PayloadInterface
 {
 public:
-    virtual uint8_t *buildTransmission();
-    virtual bool readMessage(uint8_t *message);
+    virtual bool buildTransmission(uint8_t *transmission, uint8_t len);
+    virtual bool readMessage(uint8_t *message, uint8_t len);
     virtual void print();
 };
 
