@@ -14,7 +14,7 @@ void ElevatorPage::paint(DisplayController &display, bool isActivated, TShirtCan
     display.clear();
 
     display.printRegion(1, 0, "Elevator Angle");
-    display.printRegion(7, 1, String(payload.m_angle.asInt()));
+    display.printRegion(7, 1, String(payload.getAngle()));
 
     if (isActivated)
     {
@@ -25,15 +25,15 @@ void ElevatorPage::paint(DisplayController &display, bool isActivated, TShirtCan
 
 void ElevatorPage::clockwise(TShirtCannonPayload &payload)
 {
-    uint8_t &angle = payload.m_angle;
-    angle = angle.asInt() + this->m_increment;
-    angle = rangeFilter(angle.asInt());
+    uint8_t angle = payload.getAngle();
+    angle = angle + this->m_increment;
+    angle = rangeFilter(angle);
 }
 void ElevatorPage::counterClockwise(TShirtCannonPayload &payload)
 {
-    uint8_t &angle = payload.m_angle;
-    angle = angle.asInt() - this->m_increment;
-    angle = rangeFilter(angle.asInt());
+    uint8_t angle = payload.getAngle();
+    angle = angle - this->m_increment;
+    angle = rangeFilter(angle);
 }
 
 int ElevatorPage::rangeFilter(int value)

@@ -12,33 +12,33 @@ void DashPage::paint(DisplayController &display, bool isActivated, TShirtCannonP
 
     if (isActivated)
     {
-        display.printRegion(0, 0, payload.m_error.asString());
+        display.printRegion(0, 0, "ERROR: " + String(payload.getError()));
     }
     else
     {
-        if (strlen(payload.m_error.asString()) > 0)
+        if (payload.getError() != 0)
         {
             display.printRegion(0, 0, "ERROR");
         }
         else
         {
-            display.printRegion(0, 0, payload.m_status.asString());
-            Serial.println(payload.m_status.asString());
+            display.printRegion(0, 0, "Status: " + String(payload.getStatus()));
+            Serial.println(payload.getStatus());
         }
 
         display.printRegion(12, 0, "R");
-        display.printBattery(13, 0, this->m_robotBatChar, payload.m_batteryVoltage.asFloat() * 100);
+        display.printBattery(13, 0, this->m_robotBatChar, payload.getBatteryVoltage() * 100.0);
         display.printRegion(14, 0, "C");
         display.printBattery(15, 0, this->m_controllerBatChar, 30.0);
 
         display.printRegion(0, 1, "A:");
-        display.printRegion(2, 1, String(payload.m_angle.asInt()));
+        display.printRegion(2, 1, String(payload.getAngle()));
 
         display.printRegion(5, 1, "P:");
-        display.printRegion(7, 1, String(payload.m_firingPressure.asInt()));
+        display.printRegion(7, 1, String(payload.getFiringPressure()));
 
         display.printRegion(11, 1, "D:");
-        display.printRegion(13, 1, String(payload.m_firingTime.asInt()));
+        display.printRegion(13, 1, String(payload.getFiringTime()));
     }
 }
 

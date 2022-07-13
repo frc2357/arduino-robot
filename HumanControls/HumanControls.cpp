@@ -88,7 +88,7 @@ void HumanControls::setStatus()
 
     if (this->m_isConnected)
     {
-        if (strlen(m_payload.m_error.asString()) == 0)
+        if (m_payload.getError() == 0)
         {
             // Check the robot's status and see if it is different then the controllers.
             // If it is, set the status to the lowest given status. Ex. Robot returns disabled, but controller enabled, so
@@ -126,7 +126,7 @@ void HumanControls::setStatus()
     {
         Serial.println(status);
         lastStatus = status;
-        m_payload.m_status = status;
+        m_payload.setStatus(status);
         m_menuController.menuRefresh(m_payload);
     }
 
@@ -190,7 +190,7 @@ void HumanControls::setError(const char *format, ...)
     va_end(args);
 
     status = HumanControls::STATUS_DISABLED;
-    m_payload.m_status = HumanControls::STATUS_DISABLED;
+    m_payload.setStatus(HumanControls::STATUS_DISABLED);
 
     Serial.print("ERROR: ");
     Serial.println(message);

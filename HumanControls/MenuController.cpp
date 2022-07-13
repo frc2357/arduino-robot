@@ -57,9 +57,9 @@ void MenuController::init(TShirtCannonPayload &payload, unsigned int downArrow, 
 {
     Serial.println("Menu Init");
     this->m_display.init(downArrow, upArrow);
-    payload.root()["vlv"] = this->m_valvePage.rangeFilter(payload.m_firingTime.asInt());
-    payload.root()["ang"] = this->m_elevatorPage.rangeFilter(payload.m_angle.asInt());
-    payload.root()["fPr"] = this->m_shotPage.rangeFilter(payload.m_firingPressure.asInt());
+    payload.setFiringTime(this->m_valvePage.rangeFilter(payload.getFiringTime()));
+    payload.setAngle(this->m_elevatorPage.rangeFilter(payload.getAngle()));
+    payload.setFiringPressure(this->m_shotPage.rangeFilter(payload.getFiringPressure()));
     this->m_currentPage->paint(m_display, this->m_isActive, payload);
 }
 

@@ -10,10 +10,10 @@ void DebugPage::paint(DisplayController &display, bool isActivated, TShirtCannon
 {
     display.clear();
     display.printRegion(0, 0, "batteryVoltage:");
-    display.printRegion(2, 0, String(payload.m_batteryVoltage.asInt()));
+    display.printRegion(2, 0, String(payload.getBatteryVoltage()));
 
     display.printRegion(0, 1, "messageIndex:");
-    display.printRegion(2, 1, String(payload.m_messageIndex.asInt()));
+    display.printRegion(2, 1, String(payload.getMessageIndex()));
 }
 
 void DebugPage::clockwise(TShirtCannonPayload &payload)

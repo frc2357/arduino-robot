@@ -16,14 +16,14 @@ void ShotPage::paint(DisplayController &display, bool isActivated, TShirtCannonP
     display.printRegion(1, 0, "Shot Pressure");
     display.printRegion(0, 1, "F:");
 
-    display.printRegion(3, 1, String(payload.m_firingPressure.asInt()));
+    display.printRegion(3, 1, String(payload.getFiringPressure()));
     display.printRegion(11, 1, "T:");
-    display.printRegion(13, 1, String(payload.m_tankPressure.asInt()));
+    display.printRegion(13, 1, String(payload.getTankPressure()));
 
     if (isActivated)
     {
         display.printRegion(2, 1, this->m_downArrow);
-        if (payload.m_firingPressure.asInt() >= 100)
+        if (payload.getFiringPressure() >= 100)
         {
             display.printRegion(6, 1, this->m_upArrow);
         }
@@ -36,15 +36,15 @@ void ShotPage::paint(DisplayController &display, bool isActivated, TShirtCannonP
 
 void ShotPage::clockwise(TShirtCannonPayload &payload)
 {
-    JsonElement &frPres = payload.m_firingPressure;
-    frPres = frPres.asInt() + this->m_increment;
-    frPres = rangeFilter(frPres.asInt());
+    uint8_t frPres = payload.getFiringPressure();
+    frPres = frPres + this->m_increment;
+    frPres = rangeFilter(frPres);
 }
 void ShotPage::counterClockwise(TShirtCannonPayload &payload)
 {
-    JsonElement &frPres = payload.m_firingPressure;
-    frPres = frPres.asInt() - this->m_increment;
-    frPres = rangeFilter(frPres.asInt());
+    uint8_t frPres = payload.getFiringPressure();
+    frPres = frPres - this->m_increment;
+    frPres = rangeFilter(frPres);
 }
 
 int ShotPage::rangeFilter(int value)
