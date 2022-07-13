@@ -11,9 +11,9 @@ class ElevatorPage : public Page
 public:
     ElevatorPage(int increment, int min, int max, unsigned int downArrow, unsigned int upArrow,
                  unsigned int robotBatChar, unsigned int controllerBatChar);
-    void paint(DisplayController &display, bool isActivated, JsonElement &object);
-    void clockwise(JsonElement &object);
-    void counterClockwise(JsonElement &object);
+    void paint(DisplayController &display, bool isActivated, TShirtCannonPayload &payload);
+    void clockwise(TShirtCannonPayload &payload);
+    void counterClockwise(TShirtCannonPayload &payload);
     int rangeFilter(int value);
 
 private:

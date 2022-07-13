@@ -5,6 +5,7 @@
 #include "DisplayInterface.h"
 #include "RotaryKnobController.h"
 #include "DisplayController.h"
+#include "TShirtCannonPayload.h"
 
 class Page : DisplayInterface
 {
@@ -21,9 +22,9 @@ public:
     Page(bool isActive, bool applyHang, unsigned int downArrow, unsigned int upArrow,
          unsigned int robotBatChar, unsigned int controllerBatChar, Page::PageType name);
     void cleanUp(DisplayController &display);
-    virtual void paint(DisplayController &display, bool isActivated, JsonElement &object) = 0;
-    virtual void clockwise(JsonElement &object) = 0;
-    virtual void counterClockwise(JsonElement &object) = 0;
+    virtual void paint(DisplayController &display, bool isActivated, TShirtCannonPayload &payload) = 0;
+    virtual void clockwise(TShirtCannonPayload &payload) = 0;
+    virtual void counterClockwise(TShirtCannonPayload &payload) = 0;
     virtual int rangeFilter(int value) = 0;
     bool canActivate();
     void setNextPage(Page &page);
