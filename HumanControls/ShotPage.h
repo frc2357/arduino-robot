@@ -4,6 +4,7 @@
 #include "Page.h"
 #include <Arduino.h>
 #include <JsonElement.h>
+#include "TShirtCannonPayload.h"
 
 class ShotPage : public Page
 {

@@ -6,7 +6,7 @@ const char *HumanControls::STATUS_PRIMED = "Primed";
 const char *HumanControls::status = HumanControls::STATUS_DISABLED;
 const char *HumanControls::lastStatus = HumanControls::STATUS_DISABLED;
 
-HumanControls::HumanControls(JsonState &state, unsigned int encoderPinClk,
+HumanControls::HumanControls(TShirtCannonPayload &payload, unsigned int encoderPinClk,
                              unsigned int encoderPinDt,
                              unsigned int displayAddress,
                              unsigned int displayLen,
@@ -35,7 +35,7 @@ HumanControls::HumanControls(JsonState &state, unsigned int encoderPinClk,
                              unsigned int joystickMax,
                              unsigned int joystickPinVRY,
                              unsigned int yDeadZoneSize)
-    : m_state(state),
+    : m_payload(payload),
       m_menuController(encoderPinClk, encoderPinDt, displayAddress, displayLen, displayWidth,
                        angleIncrement, angleMin, angleMax, pressureIncrement, pressureMin,
                        pressureMax, durationIncrement, durationMin, durationMax, hangTimerDuration,
@@ -59,7 +59,7 @@ void HumanControls::init(unsigned int downArrow, unsigned int upArrow)
     m_pinDebouncer.addPin(this->m_primePin, HIGH, INPUT_PULLUP);
     m_pinDebouncer.addPin(this->m_firePin, HIGH, INPUT_PULLUP);
     m_pinDebouncer.begin();
-    m_menuController.init(m_state, downArrow, upArrow);
+    m_menuController.init(m_payload, downArrow, upArrow);
 }
 
 void HumanControls::update()
@@ -71,15 +71,16 @@ void HumanControls::update()
 
     this->setStatus();
 
-    m_menuController.menuUpdate(m_state, status == HumanControls::STATUS_ENABLED);
+    m_menuController.menuUpdate(m_payload, status == HumanControls::STATUS_ENABLED);
     m_pinDebouncer.update();
 
     m_rightStick.update();
     m_leftStick.update();
-    m_state.root()["x"] = m_leftStick.getResult();
-    m_state.root()["y"] = m_rightStick.getResult();
+    // TODO: Convert joystick values to motor speeds for m_payload
+    // m_payload.root()["x"] = m_leftStick.getResult();
+    // m_payload.root()["y"] = m_rightStick.getResult();
     Serial.println("vel: " + String(m_rightStick.getResult()));
-    //Serial.println("turn: " + String(m_leftStick.getResult()));
+    // Serial.println("turn: " + String(m_leftStick.getResult()));
 }
 
 void HumanControls::setStatus()
@@ -87,12 +88,12 @@ void HumanControls::setStatus()
 
     if (this->m_isConnected)
     {
-        if (strlen(m_state.root()["err"].asString()) == 0)
+        if (strlen(m_payload.m_error.asString()) == 0)
         {
-            //Check the robot's status and see if it is different then the controllers.
-            //If it is, set the status to the lowest given status. Ex. Robot returns disabled, but controller enabled, so
-            //set both statuses to disabled. Robot status and controller status should always be the same.
-            //Only exception may be due to firing setting status to enabled after firing.
+            // Check the robot's status and see if it is different then the controllers.
+            // If it is, set the status to the lowest given status. Ex. Robot returns disabled, but controller enabled, so
+            // set both statuses to disabled. Robot status and controller status should always be the same.
+            // Only exception may be due to firing setting status to enabled after firing.
 
             if (m_enableController.getIsEnabled())
             {
@@ -118,26 +119,26 @@ void HumanControls::setStatus()
     else
     {
         status = HumanControls::STATUS_DISABLED;
-        m_state.root()["hCtl"]["conn"] = false;
+        // m_payload.root()["hCtl"]["conn"] = false; Potentially not used
     }
 
     if (status != lastStatus)
     {
         Serial.println(status);
         lastStatus = status;
-        m_state.root()["status"] = status;
-        m_menuController.menuRefresh(m_state);
+        m_payload.m_status = status;
+        m_menuController.menuRefresh(m_payload);
     }
 
-    //Enventually will set the robot's status here
+    // Enventually will set the robot's status here
 }
 
-//Methods for debouncer
+// Methods for debouncer
 void HumanControls::onPinActivated(int pinNr)
 {
     if (pinNr == m_encoderPinSW)
     {
-        m_menuController.menuPress(m_state, (status == HumanControls::STATUS_ENABLED));
+        m_menuController.menuPress(m_payload, (status == HumanControls::STATUS_ENABLED));
     }
     else if (pinNr == m_enablePin)
     {
@@ -175,9 +176,9 @@ void HumanControls::onPinDeactivated(int pinNr)
 
 void HumanControls::connect()
 {
-    //Connect to the robot
+    // Connect to the robot
     this->m_isConnected = true;
-    m_state.root()["hCtl"]["conn"] = true;
+    // m_payload.root()["hCtl"]["conn"] = true; Potentially not used
 }
 
 void HumanControls::setError(const char *format, ...)
@@ -189,7 +190,7 @@ void HumanControls::setError(const char *format, ...)
     va_end(args);
 
     status = HumanControls::STATUS_DISABLED;
-    m_state.root()["status"] = HumanControls::STATUS_DISABLED;
+    m_payload.m_status = HumanControls::STATUS_DISABLED;
 
     Serial.print("ERROR: ");
     Serial.println(message);

@@ -6,21 +6,21 @@ DebugPage::DebugPage(unsigned int downArrow, unsigned int upArrow, unsigned int 
 {
 }
 
-void DebugPage::paint(DisplayController &display, bool isActivated, JsonElement &object)
+void DebugPage::paint(DisplayController &display, bool isActivated, TShirtCannonPayload &payload)
 {
     display.clear();
-    display.printRegion(0, 0, "v:");
-    display.printRegion(2, 0, String(object["v"].asInt()));
+    display.printRegion(0, 0, "batteryVoltage:");
+    display.printRegion(2, 0, String(payload.m_batteryVoltage.asInt()));
 
-    display.printRegion(0, 1, "t:");
-    display.printRegion(2, 1, String(object["t"].asInt()));
+    display.printRegion(0, 1, "messageIndex:");
+    display.printRegion(2, 1, String(payload.m_messageIndex.asInt()));
 }
 
-void DebugPage::clockwise(JsonElement &object)
+void DebugPage::clockwise(TShirtCannonPayload &payload)
 {
     return;
 }
-void DebugPage::counterClockwise(JsonElement &object)
+void DebugPage::counterClockwise(TShirtCannonPayload &payload)
 {
     return;
 }

@@ -9,21 +9,21 @@ ShotPage::ShotPage(int increment, int min, int max, unsigned int downArrow, unsi
     this->m_increment = increment;
 }
 
-void ShotPage::paint(DisplayController &display, bool isActivated, JsonElement &object)
+void ShotPage::paint(DisplayController &display, bool isActivated, TShirtCannonPayload &payload)
 {
     display.clear();
 
     display.printRegion(1, 0, "Shot Pressure");
     display.printRegion(0, 1, "F:");
 
-    display.printRegion(3, 1, String(object["fPr"].asInt()));
+    display.printRegion(3, 1, String(payload.m_firingPressure.asInt()));
     display.printRegion(11, 1, "T:");
-    display.printRegion(13, 1, String(object["tPr"].asInt()));
+    display.printRegion(13, 1, String(payload.m_tankPressure.asInt()));
 
     if (isActivated)
     {
         display.printRegion(2, 1, this->m_downArrow);
-        if (object["fPr"].asInt() >= 100)
+        if (payload.m_firingPressure.asInt() >= 100)
         {
             display.printRegion(6, 1, this->m_upArrow);
         }
@@ -34,15 +34,15 @@ void ShotPage::paint(DisplayController &display, bool isActivated, JsonElement &
     }
 }
 
-void ShotPage::clockwise(JsonElement &object)
+void ShotPage::clockwise(TShirtCannonPayload &payload)
 {
-    JsonElement &frPres = object["fPr"];
+    JsonElement &frPres = payload.m_firingPressure;
     frPres = frPres.asInt() + this->m_increment;
     frPres = rangeFilter(frPres.asInt());
 }
-void ShotPage::counterClockwise(JsonElement &object)
+void ShotPage::counterClockwise(TShirtCannonPayload &payload)
 {
-    JsonElement &frPres = object["fPr"];
+    JsonElement &frPres = payload.m_firingPressure;
     frPres = frPres.asInt() - this->m_increment;
     frPres = rangeFilter(frPres.asInt());
 }

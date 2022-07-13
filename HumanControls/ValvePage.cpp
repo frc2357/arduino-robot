@@ -9,12 +9,12 @@ ValvePage::ValvePage(int increment, int min, int max, unsigned int downArrow, un
     this->m_increment = increment;
 }
 
-void ValvePage::paint(DisplayController &display, bool isActivated, JsonElement &object)
+void ValvePage::paint(DisplayController &display, bool isActivated, TShirtCannonPayload &payload)
 {
     display.clear();
 
     display.printRegion(1, 0, "Valve Duration");
-    display.printRegion(6, 1, String(object["vlv"].asInt()));
+    display.printRegion(6, 1, String(payload.m_firingTime.asInt()));
 
     if (isActivated)
     {
@@ -23,15 +23,15 @@ void ValvePage::paint(DisplayController &display, bool isActivated, JsonElement 
     }
 }
 
-void ValvePage::clockwise(JsonElement &object)
+void ValvePage::clockwise(TShirtCannonPayload &payload)
 {
-    JsonElement &vlvTm = object["vlv"];
+    uint8_t &vlvTm = payload.m_firingTime;
     vlvTm = vlvTm.asInt() + this->m_increment;
     vlvTm = rangeFilter(vlvTm.asInt());
 }
-void ValvePage::counterClockwise(JsonElement &object)
+void ValvePage::counterClockwise(TShirtCannonPayload &payload)
 {
-    JsonElement &vlvTm = object["vlv"];
+    uint8_t &vlvTm = payload.m_firingTime;
     vlvTm = vlvTm.asInt() - this->m_increment;
     vlvTm = rangeFilter(vlvTm.asInt());
 }

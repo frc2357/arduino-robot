@@ -12,7 +12,7 @@
 class HumanControls
 {
 public:
-    HumanControls(JsonState &state,
+    HumanControls(TShirtCannonPayload &payload,
                   unsigned int encoderPinClk,
                   unsigned int encoderPinDt,
                   unsigned int displayAddress,
@@ -61,7 +61,7 @@ private:
     bool m_isConnected;
     static const char *lastStatus;
 
-    JsonState &m_state;
+    TShirtCannonPayload &m_payload;
 
     MenuController m_menuController;
     FTDebouncer m_pinDebouncer;

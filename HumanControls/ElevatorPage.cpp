@@ -9,12 +9,12 @@ ElevatorPage::ElevatorPage(int increment, int min, int max, unsigned int downArr
     this->m_increment = increment;
 }
 
-void ElevatorPage::paint(DisplayController &display, bool isActivated, JsonElement &object)
+void ElevatorPage::paint(DisplayController &display, bool isActivated, TShirtCannonPayload &payload)
 {
     display.clear();
 
     display.printRegion(1, 0, "Elevator Angle");
-    display.printRegion(7, 1, String(object["ang"].asInt()));
+    display.printRegion(7, 1, String(payload.m_angle.asInt()));
 
     if (isActivated)
     {
@@ -23,15 +23,15 @@ void ElevatorPage::paint(DisplayController &display, bool isActivated, JsonEleme
     }
 }
 
-void ElevatorPage::clockwise(JsonElement &object)
+void ElevatorPage::clockwise(TShirtCannonPayload &payload)
 {
-    JsonElement &angle = object["ang"];
+    uint8_t &angle = payload.m_angle;
     angle = angle.asInt() + this->m_increment;
     angle = rangeFilter(angle.asInt());
 }
-void ElevatorPage::counterClockwise(JsonElement &object)
+void ElevatorPage::counterClockwise(TShirtCannonPayload &payload)
 {
-    JsonElement &angle = object["ang"];
+    uint8_t &angle = payload.m_angle;
     angle = angle.asInt() - this->m_increment;
     angle = rangeFilter(angle.asInt());
 }

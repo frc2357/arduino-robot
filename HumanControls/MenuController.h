@@ -12,6 +12,7 @@
 #include "RotaryKnobController.h"
 #include "DisplayController.h"
 #include "FireController.h"
+#include "TShirtCannonPayload.h"
 
 class MenuController
 {
@@ -35,10 +36,10 @@ public:
                    unsigned int upArrow,
                    unsigned int robotBatChar,
                    unsigned int controllerBatChar);
-    void init(JsonState &state, unsigned int downArrow, unsigned int upArrow);
-    void menuUpdate(JsonState &state, bool isEnabled);
-    void menuRefresh(JsonState &state);
-    void menuPress(JsonState &state, bool isEnabled);
+    void init(TShirtCannonPayload &payload, unsigned int downArrow, unsigned int upArrow);
+    void menuUpdate(TShirtCannonPayload &payload, bool isEnabled);
+    void menuRefresh(TShirtCannonPayload &payload);
+    void menuPress(TShirtCannonPayload &payload, bool isEnabled);
 
 private:
     RotaryKnobController m_rotaryKnob;
