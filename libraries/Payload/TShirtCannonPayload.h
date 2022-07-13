@@ -46,5 +46,29 @@ public:
     bool readMessage(uint8_t *message, uint8_t len);
     uint8_t getAttributeSize(AttributeSize attr);
     void print();
+
+    uint8_t getMessageType();
+    uint8_t getMessageIndex();
+    uint8_t getStatus();
+    uint8_t getError();
+    uint8_t getControllerDriveLeft();
+    uint8_t getControllerDriveRight();
+    uint8_t getBatteryVoltage();
+    uint8_t getAngle();
+    uint8_t getTankPressure();
+    uint8_t getFiringPressure();
+    uint8_t getFiringTime();
+
+    void setMessageType(uint8_t value);
+    void setMessageIndex(uint8_t value);
+    void setStatus(uint8_t value);
+    void setError(uint8_t value);
+    void setControllerDriveLeft(uint8_t value);
+    void setControllerDriveRight(uint8_t value);
+    void setBatteryVoltage(uint8_t value);
+    void setAngle(uint8_t value);
+    void setTankPressure(uint8_t value);
+    void setFiringPressure(uint8_t value);
+    void setFiringTime(uint8_t value);
 };
 #endif

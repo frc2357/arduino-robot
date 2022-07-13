@@ -172,3 +172,105 @@ void TShirtCannonPayload::print()
     Serial.println(m_firingTime, BIN);
     Serial.println();
 }
+
+// Getters
+uint8_t TShirtCannonPayload::getMessageType()
+{
+    return this->messageType;
+}
+
+uint8_t TShirtCannonPayload::getMessageIndex()
+{
+    return this->messageIndex;
+}
+
+uint8_t TShirtCannonPayload::getStatus()
+{
+    return this->status;
+}
+
+uint8_t TShirtCannonPayload::getError()
+{
+    return this->error;
+}
+
+uint8_t TShirtCannonPayload::getControllerDriveLeft()
+{
+    return this->controllerDriveLeft;
+}
+
+uint8_t TShirtCannonPayload::getControllerDriveRight()
+{
+    return this->controllerDriveRight;
+}
+
+uint8_t TShirtCannonPayload::getBatteryVoltage()
+{
+    return this->batteryVoltage;
+}
+
+uint8_t TShirtCannonPayload::getAngle()
+{
+    return this->angle;
+}
+
+uint8_t TShirtCannonPayload::getTankPressure()
+{
+    return this->tankPressure;
+}
+
+uint8_t TShirtCannonPayload::getFiringPressure()
+{
+    return this->firingPressure;
+}
+
+uint8_t TShirtCannonPayload::getFiringTime()
+{
+    return this->firingTime;
+}
+
+// Setters
+void TShirtCannonPayload::setMessageType(uint8_t value)
+{
+    this->messageType = value;
+}
+void TShirtCannonPayload::setMessageIndex(uint8_t value)
+{
+    this->messageIndex = value;
+}
+void TShirtCannonPayload::setStatus(uint8_t value)
+{
+    this->status = value;
+}
+void TShirtCannonPayload::setError(uint8_t value)
+{
+    this->error = value;
+}
+void TShirtCannonPayload::setControllerDriveLeft(uint8_t value)
+{
+    this->controllerDriveLeft = value;
+}
+void TShirtCannonPayload::setControllerDriveRight(uint8_t value)
+{
+    this->controllerDriveRight = value;
+}
+void TShirtCannonPayload::setBatteryVoltage(uint8_t value)
+{
+    this->batteryVoltage = value;
+}
+void TShirtCannonPayload::setAngle(uint8_t value)
+{
+    this->angle = value;
+}
+void TShirtCannonPayload::setTankPressure(uint8_t value)
+{
+    this->tankPressure = value;
+}
+void TShirtCannonPayload::setFiringPressure(uint8_t value)
+{
+    this->firingPressure = value;
+}
+void TShirtCannonPayload::setFiringTime(uint8_t value)
+{
+    this->firingTime = value;
+}
