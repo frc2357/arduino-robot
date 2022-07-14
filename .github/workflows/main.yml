@@ -1,0 +1,37 @@
+name: Compile Sketch
+
+# The workflow will run on every push and pull request to the repository
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  compile-sketch:
+    runs-on: ubuntu-latest
+
+    steps:
+      # This step makes the contents of the repository available to the workflow
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # For more information: https://github.com/arduino/compile-sketches#readme
+      - name: Compile Custom Libraries
+        uses: arduino/compile-sketches@v1
+        with:
+          # The default is to compile for the Arduino Uno board. If you want to compile for other boards, use the `fqbn` input.
+          sketch-paths: |
+            - ./libraries
+          libraries: |
+            # The "blink" sketch being compiled in this demo doesn't use any libraries, so just use an empty list
+            - ./3rd-party-libraries
+      - name: Compile T-Shirt Cannon Projects
+        uses: arduino/compile-sketches@v1
+        with:
+          sketch-paths: |
+            - ./HumanControls
+            - ./RobotControl
+          libraries: |
+            - ./3rd-party-libraries
+            - ./libraries
