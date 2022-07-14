@@ -24,7 +24,6 @@ jobs:
           sketch-paths: |
             - ./libraries
           libraries: |
-            # The "blink" sketch being compiled in this demo doesn't use any libraries, so just use an empty list
             - ./3rd-party-libraries
       - name: Compile T-Shirt Cannon Projects
         uses: arduino/compile-sketches@v1
