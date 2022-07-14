@@ -119,7 +119,6 @@ void HumanControls::setStatus()
     else
     {
         status = HumanControls::STATUS_DISABLED;
-        // m_payload.root()["hCtl"]["conn"] = false; Potentially not used
     }
 
     if (status != lastStatus)
@@ -178,7 +177,6 @@ void HumanControls::connect()
 {
     // Connect to the robot
     this->m_isConnected = true;
-    // m_payload.root()["hCtl"]["conn"] = true; Potentially not used
 }
 
 void HumanControls::setError(const char *format, ...)
