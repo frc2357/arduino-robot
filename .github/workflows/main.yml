@@ -33,5 +33,5 @@ jobs:
             - ./HumanControls
             - ./RobotControl
           libraries: |
-            - ./3rd-party-libraries
-            - ./libraries
+            - source-path: ./3rd-party-libraries
+            - source-path: ./libraries
