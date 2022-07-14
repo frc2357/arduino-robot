@@ -132,6 +132,8 @@ uint8_t TShirtCannonPayload::getAttributeSize(AttributeSize attr)
     case AttributeSize::CONTROLLER_DRIVE_LEFT:
     case AttributeSize::CONTROLLER_DRIVE_RIGHT:
         return 8;
+    default:
+        return 0;
     }
 }
 

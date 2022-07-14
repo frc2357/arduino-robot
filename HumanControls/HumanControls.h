@@ -12,7 +12,7 @@
 class HumanControls
 {
 public:
-    HumanControls(JsonState &state,
+    HumanControls(TShirtCannonPayload &payload,
                   unsigned int encoderPinClk,
                   unsigned int encoderPinDt,
                   unsigned int displayAddress,
@@ -49,19 +49,19 @@ public:
     void onPinDeactivated(int pinNr);
     void connect();
 
-    static const char *STATUS_DISABLED;
-    static const char *STATUS_ENABLED;
-    static const char *STATUS_PRIMED;
-    static const char *status;
+    static const uint8_t STATUS_DISABLED;
+    static const uint8_t STATUS_ENABLED;
+    static const uint8_t STATUS_PRIMED;
+    static uint8_t status;
 
 private:
     void setError(const char *format, ...);
 
     int m_encoderPinSW, m_enablePin, m_primePin, m_firePin;
     bool m_isConnected;
-    static const char *lastStatus;
+    static uint8_t lastStatus;
 
-    JsonState &m_state;
+    TShirtCannonPayload &m_payload;
 
     MenuController m_menuController;
     FTDebouncer m_pinDebouncer;

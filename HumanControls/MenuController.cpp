@@ -33,14 +33,14 @@ MenuController::MenuController(unsigned int encoderPinClk,
 
     this->m_rotation = 0;
 
-    //Set previous pages
+    // Set previous pages
     m_dashPage.setPreviousPage(m_debugPage);
     m_elevatorPage.setPreviousPage(m_dashPage);
     m_shotPage.setPreviousPage(m_elevatorPage);
     m_valvePage.setPreviousPage(m_shotPage);
     m_debugPage.setPreviousPage(m_valvePage);
 
-    //Set next pages
+    // Set next pages
     m_dashPage.setNextPage(m_elevatorPage);
     m_elevatorPage.setNextPage(m_shotPage);
     m_shotPage.setNextPage(m_valvePage);
@@ -53,26 +53,26 @@ MenuController::MenuController(unsigned int encoderPinClk,
     this->m_time = millis();
 }
 
-void MenuController::init(JsonState &state, unsigned int downArrow, unsigned int upArrow)
+void MenuController::init(TShirtCannonPayload &payload, unsigned int downArrow, unsigned int upArrow)
 {
     Serial.println("Menu Init");
     this->m_display.init(downArrow, upArrow);
-    state.root()["vlv"] = this->m_valvePage.rangeFilter(state.root()["vlv"].asInt());
-    state.root()["ang"] = this->m_elevatorPage.rangeFilter(state.root()["ang"].asInt());
-    state.root()["fPr"] = this->m_shotPage.rangeFilter(state.root()["fPr"].asInt());
-    this->m_currentPage->paint(m_display, this->m_isActive, state.root());
+    payload.setFiringTime(this->m_valvePage.rangeFilter(payload.getFiringTime()));
+    payload.setAngle(this->m_elevatorPage.rangeFilter(payload.getAngle()));
+    payload.setFiringPressure(this->m_shotPage.rangeFilter(payload.getFiringPressure()));
+    this->m_currentPage->paint(m_display, this->m_isActive, payload);
 }
 
-void MenuController::menuRefresh(JsonState &state)
+void MenuController::menuRefresh(TShirtCannonPayload &payload)
 {
     if (this->m_currentPage->getName() != this->m_dashPage.getName())
     {
         m_isActive = false;
     }
-    this->m_currentPage->paint(m_display, m_isActive, state.root());
+    this->m_currentPage->paint(m_display, m_isActive, payload);
 }
 
-void MenuController::menuUpdate(JsonState &state, bool isEnabled)
+void MenuController::menuUpdate(TShirtCannonPayload &payload, bool isEnabled)
 {
     this->m_rotation = this->m_rotaryKnob.getValue();
 
@@ -80,12 +80,12 @@ void MenuController::menuUpdate(JsonState &state, bool isEnabled)
     {
         if (this->m_rotation == 1)
         {
-            this->m_currentPage->clockwise(state.root());
+            this->m_currentPage->clockwise(payload);
         }
 
         if (this->m_rotation == -1)
         {
-            this->m_currentPage->counterClockwise(state.root());
+            this->m_currentPage->counterClockwise(payload);
         }
     }
     else
@@ -105,7 +105,7 @@ void MenuController::menuUpdate(JsonState &state, bool isEnabled)
     {
         this->m_time = millis();
         this->m_currentPage->cleanUp(m_display);
-        this->m_currentPage->paint(m_display, m_isActive, state.root());
+        this->m_currentPage->paint(m_display, m_isActive, payload);
     }
 
     if (this->m_currentPage->applyHang() && millis() > (this->m_time + this->m_hangTimerDuration))
@@ -113,11 +113,11 @@ void MenuController::menuUpdate(JsonState &state, bool isEnabled)
         this->m_currentPage = &m_dashPage;
         this->m_isActive = false;
         this->m_currentPage->cleanUp(m_display);
-        this->m_currentPage->paint(m_display, m_isActive, state.root());
+        this->m_currentPage->paint(m_display, m_isActive, payload);
     }
 }
 
-void MenuController::menuPress(JsonState &state, bool isEnabled)
+void MenuController::menuPress(TShirtCannonPayload &payload, bool isEnabled)
 {
     if ((isEnabled && m_currentPage->canActivate()) || this->m_currentPage->getName() == this->m_dashPage.getName())
     {
@@ -128,5 +128,5 @@ void MenuController::menuPress(JsonState &state, bool isEnabled)
     {
         this->m_isActive = false;
     }
-    this->m_currentPage->paint(m_display, m_isActive, state.root());
+    this->m_currentPage->paint(m_display, m_isActive, payload);
 }
