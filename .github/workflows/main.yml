@@ -17,14 +17,6 @@ jobs:
         uses: actions/checkout@v2
 
       # For more information: https://github.com/arduino/compile-sketches#readme
-      - name: Compile Custom Libraries
-        uses: arduino/compile-sketches@v1
-        with:
-          # The default is to compile for the Arduino Uno board. If you want to compile for other boards, use the `fqbn` input.
-          sketch-paths: |
-            - ./libraries
-          libraries: |
-            - source-path: ./3rd-party-libraries
       - name: Compile T-Shirt Cannon Projects
         uses: arduino/compile-sketches@v1.0.1
         with:
