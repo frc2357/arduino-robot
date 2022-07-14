@@ -26,7 +26,7 @@ jobs:
           libraries: |
             - ./3rd-party-libraries
       - name: Compile T-Shirt Cannon Projects
-        uses: arduino/compile-sketches@v1
+        uses: arduino/compile-sketches@v1.0.1
         with:
           sketch-paths: |
             - ./HumanControls
