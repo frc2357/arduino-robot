@@ -1,10 +1,10 @@
 #include "HumanControls.h"
 
-const char *HumanControls::STATUS_DISABLED = "Disabled";
-const char *HumanControls::STATUS_ENABLED = "Enabled";
-const char *HumanControls::STATUS_PRIMED = "Primed";
-const char *HumanControls::status = HumanControls::STATUS_DISABLED;
-const char *HumanControls::lastStatus = HumanControls::STATUS_DISABLED;
+const uint8_t HumanControls::STATUS_DISABLED = 0;
+const uint8_t HumanControls::STATUS_ENABLED = 1;
+const uint8_t HumanControls::STATUS_PRIMED = 3;
+uint8_t HumanControls::status = HumanControls::STATUS_DISABLED;
+uint8_t HumanControls::lastStatus = HumanControls::STATUS_DISABLED;
 
 HumanControls::HumanControls(TShirtCannonPayload &payload, unsigned int encoderPinClk,
                              unsigned int encoderPinDt,
