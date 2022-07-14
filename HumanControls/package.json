@@ -18,6 +18,8 @@
   "arduinoLibs": [
     "FTDDebouncer@1.3.2",
     "RotaryEncoder@1.1.2",
-    "../libraries/JsonState"
+    "../libraries/JsonState",
+    "../libraries/900MHZRadio",
+    "../libraries/Payload"
   ]
 }
