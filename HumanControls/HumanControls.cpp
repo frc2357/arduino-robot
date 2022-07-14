@@ -76,9 +76,34 @@ void HumanControls::update()
 
     m_rightStick.update();
     m_leftStick.update();
-    // TODO: Convert joystick values to motor speeds for m_payload
-    // m_payload.root()["x"] = m_leftStick.getResult();
-    // m_payload.root()["y"] = m_rightStick.getResult();
+
+    uint8_t x, y, left, right;
+    x = m_rightStick.getResult() / 4;
+    y = m_leftStick.getResult() / 4;
+
+    left = y - x;
+    right = y + x;
+
+    if (left > 255)
+    {
+        left = 255;
+    }
+    else if (left < 0)
+    {
+        left = 0;
+    }
+    if (right > 255)
+    {
+        right = 255;
+    }
+    else if (right < 0)
+    {
+        right = 0;
+    }
+
+    m_payload.setControllerDriveLeft(left);
+    m_payload.setControllerDriveRight(right);
+
     Serial.println("vel: " + String(m_rightStick.getResult()));
     // Serial.println("turn: " + String(m_leftStick.getResult()));
 }
