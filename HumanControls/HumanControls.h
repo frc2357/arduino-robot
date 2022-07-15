@@ -57,6 +57,8 @@ public:
 private:
     void setError(const char *format, ...);
 
+    const uint8_t MAX_DRIVE_SPEED = 63;
+
     int m_encoderPinSW, m_enablePin, m_primePin, m_firePin;
     bool m_isConnected;
     static uint8_t lastStatus;

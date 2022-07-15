@@ -1,4 +1,5 @@
 #include "HumanControls.h"
+#include "Utils.h"
 
 const uint8_t HumanControls::STATUS_DISABLED = 0;
 const uint8_t HumanControls::STATUS_ENABLED = 1;
@@ -77,32 +78,16 @@ void HumanControls::update()
     m_rightStick.update();
     m_leftStick.update();
 
-    uint8_t x, y, left, right;
-    x = m_rightStick.getResult() / 4;
-    y = m_leftStick.getResult() / 4;
+    double turn, speed;
+    turn = m_rightStick.getResult();
+    speed = m_leftStick.getResult();
 
-    left = y - x;
-    right = y + x;
+    Utils.setMotors(m_payload, turn, speed);
 
-    if (left > 255)
-    {
-        left = 255;
-    }
-    else if (left < 0)
-    {
-        left = 0;
-    }
-    if (right > 255)
-    {
-        right = 255;
-    }
-    else if (right < 0)
-    {
-        right = 0;
-    }
-
-    m_payload.setControllerDriveLeft(left);
-    m_payload.setControllerDriveRight(right);
+    Serial.print("DriveLeft: ");
+    Serial.println(m_payload.getControllerDriveLeft());
+    Serial.print("DriveRight: ");
+    Serial.println(m_payload.getControllerDriveRight());
 
     Serial.println("vel: " + String(m_rightStick.getResult()));
     // Serial.println("turn: " + String(m_leftStick.getResult()));
