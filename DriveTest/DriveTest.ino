@@ -4,6 +4,7 @@
 
 #define JOYSTICK_PIN_VRX 0
 #define JOYSTICK_PIN_VRY 1
+#define POWER_DOWN_PIN 19
 
 #define DEAD_ZONE_SIZE 100
 #define JOYSTICK_MAX 1023
@@ -16,6 +17,9 @@ JoystickAxis rightStick(JOYSTICK_PIN_VRX, DEAD_ZONE_SIZE, JOYSTICK_MAX);
 void setup()
 {
     Serial.begin(115200);
+
+    pinMode(POWER_DOWN_PIN, OUTPUT);
+    digitalWrite(POWER_DOWN_PIN, HIGH);
 }
 
 void loop()
