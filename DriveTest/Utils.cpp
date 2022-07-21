@@ -1,6 +1,8 @@
 #include "Utils.h"
 
-static void Utils::setMotors(TShirtCannonPayload payload, float turn, float speed)
+#define MAX_DRIVE_SPEED 63
+
+void Utils::setMotors(TShirtCannonPayload payload, float turn, float speed)
 {
     double left, right;
     uint8_t leftSpeed, rightSpeed, leftDir, rightDir;
