@@ -2,13 +2,13 @@
 
 #define MAX_DRIVE_SPEED 63
 
-void Utils::setMotors(TShirtCannonPayload payload, float turn, float speed)
+void Utils::setMotors(TShirtCannonPayload &payload, float turn, float speed)
 {
     double left, right;
     uint8_t leftSpeed, rightSpeed, leftDir, rightDir;
 
-    left = -((-1 * speed) + (-1 * turn));
-    right = -(speed + (-1 * turn));
+    left = (-1 * turn) + (-1 * speed);
+    right = turn + (-1 * speed);
 
     leftDir = left < 0 ? 1 : 0;
     rightDir = right < 0 ? 1 : 0;

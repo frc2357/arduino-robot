@@ -6,9 +6,7 @@
 class Utils
 {
 public:
-    static void setMotors(TShirtCannonPayload payload, float x, float y);
-//private:
-//    const uint8_t MAX_DRIVE_SPEED = 63;
+    static void setMotors(TShirtCannonPayload &payload, float x, float y);
 };
 
 #endif
