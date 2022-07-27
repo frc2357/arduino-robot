@@ -162,7 +162,7 @@ void RFM_95C::handleInterrupt()
     //    if (_mode == RHModeRx && irq_flags & (RFM_95C_RX_TIMEOUT | RFM_95C_PAYLOAD_CRC_ERROR))
     {
         _rxBad++;
-        Serial.println("CRC Error")
+        Serial.println("CRC Error");
     }
     else if (_mode == RHModeRx && irq_flags & RFM_95C_RX_DONE)
     {
