@@ -7,6 +7,7 @@
  */
 
 #include <JsonElement.h>
+#include <TShirtCannonPayload.h>
 #include "Utils.h"
 #include "Robot.h"
 #include "StatusLEDs.h"
@@ -18,31 +19,9 @@
 #define PIN_LED_BUILTIN    LED_BUILTIN
 
 // Set up the JSON State for the robot
-JsonElement eStopFields[] = {
-  Json::Boolean("btn", true),
-};
+TShirtCannonPayload payload;
 
-JsonElement robotStateFields[] = {
-  Json::Int("v", SOFTWARE_VERSION),
-  Json::Int("t", 0),
-  Json::String("status", "Disabled"),
-  Json::Object("eStop", eStopFields),
-  Json::Float("b", 0.0),
-  Json::Int("ang", 0),
-  Json::Int("tPr", 0),
-  Json::Int("fPr", 0),
-  Json::Int("vlv", 0),
-  Json::Float("x", 0.0),
-  Json::Float("y", 0.0),
-  Json::Boolean("fire", false),
-  Json::Boolean("fill", false),
-  Json::String("err", "", 16),
-};
-JsonElement robotState = Json::Object(robotStateFields);
-
-JsonState state(robotState);
-
-Robot robot(state, PIN_LED_BUILTIN, I2C_HOST_ADDRESS, I2C_DEVICE_ADDRESS);
+Robot robot(payload, PIN_LED_BUILTIN, I2C_HOST_ADDRESS, I2C_DEVICE_ADDRESS);
 
 // Primary Setup
 void setup() {

@@ -11,7 +11,7 @@ class CommsI2C : public Stream {
     CommsI2C(int myAddress, int deviceAddress);
 
     void init();
-    void sendState(JsonState &state);
+    void sendBytes(const uint8_t *data, const uint8_t len);
 
     void beginWrite();
     size_t endWrite();

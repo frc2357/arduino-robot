@@ -3,12 +3,12 @@
 
 const unsigned long Robot::TICK_DURATION_MILLIS = 100;
 
-const char *Robot::STATUS_DISABLED = "Disabled";
-const char *Robot::STATUS_ENABLED = "Enabled";
-const char *Robot::STATUS_PRIMED = "Primed";
+static const uint8_t Robot::STATUS_DISABLED = 0;
+static const uint8_t Robot::STATUS_ENABLED = 1;
+static const uint8_t Robot::STATUS_PRIMED = 3;
 
-Robot::Robot(JsonState &state, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress) :
-  m_state(state),
+Robot::Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress) :
+  m_payload(payload),
   m_statusLEDs(pinLedBuiltin),
   m_commsI2C(i2cHostAddress, i2cDeviceAddress)
 {
@@ -28,14 +28,25 @@ void Robot::init() {
 }
 
 void Robot::update() {
-  int tick = m_state.root()["t"].asInt();
+  int tick = m_payload.getMessageIndex();
   unsigned long tickStartMillis = millis();
 
   m_statusLEDs.update(tick);
-  m_commsI2C.sendState(m_state);
+  
+  uint8_t* transmission;
+  *transmission = 23;
+  *(transmission + 1) = 57;
+  m_payload.buildTransmission((transmission+2), 7);
+  m_commsI2C.sendBytes(transmission, 9);
 
-  // Increment time state variables
-  m_state.root()["t"] = tick + 1;
+  // Increment time payload variables
+
+  if(tick >= 31) {
+    tick = 0;
+  } else {
+    tick++;
+  }
+  m_payload.setMessageIndex(tick);
 
   int tickDurationMillis = millis() - tickStartMillis;
   // TODO: Remove after timing is solved
@@ -56,28 +67,33 @@ void Robot::update() {
 
 void Robot::updateSerial() {
   if (Serial.available() > 0) {
-    String line = Serial.readString();
-    updateFromJson(line.c_str());
-    m_state.printJson(Serial);
+    uint8_t *data = Serial.read();
+
+    if(*data != 23 && *(data + 1) != 57) {
+      setError("Receive serial data does not start with a byte with value 23 followed by byte with value 57");
+    }
+
+    updatePayload((data + 2), 7);
+    m_payload.print();
     Serial.println();
   }
 }
 
-void Robot::updateFromJson(const char *json) {
-  m_state.updateFromJson(json);
+void Robot::updatePayload(const uint8_t *data, const uint8_t len) {
+  bool success = m_payload.readMessage(data, len);
 
-  const char *status = m_state.root()["status"].asString();
-  const char *err = m_state.root()["err"].asString();
+  const char *status = m_payload.getStatus();
+  const char *err = m_payload.getStatus();
 
-  if (strlen(err) > 0) {
+  if (strlen(err) > 0 || success) {
     m_statusLEDs.setBlinkPattern(StatusLEDs::ERROR);
-    m_state.root()["status"] = STATUS_DISABLED;
+    m_payload.setStatus(STATUS_DISABLED);
   } else {
-    if (strcmp(status, STATUS_DISABLED) == 0) {
+    if (status == STATUS_DISABLED) {
       m_statusLEDs.setBlinkPattern(StatusLEDs::DISABLED);
-    } else if (strcmp(status, STATUS_ENABLED) == 0) {
+    } else if (status == STATUS_ENABLED) {
       m_statusLEDs.setBlinkPattern(StatusLEDs::ENABLED);
-    } else if (strcmp(status, STATUS_PRIMED) == 0) {
+    } else if (status == STATUS_PRIMED) {
       m_statusLEDs.setBlinkPattern(StatusLEDs::PRIMED);
     } else {
       m_statusLEDs.setBlinkPattern(StatusLEDs::OFF);
@@ -105,8 +121,7 @@ void Robot::setError(const char *format, ...) {
   vsprintf(message, format, args);
   va_end(args);
 
-  m_state.root()["err"] = message;
-  m_state.root()["status"] = STATUS_DISABLED;
+  m_payload.setStatus(STATUS_DISABLED);
 
   Serial.print("ERROR: ");
   Serial.println(message);
