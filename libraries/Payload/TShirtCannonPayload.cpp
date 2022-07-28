@@ -1,7 +1,8 @@
 #include "TShirtCannonPayload.h"
 
-const int TShirtCannonPayload::PAYLOAD_LENGTH = 7;
-const int TShirtCannonPayload::DATA_LENGTH = 11;
+static const int TShirtCannonPayload::PAYLOAD_LENGTH = 7;
+static const int TShirtCannonPayload::SERIAL_PREAMBLE_LENGTH = 2;
+static const int TShirtCannonPayload::DATA_LENGTH = 11;
 
 TShirtCannonPayload::TShirtCannonPayload()
 {
@@ -110,6 +111,34 @@ bool TShirtCannonPayload::readMessage(uint8_t *message, uint8_t len)
     m_firingTime = data[10];
 
     return true;
+}
+
+bool TShirtCannonPayload::buildSerialTransmission(uint8_t *transmission, uint8_t len)
+{
+    if (len < (PAYLOAD_LENGTH + SERIAL_PREAMBLE_LENGTH))
+    {
+        Serial.println("Message is not long enough to hold data.");
+        return false;
+    }
+
+    *transmission = 23;
+    *(transmission + 1) = 57;
+    return buildTransmission((transmission + 2), len);
+}
+
+bool TShirtCannonPayload::readSerialMessage(uint8_t *message, uint8_t len)
+{
+    if (len < (PAYLOAD_LENGTH + SERIAL_PREAMBLE_LENGTH))
+    {
+        Serial.println("Message is not long enough to hold data.");
+        return false;
+    }
+
+    if(*data != 23 && *(data + 1) != 57) {
+        return false;
+    }
+
+    return readMessage((message + 2), len);
 }
 
 uint8_t TShirtCannonPayload::getAttributeSize(AttributeSize attr)
