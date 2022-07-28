@@ -32,8 +32,9 @@ void Robot::update() {
   unsigned long tickStartMillis = millis();
 
   m_statusLEDs.update(tick);
-  
+
   uint8_t* transmission;
+  // TODO: SWITCH OUT WITH PAYLOAD METHODS
   *transmission = 23;
   *(transmission + 1) = 57;
   m_payload.buildTransmission((transmission+2), 7);
@@ -69,6 +70,7 @@ void Robot::updateSerial() {
   if (Serial.available() > 0) {
     uint8_t *data = Serial.read();
 
+  // TODO: SWITCH OUT WITH PAYLOAD METHODS
     if(*data != 23 && *(data + 1) != 57) {
       setError("Receive serial data does not start with a byte with value 23 followed by byte with value 57");
     }
