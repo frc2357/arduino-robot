@@ -3,8 +3,8 @@
 
 #include <Arduino.h>
 #include <TShirtCannonPayload.h>
+#include <CommsI2C.h>
 #include "StatusLEDs.h"
-#include "CommsI2C.h"
 
 #define ROBOT_TICK_DURATION_BUFFER_LEN 5
 
