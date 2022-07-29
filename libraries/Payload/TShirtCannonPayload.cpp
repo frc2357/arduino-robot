@@ -9,13 +9,13 @@ TShirtCannonPayload::TShirtCannonPayload()
     m_messageIndex = 0;
     m_status = 0;
     m_error = 0;
+    m_firingTime = 0;
     m_controllerDriveLeft = 0;
     m_controllerDriveRight = 0;
     m_batteryVoltage = 0;
     m_angle = 0;
     m_tankPressure = 0;
     m_firingPressure = 0;
-    m_firingTime = 0;
 }
 
 bool TShirtCannonPayload::buildTransmission(uint8_t *transmission, uint8_t len)
@@ -32,13 +32,13 @@ bool TShirtCannonPayload::buildTransmission(uint8_t *transmission, uint8_t len)
     data[1] = m_messageIndex;
     data[2] = m_status;
     data[3] = m_error;
+    data[10] = m_firingTime;
     data[4] = m_controllerDriveLeft;
     data[5] = m_controllerDriveRight;
     data[6] = m_batteryVoltage;
     data[7] = m_angle;
     data[8] = m_tankPressure;
     data[9] = m_firingPressure;
-    data[10] = m_firingTime;
 
     Serial.println(data[0], BIN);
 
@@ -101,13 +101,13 @@ bool TShirtCannonPayload::readMessage(uint8_t *message, uint8_t len)
     m_messageIndex = data[1];
     m_status = data[2];
     m_error = data[3];
+    m_firingTime = data[10];
     m_controllerDriveLeft = data[4];
     m_controllerDriveRight = data[5];
     m_batteryVoltage = data[6];
     m_angle = data[7];
     m_tankPressure = data[8];
     m_firingPressure = data[9];
-    m_firingTime = data[10];
 
     return true;
 }
@@ -152,6 +152,9 @@ void TShirtCannonPayload::print()
     Serial.print("Error: ");
     Serial.println(m_error, BIN);
 
+    Serial.print("Firing Time: ");
+    Serial.println(m_firingTime, BIN);
+    
     Serial.print("Left Drive: ");
     Serial.println(m_controllerDriveLeft, BIN);
 
@@ -170,8 +173,6 @@ void TShirtCannonPayload::print()
     Serial.print("Firing Pressure: ");
     Serial.println(m_firingPressure, BIN);
 
-    Serial.print("Firing Time: ");
-    Serial.println(m_firingTime, BIN);
     Serial.println();
 }
 
@@ -194,6 +195,11 @@ uint8_t TShirtCannonPayload::getStatus()
 uint8_t TShirtCannonPayload::getError()
 {
     return this->m_error;
+}
+
+uint8_t TShirtCannonPayload::getFiringTime()
+{
+    return this->m_firingTime;
 }
 
 uint8_t TShirtCannonPayload::getControllerDriveLeft()
@@ -226,53 +232,58 @@ uint8_t TShirtCannonPayload::getFiringPressure()
     return this->m_firingPressure;
 }
 
-uint8_t TShirtCannonPayload::getFiringTime()
-{
-    return this->m_firingTime;
-}
-
 // Setters
 void TShirtCannonPayload::setMessageType(uint8_t value)
 {
     this->m_messageType = value;
 }
+
 void TShirtCannonPayload::setMessageIndex(uint8_t value)
 {
     this->m_messageIndex = value;
 }
+
 void TShirtCannonPayload::setStatus(uint8_t value)
 {
     this->m_status = value;
 }
+
 void TShirtCannonPayload::setError(uint8_t value)
 {
     this->m_error = value;
 }
+
+void TShirtCannonPayload::setFiringTime(uint8_t value)
+{
+    this->m_firingTime = value;
+}
+
 void TShirtCannonPayload::setControllerDriveLeft(uint8_t value)
 {
     this->m_controllerDriveLeft = value;
 }
+
 void TShirtCannonPayload::setControllerDriveRight(uint8_t value)
 {
     this->m_controllerDriveRight = value;
 }
+
 void TShirtCannonPayload::setBatteryVoltage(uint8_t value)
 {
     this->m_batteryVoltage = value;
 }
+
 void TShirtCannonPayload::setAngle(uint8_t value)
 {
     this->m_angle = value;
 }
+
 void TShirtCannonPayload::setTankPressure(uint8_t value)
 {
     this->m_tankPressure = value;
 }
+
 void TShirtCannonPayload::setFiringPressure(uint8_t value)
 {
     this->m_firingPressure = value;
-}
-void TShirtCannonPayload::setFiringTime(uint8_t value)
-{
-    this->m_firingTime = value;
 }
