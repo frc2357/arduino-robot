@@ -2,6 +2,7 @@
 #include "Utils.h"
 
 const unsigned long Robot::TICK_DURATION_MILLIS = 100;
+static const uint8_t Robot::SERIAL_PAYLOAD_LENGTH = 9;
 
 static const uint8_t Robot::STATUS_DISABLED = 0;
 static const uint8_t Robot::STATUS_ENABLED = 1;
@@ -67,15 +68,11 @@ void Robot::update() {
 }
 
 void Robot::updateSerial() {
-  if (Serial.available() > 0) {
+  if (Serial.available() >= 0) {
+
+    
     uint8_t *data = Serial.read();
-
-  // TODO: SWITCH OUT WITH PAYLOAD METHODS
-    if(*data != 23 && *(data + 1) != 57) {
-      setError("Receive serial data does not start with a byte with value 23 followed by byte with value 57");
-    }
-
-    updatePayload((data + 2), 7);
+    updatePayload(data, SERIAL_PAYLOAD_LENGTH);
     m_payload.print();
     Serial.println();
   }

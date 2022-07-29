@@ -11,6 +11,7 @@
 class Robot
 {
   static const unsigned long TICK_DURATION_MILLIS;
+  static const uint8_t SERIAL_PAYLOAD_LENGTH = 9;
 
   static const uint8_t STATUS_DISABLED;
   static const uint8_t STATUS_ENABLED;

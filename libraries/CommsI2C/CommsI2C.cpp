@@ -33,19 +33,18 @@ void CommsI2C::sendBytes(const uint8_t *data, const uint8_t len) {
   size_t bytesWritten = endWrite();
 }
 
-// TODO: Fill out for receiving data
 int CommsI2C::available() {
-  return 0;
+  return Wire.available();
 }
 
-// TODO: Fill out for receiving data
+// Read a single byte from the buffer
 int CommsI2C::read() {
-  return 0;
+  return Wire.read();
 }
 
-// TODO: Fill out for receiving data
+// Peek next byte
 int CommsI2C::peek() {
-  return 0;
+  return Wire.peek();
 }
 
 size_t CommsI2C::write(uint8_t value) {

@@ -12,6 +12,7 @@ class CommsI2C : public Stream {
 
     void init();
     void sendBytes(const uint8_t *data, const uint8_t len);
+    void fillBuffer();
 
     void beginWrite();
     size_t endWrite();
