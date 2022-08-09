@@ -29,7 +29,7 @@ TShirtCannonPayload payload;
 JoystickAxis leftStick(JOYSTICK_PIN_VRY, DEAD_ZONE_SIZE, JOYSTICK_MAX);
 JoystickAxis rightStick(JOYSTICK_PIN_VRX, DEAD_ZONE_SIZE, JOYSTICK_MAX);
 
-uint8_t data;
+uint8_t *data;
 uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
 
 void setup()
@@ -51,20 +51,20 @@ void setup()
     raw_driver.setTxPower(23, false);
 
     // ! UNCOMMENT THE LINES BELOW IF USING CONTROLLER
-    // pinMode(POWER_DOWN_PIN, OUTPUT);
-    // digitalWrite(POWER_DOWN_PIN, HIGH);
+    pinMode(POWER_DOWN_PIN, OUTPUT);
+    digitalWrite(POWER_DOWN_PIN, HIGH);
 }
 
 void loop()
 {
-    // rightStick.update();
-    // leftStick.update();
+    rightStick.update();
+    leftStick.update();
 
     float turn, speed;
-    turn = .5;
-    speed = -1;
-    // turn = rightStick.getResult();
-    // speed = leftStick.getResult();
+    // turn = .5;
+    // speed = -1;
+    turn = rightStick.getResult();
+    speed = leftStick.getResult();
 
     Utils::setMotors(payload, turn, speed);
 
@@ -74,21 +74,12 @@ void loop()
     Serial.println(payload.getControllerDriveRight());
     Serial.println();
 
-    data = payload.getControllerDriveLeft();
+    payload.buildTransmission(data, 7);
 
     raw_driver.send(data, sizeof(data));
     int time = millis();
 
-    raw_driver.waitPacketSend();
-
-    Serial.println("Message sent in " + String(millis() - time));
-
-    data = payload.getControllerDriveRight();
-
-    raw_driver.send(data, sizeof(data));
-    int time = millis();
-
-    raw_driver.waitPacketSend();
+    raw_driver.waitPacketSent();
 
     Serial.println("Message sent in " + String(millis() - time));
 
