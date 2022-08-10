@@ -29,11 +29,14 @@ TShirtCannonPayload payload;
 JoystickAxis leftStick(JOYSTICK_PIN_VRY, DEAD_ZONE_SIZE, JOYSTICK_MAX);
 JoystickAxis rightStick(JOYSTICK_PIN_VRX, DEAD_ZONE_SIZE, JOYSTICK_MAX);
 
-uint8_t *data;
-uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
+uint8_t buf[7];
 
 void setup()
 {
+    // ! UNCOMMENT THE LINES BELOW IF USING CONTROLLER
+    pinMode(POWER_DOWN_PIN, OUTPUT);
+    digitalWrite(POWER_DOWN_PIN, HIGH);
+
     Serial.begin(115200);
 
     if (!raw_driver.init())
@@ -49,10 +52,6 @@ void setup()
     }
 
     raw_driver.setTxPower(23, false);
-
-    // ! UNCOMMENT THE LINES BELOW IF USING CONTROLLER
-    pinMode(POWER_DOWN_PIN, OUTPUT);
-    digitalWrite(POWER_DOWN_PIN, HIGH);
 }
 
 void loop()
@@ -61,8 +60,8 @@ void loop()
     leftStick.update();
 
     float turn, speed;
-    // turn = .5;
-    // speed = -1;
+    turn = .5;
+    speed = -1;
     turn = rightStick.getResult();
     speed = leftStick.getResult();
 
@@ -74,9 +73,9 @@ void loop()
     Serial.println(payload.getControllerDriveRight());
     Serial.println();
 
-    payload.buildTransmission(data, 7);
+    payload.buildTransmission(buf, 7);
 
-    raw_driver.send(data, sizeof(data));
+    raw_driver.send(buf, sizeof(buf));
     int time = millis();
 
     raw_driver.waitPacketSent();
