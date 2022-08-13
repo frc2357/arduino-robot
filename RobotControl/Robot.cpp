@@ -36,10 +36,8 @@ void Robot::update() {
 
   uint8_t* transmission;
   // TODO: SWITCH OUT WITH PAYLOAD METHODS
-  *transmission = 23;
-  *(transmission + 1) = 57;
-  m_payload.buildTransmission((transmission+2), 7);
-  m_commsI2C.sendBytes(transmission, 9);
+  m_payload.buildTransmission(transmission, 7);
+  m_commsI2C.sendBytes(transmission, 7);
 
   // Increment time payload variables
 
