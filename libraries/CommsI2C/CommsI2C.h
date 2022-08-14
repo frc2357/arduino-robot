@@ -13,8 +13,8 @@ class CommsI2C : public Stream {
     void init();
     void sendBytes(const uint8_t *data, const uint8_t len);
     int fillBuffer(uint8_t *buf, const uint8_t len);
-    void parseBuffer(uint8_t *buf, const uint8_t bufLen, uint8_t *data, const uint8_t datLen);
-    void getBytes(uint8_t *buf, const uint8_t bufLen, uint8_t *data, const uint8_t datLen);
+    const bool parseBuffer(uint8_t *buf, const uint8_t bufLen, uint8_t *data, const uint8_t datLen);
+    const bool getBytes(uint8_t *buf, const uint8_t bufLen, uint8_t *data, const uint8_t datLen);
 
     void beginWrite();
     size_t endWrite();

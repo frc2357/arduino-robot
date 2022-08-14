@@ -50,12 +50,12 @@ int CommsI2C::fillBuffer(uint8_t *buf, const uint8_t len) {
   return bytesRead;
 }
 
-void CommsI2C::parseBuffer(uint8_t *buf, const uint8_t bufLen, uint8_t *data, const uint8_t datLen) {
+const bool CommsI2C::parseBuffer(uint8_t *buf, const uint8_t bufLen, uint8_t *data, const uint8_t datLen) {
   int preambleCount = 0;
   int dataPos = 0;
 
   if(bufLen < datLen + m_preambleLength) {
-    return;
+    return false;
   }
 
   // Find start of data
@@ -69,7 +69,7 @@ void CommsI2C::parseBuffer(uint8_t *buf, const uint8_t bufLen, uint8_t *data, co
 
   // Validate preamble is found, and there is enough in buffer for it to be good data
   if((preambleCount != 4) || (bufLen - dataPos < datLen)) {
-    return;
+    return false;
   }
 
   // Verify data is complete
@@ -90,16 +90,17 @@ void CommsI2C::parseBuffer(uint8_t *buf, const uint8_t bufLen, uint8_t *data, co
   }
 
   if((secondPreambleStart > 0) && (secondPreambleStart - dataPos < datLen)) {
-    return;
+    return false;
   }  
 
   memcpy(data, (buf + dataPos), datLen);
+  return true;
 }
 
-void CommsI2C::getBytes(uint8_t *buf, const uint8_t bufLen, uint8_t *data, const uint8_t datLen) {
+const bool CommsI2C::getBytes(uint8_t *buf, const uint8_t bufLen, uint8_t *data, const uint8_t datLen) {
   int bytesRead = fillBuffer(buf, bufLen);
 
-  parseBuffer(buf, bytesRead, data, datLen);
+  return parseBuffer(buf, bytesRead, data, datLen);
 }
 
 

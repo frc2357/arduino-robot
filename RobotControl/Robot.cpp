@@ -2,10 +2,13 @@
 
 const unsigned long Robot::TICK_DURATION_MILLIS = 100;
 const uint8_t Robot::PREAMBLE_LEN = 4;
+const unsigned int Robot::KEEP_ALIVE_MILLIS = 1000;
 
 const uint8_t Robot::STATUS_DISABLED = 0;
 const uint8_t Robot::STATUS_ENABLED = 1;
+const uint8_t Robot::STATUS_ADJUSTING = 2;
 const uint8_t Robot::STATUS_PRIMED = 3;
+const uint8_t Robot::STATUS_FIRING = 4;
 
 Robot::Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress) :
   m_payload(payload),
@@ -13,6 +16,7 @@ Robot::Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress
   m_commsI2C(i2cHostAddress, i2cDeviceAddress, PREAMBLE_LEN)
 {
   m_initTimeSeconds = 0;
+  m_lastRecvTimeMillis = 0;
 }
 
 void Robot::init() {
@@ -38,14 +42,6 @@ void Robot::update() {
   m_payload.buildTransmission(m_payloadBytes, PAYLOAD_LEN);
   m_commsI2C.sendBytes(m_payloadBytes, PAYLOAD_LEN);
 
-  // Increment time payload variables
-  if(tick >= 31) {
-    tick = 0;
-  } else {
-    tick++;
-  }
-  m_payload.setMessageIndex(tick);
-
   int tickDurationMillis = millis() - tickStartMillis;
   // TODO: Remove after timing is solved
   Serial.println(tickDurationMillis);
@@ -66,9 +62,16 @@ void Robot::update() {
 void Robot::updateSerial() {
   memset(m_payloadBytes, 0, PAYLOAD_LEN);
   memset(m_serialBuffer, 0, SERIAL_BUFFER_LEN);
-  m_commsI2C.getBytes(m_serialBuffer, SERIAL_BUFFER_LEN, m_payloadBytes, PAYLOAD_LEN);
+  bool success = m_commsI2C.getBytes(m_serialBuffer, SERIAL_BUFFER_LEN, m_payloadBytes, PAYLOAD_LEN);
 
-  updatePayload(m_payloadBytes, PAYLOAD_LEN);
+  if (success) {
+    m_lastRecvTimeMillis = millis();
+    updatePayload(m_payloadBytes, PAYLOAD_LEN);
+  }
+
+  setStatus();
+  //setRobot();
+  
   m_payload.print();
   Serial.println();
 }
@@ -92,6 +95,24 @@ void Robot::updatePayload(const uint8_t *data, const uint8_t len) {
     } else {
       m_statusLEDs.setBlinkPattern(StatusLEDs::OFF);
     }
+  }
+}
+
+void Robot::setRobot() {
+   const uint8_t status = m_payload.getStatus();
+  if (status != STATUS_ENABLED) {
+    Serial.write(0);
+    Serial.write(128);
+  } else if (status == STATUS_ENABLED) {
+    Serial.write(m_payload.getControllerDriveLeft());
+    Serial.write(m_payload.getControllerDriveLeft());
+  } 
+}
+
+void Robot::setStatus() {
+  // TODO: Switch to using tick variable for keep alive
+  if(millis() - m_lastRecvTimeMillis > KEEP_ALIVE_MILLIS) {
+    m_payload.setStatus(STATUS_DISABLED);
   }
 }
 
