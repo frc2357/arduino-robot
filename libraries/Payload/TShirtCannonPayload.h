@@ -31,19 +31,19 @@ public:
         MESSAGE_INDEX,
         STATUS,
         ERROR,
+        FIRING_TIME,
         CONTROLLER_DRIVE_LEFT,
         CONTROLLER_DRIVE_RIGHT,
         BATTERY_VOLTAGE,
         ANGLE,
         TANK_PRESSURE,
         FIRING_PRESSURE,
-        FIRING_TIME,
         LAST
     };
 
     TShirtCannonPayload();
-    bool buildTransmission(uint8_t *transmission, uint8_t len);
-    bool readMessage(uint8_t *message, uint8_t len);
+    bool buildTransmission(uint8_t *transmission, const uint8_t len);
+    bool readMessage(const uint8_t *message, const uint8_t len);
     uint8_t getAttributeSize(AttributeSize attr);
     void print();
 

@@ -1,17 +1,16 @@
 #include "Robot.h"
-#include "Utils.h"
 
 const unsigned long Robot::TICK_DURATION_MILLIS = 100;
-static const uint8_t Robot::SERIAL_PAYLOAD_LENGTH = 9;
+const uint8_t Robot::PREAMBLE_LEN = 4;
 
-static const uint8_t Robot::STATUS_DISABLED = 0;
-static const uint8_t Robot::STATUS_ENABLED = 1;
-static const uint8_t Robot::STATUS_PRIMED = 3;
+const uint8_t Robot::STATUS_DISABLED = 0;
+const uint8_t Robot::STATUS_ENABLED = 1;
+const uint8_t Robot::STATUS_PRIMED = 3;
 
 Robot::Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress) :
   m_payload(payload),
   m_statusLEDs(pinLedBuiltin),
-  m_commsI2C(i2cHostAddress, i2cDeviceAddress)
+  m_commsI2C(i2cHostAddress, i2cDeviceAddress, PREAMBLE_LEN)
 {
   m_initTimeSeconds = 0;
 }
@@ -34,13 +33,12 @@ void Robot::update() {
 
   m_statusLEDs.update(tick);
 
-  uint8_t* transmission;
   // TODO: SWITCH OUT WITH PAYLOAD METHODS
-  m_payload.buildTransmission(transmission, 7);
-  m_commsI2C.sendBytes(transmission, 7);
+  memset(m_payloadBytes, 0, PAYLOAD_LEN);
+  m_payload.buildTransmission(m_payloadBytes, PAYLOAD_LEN);
+  m_commsI2C.sendBytes(m_payloadBytes, PAYLOAD_LEN);
 
   // Increment time payload variables
-
   if(tick >= 31) {
     tick = 0;
   } else {
@@ -66,23 +64,22 @@ void Robot::update() {
 }
 
 void Robot::updateSerial() {
-  if (Serial.available() >= 0) {
+  memset(m_payloadBytes, 0, PAYLOAD_LEN);
+  memset(m_serialBuffer, 0, SERIAL_BUFFER_LEN);
+  m_commsI2C.getBytes(m_serialBuffer, SERIAL_BUFFER_LEN, m_payloadBytes, PAYLOAD_LEN);
 
-    
-    uint8_t *data = Serial.read();
-    updatePayload(data, SERIAL_PAYLOAD_LENGTH);
-    m_payload.print();
-    Serial.println();
-  }
+  updatePayload(m_payloadBytes, PAYLOAD_LEN);
+  m_payload.print();
+  Serial.println();
 }
 
 void Robot::updatePayload(const uint8_t *data, const uint8_t len) {
   bool success = m_payload.readMessage(data, len);
 
-  const char *status = m_payload.getStatus();
-  const char *err = m_payload.getStatus();
+  const uint8_t status = m_payload.getStatus();
+  const uint8_t err = m_payload.getStatus();
 
-  if (strlen(err) > 0 || success) {
+  if (err > 0 || success) {
     m_statusLEDs.setBlinkPattern(StatusLEDs::ERROR);
     m_payload.setStatus(STATUS_DISABLED);
   } else {

@@ -96,9 +96,7 @@ void CommsI2C::parseBuffer(uint8_t *buf, const uint8_t bufLen, uint8_t *data, co
   memcpy(data, (buf + dataPos), datLen);
 }
 
-void CommsI2C::getBytes(const uint8_t bufLen, uint8_t *data, const uint8_t datLen) {
-  uint8_t buf[bufLen] = {};
-
+void CommsI2C::getBytes(uint8_t *buf, const uint8_t bufLen, uint8_t *data, const uint8_t datLen) {
   int bytesRead = fillBuffer(buf, bufLen);
 
   parseBuffer(buf, bytesRead, data, datLen);

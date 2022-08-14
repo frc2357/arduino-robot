@@ -2,7 +2,6 @@
 #define COMMSI2C_H
 
 #include <Arduino.h>
-#include <JsonElement.h>
 
 class CommsI2C : public Stream {
   public:
@@ -15,7 +14,7 @@ class CommsI2C : public Stream {
     void sendBytes(const uint8_t *data, const uint8_t len);
     int fillBuffer(uint8_t *buf, const uint8_t len);
     void parseBuffer(uint8_t *buf, const uint8_t bufLen, uint8_t *data, const uint8_t datLen);
-    void getBytes(const uint8_t bufLen, uint8_t *data, const uint8_t datLen);
+    void getBytes(uint8_t *buf, const uint8_t bufLen, uint8_t *data, const uint8_t datLen);
 
     void beginWrite();
     size_t endWrite();

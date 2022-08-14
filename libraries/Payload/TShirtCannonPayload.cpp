@@ -18,7 +18,7 @@ TShirtCannonPayload::TShirtCannonPayload()
     m_firingPressure = 0;
 }
 
-bool TShirtCannonPayload::buildTransmission(uint8_t *transmission, uint8_t len)
+bool TShirtCannonPayload::buildTransmission(uint8_t *transmission, const uint8_t len)
 {
 
     if (len < PAYLOAD_LENGTH)
@@ -32,13 +32,13 @@ bool TShirtCannonPayload::buildTransmission(uint8_t *transmission, uint8_t len)
     data[1] = m_messageIndex;
     data[2] = m_status;
     data[3] = m_error;
-    data[10] = m_firingTime;
-    data[4] = m_controllerDriveLeft;
-    data[5] = m_controllerDriveRight;
-    data[6] = m_batteryVoltage;
-    data[7] = m_angle;
-    data[8] = m_tankPressure;
-    data[9] = m_firingPressure;
+    data[4] = m_firingTime;
+    data[5] = m_controllerDriveLeft;
+    data[6] = m_controllerDriveRight;
+    data[7] = m_batteryVoltage;
+    data[8] = m_angle;
+    data[9] = m_tankPressure;
+    data[10] = m_firingPressure;
 
     Serial.println(data[0], BIN);
 
@@ -63,7 +63,7 @@ bool TShirtCannonPayload::buildTransmission(uint8_t *transmission, uint8_t len)
     return true;
 }
 
-bool TShirtCannonPayload::readMessage(uint8_t *message, uint8_t len)
+bool TShirtCannonPayload::readMessage(const uint8_t *message, const uint8_t len)
 {
 
     uint8_t data[DATA_LENGTH];
@@ -101,13 +101,13 @@ bool TShirtCannonPayload::readMessage(uint8_t *message, uint8_t len)
     m_messageIndex = data[1];
     m_status = data[2];
     m_error = data[3];
-    m_firingTime = data[10];
-    m_controllerDriveLeft = data[4];
-    m_controllerDriveRight = data[5];
-    m_batteryVoltage = data[6];
-    m_angle = data[7];
-    m_tankPressure = data[8];
-    m_firingPressure = data[9];
+    m_firingTime = data[4];
+    m_controllerDriveLeft = data[5];
+    m_controllerDriveRight = data[6];
+    m_batteryVoltage = data[7];
+    m_angle = data[8];
+    m_tankPressure = data[9];
+    m_firingPressure = data[10];
 
     return true;
 }
