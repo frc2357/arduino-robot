@@ -3,7 +3,7 @@
 #include "JoystickAxis.h"
 #include "Utils.h"
 #include "TShirtCannonPayload.h"
-#include "RH_RF95.h"
+#include "RFM95C.h"
 #include "RHReliableDatagram.h"
 
 #define JOYSTICK_PIN_VRX 0
@@ -22,7 +22,7 @@
 #define CONTROLLER_ADDRESS 1
 #define ROBOT_ADDRESS 2
 
-RH_RF95 raw_driver(RFM95_CS, RFM95_INT);
+RFM_95C raw_driver(RFM95_CS, RFM95_INT);
 
 TShirtCannonPayload payload;
 
