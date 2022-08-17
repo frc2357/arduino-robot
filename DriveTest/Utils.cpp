@@ -33,6 +33,6 @@ void Utils::setMotors(TShirtCannonPayload &payload, float turn, float speed)
         rightSpeed = 0;
     }
 
-    payload.setControllerDriveLeft((leftDir << 5) | leftSpeed);
-    payload.setControllerDriveRight((1 << 6) | (rightDir << 5) | rightSpeed);
+    payload.setControllerDriveLeft((leftDir << 6) | leftSpeed);
+    payload.setControllerDriveRight((1 << 7) | (rightDir << 6) | rightSpeed);
 }

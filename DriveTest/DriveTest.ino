@@ -71,16 +71,22 @@ void loop()
     Serial.println(payload.getControllerDriveLeft());
     Serial.print("Right motor speed: ");
     Serial.println(payload.getControllerDriveRight());
-    Serial.println();
 
     payload.buildTransmission(buf, 7);
+
+    for (int i = 0; i < sizeof(buf); i++)
+    {
+        Serial.println(buf[i], BIN);
+    }
 
     raw_driver.send(buf, sizeof(buf));
     int time = millis();
 
     raw_driver.waitPacketSent();
 
-    Serial.println("Message sent in " + String(millis() - time));
+    Serial.println("Message sent in " + String(millis() - time) + "ms");
+
+    Serial.println();
 
     delay(1000);
 }
