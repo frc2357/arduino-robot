@@ -128,4 +128,5 @@ size_t CommsI2C::write(uint8_t value) {
   Wire.write(value);
   m_messageBytesWritten++;
   m_totalBytesWritten++;
+  return m_messageBytesWritten;
 }

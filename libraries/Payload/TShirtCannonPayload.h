@@ -11,6 +11,9 @@ private:
     // Attributes in the payload
     static const int PAYLOAD_LENGTH; // Length of payload in bytes
     static const int DATA_LENGTH;
+    static const int PAYLOAD_LENGTH_LAST_INDEX;
+    static const int DATA_LENGTH_LAST_INDEX;
+
     uint8_t m_messageType;          // 0=From robot, 1=From controller, 2=no op from controller, 3=drive x/y from controller
     uint8_t m_messageIndex;         // Count up from 0, then roll over from 31 back to 0
     uint8_t m_status;               // 0=disabled, 1=enabled, 2=adjusting (cannot prime or fire), 3=primed, 4=firing

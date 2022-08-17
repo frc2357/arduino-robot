@@ -28,12 +28,30 @@ void RobotComms::init(unsigned int radioFreq) {
 void RobotComms::update() {
     uint8_t payloadLen = PAYLOAD_LEN;
 
-    if (m_radio.recv(m_payload, &payloadLen)) {
-        Serial.println((uint8_t)m_payload);
+    //if (m_radio.recv(m_payload, &payloadLen)) {
+        //Serial.println((uint8_t)m_payload);
 
         // Send down serial if full message received
+
+        TShirtCannonPayload payload = TShirtCannonPayload();
+
+        payload.setStatus(1);
+        payload.buildTransmission(m_payload, PAYLOAD_LEN);
+        Serial.println("Start Payload");
+        Serial.println(m_payload[0], BIN);
+        Serial.println(m_payload[1], BIN);
+        Serial.println(m_payload[2], BIN);
+        Serial.println(m_payload[3], BIN);
+        Serial.println(m_payload[4], BIN);
+        Serial.println(m_payload[5], BIN);
+        Serial.println(m_payload[6], BIN);
+        Serial.println("End payload");
+
+        payload.print();
+        
         if(payloadLen == PAYLOAD_LEN) {
             m_commsI2C.sendBytes(m_payload, PAYLOAD_LEN);
         }
-    }
+    //}
+    delay(100);
 }

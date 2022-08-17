@@ -2,6 +2,8 @@
 
 const int TShirtCannonPayload::PAYLOAD_LENGTH = 7;
 const int TShirtCannonPayload::DATA_LENGTH = 11;
+const int TShirtCannonPayload::PAYLOAD_LENGTH_LAST_INDEX = TShirtCannonPayload::PAYLOAD_LENGTH - 1;
+const int TShirtCannonPayload::DATA_LENGTH_LAST_INDEX = TShirtCannonPayload::DATA_LENGTH - 1;
 
 TShirtCannonPayload::TShirtCannonPayload()
 {
@@ -40,21 +42,21 @@ bool TShirtCannonPayload::buildTransmission(uint8_t *transmission, const uint8_t
     data[9] = m_tankPressure;
     data[10] = m_firingPressure;
 
-    Serial.println(data[0], BIN);
-
     int bitPos = 0;
-    int elem = 0;
-    for (int i = 0; i < DATA_LENGTH; i++)
+    int elem = PAYLOAD_LENGTH_LAST_INDEX;
+    for (int i = DATA_LENGTH_LAST_INDEX; i > 0; i--)
     {
         uint8_t attrVal = data[i];
+    
         for (int j = 0; j < getAttributeSize(static_cast<AttributeSize>(i)); j++)
         {
             bitWrite(transmission[elem], bitPos, attrVal & 1);
+            
             bitPos++;
             attrVal >>= 1;
             if (bitPos >= 8)
             {
-                elem++;
+                elem--;
                 bitPos = 0;
             }
         }
@@ -76,13 +78,11 @@ bool TShirtCannonPayload::readMessage(const uint8_t *message, const uint8_t len)
     }
 
     int bitPos = 0;
-    int elem = 0;
+    int elem = PAYLOAD_LENGTH_LAST_INDEX;
 
-    uint8_t attrVal = message[0];
-    for (int i = 0; i < DATA_LENGTH; i++)
+    uint8_t attrVal = message[PAYLOAD_LENGTH_LAST_INDEX];
+    for (int i = DATA_LENGTH_LAST_INDEX; i > 0 ; i--)
     {
-        Serial.print("i: ");
-        Serial.println(i);
         for (int j = 0; j < getAttributeSize(static_cast<AttributeSize>(i)); j++)
         {
             bitWrite(data[i], j, attrVal & 1);
@@ -91,7 +91,7 @@ bool TShirtCannonPayload::readMessage(const uint8_t *message, const uint8_t len)
             if (bitPos >= 8)
             {
                 bitPos = 0;
-                elem++;
+                elem--;
                 attrVal = message[elem];
             }
         }
