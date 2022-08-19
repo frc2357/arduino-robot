@@ -32,6 +32,7 @@ void Robot::init() {
 }
 
 void Robot::update() {
+  Serial.println("Printing");
   int tick = m_payload.getMessageIndex();
   unsigned long tickStartMillis = millis();
 
@@ -40,7 +41,7 @@ void Robot::update() {
   // TODO: SWITCH OUT WITH PAYLOAD METHODS
   memset(m_payloadBytes, 0, PAYLOAD_LEN);
   m_payload.buildTransmission(m_payloadBytes, PAYLOAD_LEN);
-  m_commsI2C.sendBytes(m_payloadBytes, PAYLOAD_LEN);
+  //m_commsI2C.sendBytes(m_payloadBytes, PAYLOAD_LEN);
 
   int tickDurationMillis = millis() - tickStartMillis;
   // TODO: Remove after timing is solved
@@ -67,6 +68,7 @@ void Robot::updateSerial() {
   if (success) {
     m_lastRecvTimeMillis = millis();
     updatePayload(m_payloadBytes, PAYLOAD_LEN);
+    Serial.println("Bytes parsed");
   }
 
   setStatus();
