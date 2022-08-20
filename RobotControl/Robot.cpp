@@ -103,8 +103,8 @@ void Robot::updatePayload(const uint8_t *data, const uint8_t len) {
 void Robot::setRobot() {
    const uint8_t status = m_payload.getStatus();
   if (status != STATUS_ENABLED) {
-    Serial.write(0);
-    Serial.write(128);
+    Serial.write((uint8_t)0);
+    Serial.write((uint8_t)128);
   } else if (status == STATUS_ENABLED) {
     Serial.write(m_payload.getControllerDriveLeft());
     Serial.write(m_payload.getControllerDriveLeft());

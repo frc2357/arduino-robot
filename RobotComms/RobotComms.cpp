@@ -8,17 +8,17 @@ RobotComms::RobotComms(unsigned int radioSS, unsigned int radioINT, unsigned int
 }
 
 void RobotComms::init(unsigned int radioFreq) {
-    if (!m_radio.init())
-        Serial.println("radio init failed");
+    // if (!m_radio.init())
+    //     Serial.println("radio init failed");
 
-    if (!m_radio.setFrequency(radioFreq))
-    {
-        Serial.println("radio setFrequency failed");
-        while (1)
-            ;
-    }
+    // if (!m_radio.setFrequency(radioFreq))
+    // {
+    //     Serial.println("radio setFrequency failed");
+    //     while (1)
+    //         ;
+    // }
 
-    m_radio.setTxPower(23, false);
+   // m_radio.setTxPower(23, false);
 
     m_commsI2C.init();
 
@@ -50,7 +50,7 @@ void RobotComms::update() {
         payload.print();
         
         if(payloadLen == PAYLOAD_LEN) {
-            m_commsI2C.sendBytes(m_payload, PAYLOAD_LEN);
+            //m_commsI2C.sendBytes(m_payload, PAYLOAD_LEN);
         }
     //}
     delay(100);

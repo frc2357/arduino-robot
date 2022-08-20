@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <TShirtCannonPayload.h>
-#include <CommsI2C.h>
+#include <CommsI2CMaster.h>
 #include "StatusLEDs.h"
 #include "Utils.h"
 
@@ -40,7 +40,7 @@ private:
 
   TShirtCannonPayload &m_payload;
   StatusLEDs m_statusLEDs;
-  CommsI2C m_commsI2C;
+  CommsI2CMaster m_commsI2C;
   int m_initTimeSeconds;
   int m_tickDurations[ROBOT_TICK_DURATION_BUFFER_LEN];
   size_t m_tickDurationsIndex;

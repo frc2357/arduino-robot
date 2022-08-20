@@ -13,7 +13,7 @@
 
 #define SOFTWARE_VERSION   1
 #define SERIAL_BAUD_RATE   115200
-#define I2C_HOST_ADDRESS   0x04
+#define I2C_HOST_ADDRESS   0x09
 #define I2C_DEVICE_ADDRESS 0x08
 #define PIN_LED_BUILTIN    LED_BUILTIN
 
@@ -30,11 +30,17 @@ void setup() {
     Serial.print(SOFTWARE_VERSION);
     Serial.println(" -----------");
   }
-  robot.init();
+  //robot.init();
   Serial.print("----------- Init complete -----------");
 }
 
 // Main Loop
 void loop() {
-  robot.update();
+  //robot.update();
+  if (Serial.available() > 0) {
+    Serial.println("Serial data found");
+  } else {
+    Serial.println("Serial data not found");
+  }
+  delay(100);
 }
