@@ -2,9 +2,9 @@
 
 #include "JoystickAxis.h"
 #include "Utils.h"
-#include "TShirtCannonPayload.h"
-#include "RFM95C.h"
-#include "RHReliableDatagram.h"
+#include <TShirtCannonPayload.h>
+#include <RFM95C.h>
+#include "FTDebouncer.h"
 
 #define JOYSTICK_PIN_VRX 0
 #define JOYSTICK_PIN_VRY 1
@@ -22,7 +22,11 @@
 #define CONTROLLER_ADDRESS 1
 #define ROBOT_ADDRESS 2
 
+#define ENABLE_PIN 10      // Digital Pin for the enable button
+
 RFM_95C raw_driver(RFM95_CS, RFM95_INT);
+
+FTDebouncer m_pinDebouncer(1);
 
 TShirtCannonPayload payload;
 
@@ -52,16 +56,18 @@ void setup()
     }
 
     raw_driver.setTxPower(23, false);
+
+    m_pinDebouncer.addPin(ENABLE_PIN, HIGH, INPUT_PULLUP);
+    m_pinDebouncer.begin();
 }
 
 void loop()
 {
     rightStick.update();
     leftStick.update();
+    m_pinDebouncer.update();
 
     float turn, speed;
-    turn = .5;
-    speed = -1;
     turn = rightStick.getResult();
     speed = leftStick.getResult();
 
@@ -71,6 +77,8 @@ void loop()
     Serial.println(payload.getControllerDriveLeft());
     Serial.print("Right motor speed: ");
     Serial.println(payload.getControllerDriveRight());
+    Serial.print("Status: ");
+    Serial.println(payload.getStatus());
 
     payload.buildTransmission(buf, 7);
 
@@ -80,13 +88,16 @@ void loop()
     }
 
     raw_driver.send(buf, sizeof(buf));
-    int time = millis();
-
-    raw_driver.waitPacketSent();
-
-    Serial.println("Message sent in " + String(millis() - time) + "ms");
-
+    
     Serial.println();
+}
 
-    delay(1000);
+void onPinActivated(int pinNr)
+{
+    payload.setStatus(1);
+}
+
+void onPinDeactivated(int pinNr)
+{
+    payload.setStatus(0);
 }
