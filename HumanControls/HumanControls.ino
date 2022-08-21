@@ -73,7 +73,6 @@ void setup()
 
 void loop()
 {
-
     humanControls.update();
 }
 
@@ -81,6 +80,7 @@ void onPinActivated(int pinNr)
 {
     humanControls.onPinActivated(pinNr);
 }
+
 void onPinDeactivated(int pinNr)
 {
     humanControls.onPinDeactivated(pinNr);

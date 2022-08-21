@@ -1,4 +1,5 @@
 #include "HumanControls.h"
+#include "Utils.h"
 
 const uint8_t HumanControls::STATUS_DISABLED = 0;
 const uint8_t HumanControls::STATUS_ENABLED = 1;
@@ -76,9 +77,18 @@ void HumanControls::update()
 
     m_rightStick.update();
     m_leftStick.update();
-    // TODO: Convert joystick values to motor speeds for m_payload
-    // m_payload.root()["x"] = m_leftStick.getResult();
-    // m_payload.root()["y"] = m_rightStick.getResult();
+
+    double turn, speed;
+    turn = m_rightStick.getResult();
+    speed = m_leftStick.getResult();
+
+    Utils.setMotors(m_payload, turn, speed);
+
+    Serial.print("DriveLeft: ");
+    Serial.println(m_payload.getControllerDriveLeft());
+    Serial.print("DriveRight: ");
+    Serial.println(m_payload.getControllerDriveRight());
+
     Serial.println("vel: " + String(m_rightStick.getResult()));
     // Serial.println("turn: " + String(m_leftStick.getResult()));
 }
