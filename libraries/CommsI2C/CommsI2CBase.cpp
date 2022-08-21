@@ -15,9 +15,9 @@ void CommsI2CBase::init() {
 int CommsI2CBase::fillBuffer(uint8_t *buf, const uint8_t len) {
   int bytesRead = 0;
   while(available() && bytesRead < len) {
-    uint8_t val = read();
-    Serial.println(val);
-    buf[bytesRead] = val; 
+    //uint8_t val = read();
+    //Serial.println(val);
+    buf[bytesRead] = read(); 
     bytesRead++;
   }
   return bytesRead;

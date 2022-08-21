@@ -16,6 +16,7 @@ Robot::Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress
   m_commsI2C(i2cHostAddress, i2cDeviceAddress, PREAMBLE_LEN)
 {
   m_initTimeSeconds = 0;
+  m_lastRecvIndex = -1;
   m_lastRecvTimeMillis = 0;
 }
 
@@ -32,7 +33,7 @@ void Robot::init() {
 }
 
 void Robot::update() {
-  Serial.println("Printing");
+  //Serial.println("Printing");
   int tick = m_payload.getMessageIndex();
   unsigned long tickStartMillis = millis();
 
@@ -44,8 +45,8 @@ void Robot::update() {
 
   int tickDurationMillis = millis() - tickStartMillis;
   // TODO: Remove after timing is solved
-  Serial.print("Tick time: ");
-  Serial.println(tickDurationMillis);
+  //Serial.print("Tick time: ");
+  //Serial.println(tickDurationMillis);
   updateTickDurations(tickDurationMillis);
 
   updateSerial();
@@ -66,16 +67,15 @@ void Robot::updateSerial() {
   bool success = m_commsI2C.getBytes(m_serialBuffer, SERIAL_BUFFER_LEN, m_payloadBytes, PAYLOAD_LEN);
 
   if (success) {
-    m_lastRecvTimeMillis = millis();
     updatePayload(m_payloadBytes, PAYLOAD_LEN);
-    Serial.println("Bytes parsed");
+    //Serial.println("Bytes parsed");
   }
 
   setStatus();
-  //setRobot();
+  setRobot();
   
-  m_payload.print();
-  Serial.println();
+  //m_payload.print();
+  //Serial.println();
 }
 
 void Robot::updatePayload(const uint8_t *data, const uint8_t len) {
@@ -107,15 +107,22 @@ void Robot::setRobot() {
     Serial.write((uint8_t)128);
   } else if (status == STATUS_ENABLED) {
     Serial.write(m_payload.getControllerDriveLeft());
-    Serial.write(m_payload.getControllerDriveLeft());
+    Serial.write(m_payload.getControllerDriveRight());
   } 
 }
 
 void Robot::setStatus() {
   // TODO: Switch to using tick variable for keep alive
+  int currentIndex = m_payload.getMessageIndex();
+  if (m_lastRecvIndex != currentIndex) {
+    m_lastRecvTimeMillis = millis();
+    m_lastRecvIndex = currentIndex;
+  }
+
   if(millis() - m_lastRecvTimeMillis > KEEP_ALIVE_MILLIS) {
     m_payload.setStatus(STATUS_DISABLED);
   }
+
 }
 
 int Robot::getAverageTickDuration() {
@@ -140,6 +147,6 @@ void Robot::setError(const char *format, ...) {
 
   m_payload.setStatus(STATUS_DISABLED);
 
-  Serial.print("ERROR: ");
-  Serial.println(message);
+  //Serial.print("ERROR: ");
+  //Serial.println(message);
 }

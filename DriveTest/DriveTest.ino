@@ -71,14 +71,15 @@ void loop()
     turn = rightStick.getResult();
     speed = leftStick.getResult();
 
+    if (payload.getMessageIndex() + 1 > 31) {
+        payload.setMessageIndex(0);
+    } else {
+        payload.setMessageIndex(payload.getMessageIndex() + 1);
+    }
+
     Utils::setMotors(payload, turn, speed);
 
-    Serial.print("Left motor speed: ");
-    Serial.println(payload.getControllerDriveLeft());
-    Serial.print("Right motor speed: ");
-    Serial.println(payload.getControllerDriveRight());
-    Serial.print("Status: ");
-    Serial.println(payload.getStatus());
+    payload.print();
 
     payload.buildTransmission(buf, 7);
 

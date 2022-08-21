@@ -22,7 +22,6 @@ class RobotComms {
     private:
       RFM_95C m_radio;
       CommsI2CSlave m_commsI2C;
-      uint8_t m_index;
       uint8_t m_payload[PAYLOAD_LEN];
 };
 

@@ -4,21 +4,20 @@ const uint8_t RobotComms::PREAMBLE_LEN = 4;
 
 RobotComms::RobotComms(unsigned int radioSS, unsigned int radioINT, unsigned int i2cHostAddress)
  : m_radio(radioSS, radioINT), m_commsI2C(i2cHostAddress, PREAMBLE_LEN, m_payload, PAYLOAD_LEN) {
-    m_index = 0;
 }
 
 void RobotComms::init(unsigned int radioFreq, void (*recFunction)(int), void (*reqFunction)(void)) {
-    // if (!m_radio.init())
-    //     Serial.println("radio init failed");
+    if (!m_radio.init())
+        Serial.println("radio init failed");
 
-    // if (!m_radio.setFrequency(radioFreq))
-    // {
-    //     Serial.println("radio setFrequency failed");
-    //     while (1)
-    //         ;
-    // }
+    if (!m_radio.setFrequency(radioFreq))
+    {
+        Serial.println("radio setFrequency failed");
+        while (1)
+            ;
+    }
 
-   // m_radio.setTxPower(23, false);
+   m_radio.setTxPower(23, false);
 
     m_commsI2C.init(recFunction, reqFunction);
 
@@ -28,19 +27,11 @@ void RobotComms::init(unsigned int radioFreq, void (*recFunction)(int), void (*r
 void RobotComms::update() {
     uint8_t payloadLen = PAYLOAD_LEN;
 
-    //if (m_radio.recv(m_payload, &payloadLen)) {
-        // Send down serial if full message received
-
-        m_index++;
-        if (m_index > 31) {
-            m_index = 0;
-        }
-        TShirtCannonPayload payload = TShirtCannonPayload();
-
-        payload.setStatus(1);
-        payload.setMessageIndex(m_index);
-        payload.buildTransmission(m_payload, PAYLOAD_LEN);
-    //}
+    if (m_radio.recv(m_payload, &payloadLen)) {
+        Serial.println("Radio message received");
+    } else {
+        Serial.println("No radio message");
+    }
     delay(100);
 }
 

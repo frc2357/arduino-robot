@@ -44,6 +44,7 @@ private:
   int m_initTimeSeconds;
   int m_tickDurations[ROBOT_TICK_DURATION_BUFFER_LEN];
   size_t m_tickDurationsIndex;
+  uint8_t m_lastRecvIndex;
   unsigned long m_lastRecvTimeMillis;
 
   uint8_t m_payloadBytes[PAYLOAD_LEN];
