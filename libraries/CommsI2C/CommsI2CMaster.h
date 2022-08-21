@@ -8,6 +8,7 @@
 class CommsI2CMaster : public CommsI2CBase {
   public:
     CommsI2CMaster(int myAddress, int deviceAddress, int preambleLength);
+    void init();
 
     void sendBytes(const uint8_t *data, const uint8_t len);
     const bool getBytes(uint8_t *buf, const uint8_t bufLen, uint8_t *data, const uint8_t datLen);

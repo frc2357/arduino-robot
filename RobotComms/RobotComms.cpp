@@ -2,12 +2,12 @@
 
 const uint8_t RobotComms::PREAMBLE_LEN = 4;
 
-RobotComms::RobotComms(unsigned int radioSS, unsigned int radioINT, unsigned int i2cHostAddress, unsigned int i2cDeviceAddress)
- : m_radio(radioSS, radioINT), m_commsI2C(i2cHostAddress, i2cDeviceAddress, PREAMBLE_LEN) {
-
+RobotComms::RobotComms(unsigned int radioSS, unsigned int radioINT, unsigned int i2cHostAddress)
+ : m_radio(radioSS, radioINT), m_commsI2C(i2cHostAddress, PREAMBLE_LEN, m_payload, PAYLOAD_LEN) {
+    m_index = 0;
 }
 
-void RobotComms::init(unsigned int radioFreq) {
+void RobotComms::init(unsigned int radioFreq, void (*recFunction)(int), void (*reqFunction)(void)) {
     // if (!m_radio.init())
     //     Serial.println("radio init failed");
 
@@ -20,7 +20,7 @@ void RobotComms::init(unsigned int radioFreq) {
 
    // m_radio.setTxPower(23, false);
 
-    m_commsI2C.init();
+    m_commsI2C.init(recFunction, reqFunction);
 
     Serial.println("Finished init");
 }
@@ -29,29 +29,25 @@ void RobotComms::update() {
     uint8_t payloadLen = PAYLOAD_LEN;
 
     //if (m_radio.recv(m_payload, &payloadLen)) {
-        //Serial.println((uint8_t)m_payload);
-
         // Send down serial if full message received
 
+        m_index++;
+        if (m_index > 31) {
+            m_index = 0;
+        }
         TShirtCannonPayload payload = TShirtCannonPayload();
 
         payload.setStatus(1);
+        payload.setMessageIndex(m_index);
         payload.buildTransmission(m_payload, PAYLOAD_LEN);
-        Serial.println("Start Payload");
-        Serial.println(m_payload[0], BIN);
-        Serial.println(m_payload[1], BIN);
-        Serial.println(m_payload[2], BIN);
-        Serial.println(m_payload[3], BIN);
-        Serial.println(m_payload[4], BIN);
-        Serial.println(m_payload[5], BIN);
-        Serial.println(m_payload[6], BIN);
-        Serial.println("End payload");
-
-        payload.print();
-        
-        if(payloadLen == PAYLOAD_LEN) {
-            //m_commsI2C.sendBytes(m_payload, PAYLOAD_LEN);
-        }
     //}
     delay(100);
+}
+
+void RobotComms::onI2CReceive(int bytesRead) {
+    m_commsI2C.getBytes();
+}
+void RobotComms::onI2CRequest() {
+    m_commsI2C.sendBytes();
+    Serial.println("Data requested");
 }

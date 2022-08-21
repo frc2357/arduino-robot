@@ -14,8 +14,10 @@ void CommsI2CBase::init() {
 
 int CommsI2CBase::fillBuffer(uint8_t *buf, const uint8_t len) {
   int bytesRead = 0;
-  while(available() && len < bytesRead) {
-    buf[bytesRead] = read(); 
+  while(available() && bytesRead < len) {
+    uint8_t val = read();
+    Serial.println(val);
+    buf[bytesRead] = val; 
     bytesRead++;
   }
   return bytesRead;
@@ -30,7 +32,7 @@ const bool CommsI2CBase::parseBuffer(uint8_t *buf, const uint8_t bufLen, uint8_t
   }
 
   // Find start of data
-  for( ; (dataPos < bufLen) || (preambleCount == 4); dataPos++) {
+  for( ; (dataPos < bufLen) && (preambleCount < 4); dataPos++) {
     if (buf[dataPos] == PREAMBLE_VALUE) {
       preambleCount++;
     } else {

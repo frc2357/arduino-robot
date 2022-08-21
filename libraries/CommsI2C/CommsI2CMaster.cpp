@@ -1,8 +1,13 @@
 #include "CommsI2CMaster.h"
 #include <Wire.h>
 
-CommsI2CMaster::CommsI2CMaster(int myAddress, int deviceAddress, int preambleLength) :  CommsI2CBase(myAddress, deviceAddress){
+CommsI2CMaster::CommsI2CMaster(int myAddress, int deviceAddress, int preambleLength) :  
+  CommsI2CBase(myAddress, preambleLength){
   m_deviceAddress = deviceAddress;
+}
+
+void CommsI2CMaster::init() {
+  CommsI2CBase::init();
 }
 
 void CommsI2CMaster::sendBytes(const uint8_t *data, const uint8_t len) {
@@ -22,7 +27,7 @@ void CommsI2CMaster::sendBytes(const uint8_t *data, const uint8_t len) {
 }
 
 const bool CommsI2CMaster::getBytes(uint8_t *buf, const uint8_t bufLen, uint8_t *data, const uint8_t datLen) {
-  requestData(datLen);
+  requestData(datLen + m_preambleLength);
   
   return CommsI2CBase::getBytes(buf, bufLen, data, datLen);
 }

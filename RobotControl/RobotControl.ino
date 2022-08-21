@@ -30,17 +30,12 @@ void setup() {
     Serial.print(SOFTWARE_VERSION);
     Serial.println(" -----------");
   }
-  //robot.init();
+  robot.init();
   Serial.print("----------- Init complete -----------");
 }
 
 // Main Loop
 void loop() {
-  //robot.update();
-  if (Serial.available() > 0) {
-    Serial.println("Serial data found");
-  } else {
-    Serial.println("Serial data not found");
-  }
+  robot.update();
   delay(100);
 }

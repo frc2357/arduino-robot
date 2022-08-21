@@ -41,10 +41,10 @@ void Robot::update() {
   // TODO: SWITCH OUT WITH PAYLOAD METHODS
   memset(m_payloadBytes, 0, PAYLOAD_LEN);
   m_payload.buildTransmission(m_payloadBytes, PAYLOAD_LEN);
-  //m_commsI2C.sendBytes(m_payloadBytes, PAYLOAD_LEN);
 
   int tickDurationMillis = millis() - tickStartMillis;
   // TODO: Remove after timing is solved
+  Serial.print("Tick time: ");
   Serial.println(tickDurationMillis);
   updateTickDurations(tickDurationMillis);
 
@@ -82,9 +82,9 @@ void Robot::updatePayload(const uint8_t *data, const uint8_t len) {
   bool success = m_payload.readMessage(data, len);
 
   const uint8_t status = m_payload.getStatus();
-  const uint8_t err = m_payload.getStatus();
+  const uint8_t err = m_payload.getError();
 
-  if (err > 0 || success) {
+  if (err > 0 || !success) {
     m_statusLEDs.setBlinkPattern(StatusLEDs::ERROR);
     m_payload.setStatus(STATUS_DISABLED);
   } else {
