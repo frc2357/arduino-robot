@@ -1,28 +1,32 @@
-// ! IF USING THE CONTROLLER, MAKE SURE LINES 33-34 ARE NOT COMMENTED OUT
-
 #include "JoystickAxis.h"
 #include "Utils.h"
 #include <TShirtCannonPayload.h>
-#include <RFM95C.h>
+#include "RFM95C.h"
 #include "FTDebouncer.h"
 
+// Pins
 #define JOYSTICK_PIN_VRX 0
 #define JOYSTICK_PIN_VRY 1
+#define ENABLE_PIN 10
+#define PRIME_PIN 11
+#define FIRE_PIN 12
 #define POWER_DOWN_PIN 19
 
+// Joystick variables
 #define DEAD_ZONE_SIZE 100
 #define JOYSTICK_MAX 1023
 
+// RFM95 pins
 #define RFM95_CS 8
 #define RFM95_RST 4
 #define RFM95_INT 3
 
+// RFM95 variables
 #define RF95_FREQ 915.0
 
+// Addresses
 #define CONTROLLER_ADDRESS 1
 #define ROBOT_ADDRESS 2
-
-#define ENABLE_PIN 10      // Digital Pin for the enable button
 
 RFM_95C raw_driver(RFM95_CS, RFM95_INT);
 
@@ -58,6 +62,9 @@ void setup()
     raw_driver.setTxPower(23, false);
 
     m_pinDebouncer.addPin(ENABLE_PIN, HIGH, INPUT_PULLUP);
+    m_pinDebouncer.addPin(PRIME_PIN, HIGH, INPUT_PULLUP);
+    m_pinDebouncer.addPin(FIRE_PIN, HIGH, INPUT_PULLUP);
+
     m_pinDebouncer.begin();
 }
 
@@ -88,16 +95,38 @@ void loop()
     }
 
     raw_driver.send(buf, sizeof(buf));
-    
+
     Serial.println();
 }
 
 void onPinActivated(int pinNr)
 {
-    payload.setStatus(1);
+    if (pinNr == ENABLE_PIN)
+    {
+        payload.setStatus(1);
+    }
+    else if (pinNr == PRIME_PIN && payload.getStatus() == 1)
+    {
+        payload.setStatus(3);
+    }
+    else if (pinNr == FIRE_PIN && payload.getStatus() == 3)
+    {
+        payload.setStatus(4);
+    }
 }
 
 void onPinDeactivated(int pinNr)
 {
-    payload.setStatus(0);
+    if (pinNr == ENABLE_PIN)
+    {
+        payload.setStatus(0);
+    }
+    else if (pinNr == PRIME_PIN && payload.getStatus() > 1)
+    {
+        payload.setStatus(1);
+    }
+    else if (pinNr == FIRE_PIN && payload.getStatus() > 3)
+    {
+        payload.setStatus(3);
+    }
 }
