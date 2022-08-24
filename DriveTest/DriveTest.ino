@@ -78,6 +78,15 @@ void loop()
     turn = rightStick.getResult();
     speed = leftStick.getResult();
 
+    if (payload.getMessageIndex() + 1 > 31)
+    {
+        payload.setMessageIndex(0);
+    }
+    else
+    {
+        payload.setMessageIndex(payload.getMessageIndex() + 1);
+    }
+
     Utils::setMotors(payload, turn, speed);
 
     Serial.print("Left motor speed: ");
