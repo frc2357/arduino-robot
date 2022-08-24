@@ -3,10 +3,14 @@
 #include <TShirtCannonPayload.h>
 #include "RFM95C.h"
 #include "FTDebouncer.h"
+#include "RotaryEncoder.h"
 
 // Pins
 #define JOYSTICK_PIN_VRX 0
 #define JOYSTICK_PIN_VRY 1
+#define ENCODER_PIN_A 5
+#define ENCODER_PIN_B 6
+#define ENCODER_PIN_SW 13
 #define ENABLE_PIN 10
 #define PRIME_PIN 11
 #define FIRE_PIN 12
@@ -39,6 +43,8 @@ JoystickAxis rightStick(JOYSTICK_PIN_VRX, DEAD_ZONE_SIZE, JOYSTICK_MAX);
 
 uint8_t buf[7];
 
+RotaryEncoder encoder(ENCODER_PIN_A, ENCODER_PIN_B, RotaryEncoder::LatchMode::FOUR3);
+
 void setup()
 {
     // ! UNCOMMENT THE LINES BELOW IF USING CONTROLLER
@@ -61,6 +67,8 @@ void setup()
 
     raw_driver.setTxPower(23, false);
 
+    m_pinDebouncer.addPin(ENCODER_PIN_SW, HIGH, INPUT_PULLUP);
+
     m_pinDebouncer.addPin(ENABLE_PIN, HIGH, INPUT_PULLUP);
     m_pinDebouncer.addPin(PRIME_PIN, HIGH, INPUT_PULLUP);
     m_pinDebouncer.addPin(FIRE_PIN, HIGH, INPUT_PULLUP);
@@ -70,6 +78,13 @@ void setup()
 
 void loop()
 {
+    encoder.tick();
+
+    if (digitalRead(ENCODER_PIN_SW) == 0 && encoder.getPosition() == 10)
+    {
+        digitalWrite(POWER_DOWN_PIN, LOW);
+    }
+
     rightStick.update();
     leftStick.update();
     m_pinDebouncer.update();
