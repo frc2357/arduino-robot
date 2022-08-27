@@ -80,6 +80,8 @@ void loop()
 {
     encoder.tick();
 
+    payload.setMessageIndex((payload.getMessageIndex() + 1) % 32);
+
     if (digitalRead(ENCODER_PIN_SW) == 0 && encoder.getPosition() == 10)
     {
         digitalWrite(POWER_DOWN_PIN, LOW);
@@ -93,33 +95,28 @@ void loop()
     turn = rightStick.getResult();
     speed = leftStick.getResult();
 
-    if (payload.getMessageIndex() + 1 > 31)
-    {
-        payload.setMessageIndex(0);
-    }
-    else
-    {
-        payload.setMessageIndex(payload.getMessageIndex() + 1);
-    }
-
     Utils::setMotors(payload, turn, speed);
-
-    Serial.print("Left motor speed: ");
-    Serial.println(payload.getControllerDriveLeft());
-    Serial.print("Right motor speed: ");
-    Serial.println(payload.getControllerDriveRight());
-    Serial.print("Status: ");
-    Serial.println(payload.getStatus());
+    Utils::setAngle(payload, encoder);
 
     payload.buildTransmission(buf, 7);
 
-    for (int i = 0; i < sizeof(buf); i++)
-    {
-        Serial.println(buf[i], BIN);
-    }
+    // for (int i = 0; i < sizeof(buf); i++)
+    // {
+    //     Serial.println(buf[i], BIN);
+    // }
 
     raw_driver.send(buf, sizeof(buf));
 
+    // Serial.print("Left motor speed: ");
+    // Serial.println(payload.getControllerDriveLeft());
+    // Serial.print("Right motor speed: ");
+    // Serial.println(payload.getControllerDriveRight());
+    // Serial.print("Status: ");
+    // Serial.println(payload.getStatus());
+    Serial.print("Angle: ");
+    Serial.println(payload.getAngle());
+    Serial.print("Encoder value: ");
+    Serial.println(encoder.getPosition());
     Serial.println();
 }
 
