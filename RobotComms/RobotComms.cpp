@@ -17,7 +17,7 @@ void RobotComms::init(unsigned int radioFreq, void (*recFunction)(int), void (*r
             ;
     }
 
-   m_radio.setTxPower(23, false);
+    m_radio.setTxPower(23, false);
 
     m_commsI2C.init(recFunction, reqFunction);
 

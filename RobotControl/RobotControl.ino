@@ -16,11 +16,12 @@
 #define I2C_HOST_ADDRESS   0x09
 #define I2C_DEVICE_ADDRESS 0x08
 #define PIN_LED_BUILTIN    LED_BUILTIN
+#define FIRE_SOLENOID_PIN 3
 
 // Set up the JSON State for the robot
 TShirtCannonPayload payload;
 
-Robot robot(payload, PIN_LED_BUILTIN, I2C_HOST_ADDRESS, I2C_DEVICE_ADDRESS);
+Robot robot(payload, PIN_LED_BUILTIN, I2C_HOST_ADDRESS, I2C_DEVICE_ADDRESS, FIRE_SOLENOID_PIN);
 
 // Primary Setup
 void setup() {
