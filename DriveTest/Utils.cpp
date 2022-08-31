@@ -1,7 +1,6 @@
 #include "Utils.h"
 
 #define MAX_DRIVE_SPEED 63
-#define ANGLE_INCREMENT 5
 
 void Utils::setMotors(TShirtCannonPayload &payload, float turn, float speed)
 {
@@ -42,18 +41,18 @@ void Utils::setAngle(TShirtCannonPayload &payload, RotaryEncoder &encoder)
 {
     int pos = encoder.getPosition();
 
-    int angle = pos * ANGLE_INCREMENT;
+    // 2 = Increase angle, 1 = Decrease angle, 0 = Stay at the current angle
 
-    if (angle > 127)
+    if (pos > 0)
     {
-        payload.setAngle(127);
+        payload.setAngle(2);
     }
-    else if (angle < 0)
+    else if (pos < 0)
     {
-        payload.setAngle(0);
+        payload.setAngle(1);
     }
     else
     {
-        payload.setAngle(angle);
+        payload.setAngle(0);
     }
 }
