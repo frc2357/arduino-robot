@@ -1,5 +1,5 @@
 #include "RobotStatus.h"
 
-void RobotStatus::setRobot(RobotStatus *robot) {
+void RobotStatus::setRobot(Robot *robot) {
     m_robot = robot;
 }
