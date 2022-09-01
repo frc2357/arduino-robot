@@ -4,15 +4,10 @@ const unsigned long Robot::TICK_DURATION_MILLIS = 100;
 const uint8_t Robot::PREAMBLE_LEN = 4;
 const unsigned int Robot::KEEP_ALIVE_MILLIS = 100;
 
-const uint8_t Robot::STATUS_DISABLED = 0;
-const uint8_t Robot::STATUS_ENABLED = 1;
-const uint8_t Robot::STATUS_ADJUSTING = 2;
-const uint8_t Robot::STATUS_PRIMED = 3;
-const uint8_t Robot::STATUS_FIRING = 4;
-
 const unsigned long Robot::TEMP_FIRE_TIME_MILLIS = 100;
 
-Robot::Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress, int fireSolenoidPin) :
+Robot::Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress, int fireSolenoidPin,
+  StatusDisabled &disabled, StatusEnabled &enabled, StatusAdjusting &adjusting, StatusAdjusting &primed, StatusAdjusting &firing) :
   m_payload(payload),
   m_statusLEDs(pinLedBuiltin),
   m_commsI2C(i2cHostAddress, i2cDeviceAddress, PREAMBLE_LEN)
@@ -23,6 +18,12 @@ Robot::Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress
   m_fireSolenoidPin = fireSolenoidPin;
   m_firing = false;
   m_isHoldingFire = false;
+
+  m_statuses[STATUS_DISABLED] = disabled;
+  m_statuses[STATUS_ENABLED] = enabled;
+  m_statuses[STATUS_ADJUSTING] = adjusting;
+  m_statuses[STATUS_PRIMED] = primed;
+  m_statuses[STATUS_FIRING] = firing;
 }
 
 void Robot::init() {
@@ -63,6 +64,11 @@ void Robot::update() {
   if (timeLeftMillis > 0) {
     //delay(timeLeftMillis);
   }
+}
+
+void Robot::transition(Status status) {
+  m_currentStatus = status;
+  m_statuses[m_currentStatus].onTransition();
 }
 
 void Robot::updateSerial() {

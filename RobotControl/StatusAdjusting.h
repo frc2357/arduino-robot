@@ -2,6 +2,7 @@
 #define STATUS_ADJUSTING_H
 
 #include "RobotStatus.h"
+#include "StatusEnum.h"
 
 class StatusAdjusting : RobotStatus {
 public:
