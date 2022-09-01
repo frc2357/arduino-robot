@@ -6,11 +6,18 @@
 #include <CommsI2CMaster.h>
 #include "StatusLEDs.h"
 #include "Utils.h"
-#include "LinearActuator.h"
+#include "StatusEnum.h"
+#include "RobotStatus.h"
+#include "StatusDisabled.h"
+#include "StatusEnabled.h"
+#include "StatusAdjusting.h"
+#include "StatusPrimed.h"
+#include "StatusFiring.h"
 
 #define ROBOT_TICK_DURATION_BUFFER_LEN 5
 #define PAYLOAD_LEN 7
 #define SERIAL_BUFFER_LEN 50
+#define NUM_STATUSES 5
 
 class Robot
 {
@@ -18,21 +25,15 @@ class Robot
   static const uint8_t PREAMBLE_LEN;
   static const unsigned int KEEP_ALIVE_MILLIS;
 
-  static const uint8_t STATUS_DISABLED;
-  static const uint8_t STATUS_ADJUSTING;
-  static const uint8_t STATUS_ENABLED;
-  static const uint8_t STATUS_PRIMED;
-  static const uint8_t STATUS_FIRING;
-
-  static const uint8_t MAX_PAYLOAD_FIRING_VALUE;
-  static const int MIN_FIRE_TIME_MILLIS;
-  static const int PAYLOAD_TO_MILLIS;
+  static const unsigned long TEMP_FIRE_TIME_MILLIS;
 
 public:
-  Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress, int fireSolenoidPin, int en, int in1, int in2, uint8_t speed);
+  Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress, int fireSolenoidPin,
+    StatusDisabled &disabled, StatusEnabled &enabled, StatusAdjusting &adjusting, StatusAdjusting &primed, StatusAdjusting &firing);
 
   void init();
   void update();
+  void transition(Status status);
 
 private:
   void updateSerial();
@@ -66,13 +67,9 @@ private:
 
   bool m_firing;
   bool m_isHoldingFire;
-  unsigned long m_fireTimeMillis;
-  unsigned long m_solendoidCloseMillis;
 
-  int m_leftDrivePin;
-  int m_rightDrivePin;
-  Servo m_leftDriveMotor;
-  Servo m_rightDriveMotor;
+  RobotStatus m_statuses[NUM_STATUSES];
+  Status m_currentStatus;
 };
 
 #endif // ROBOT_H

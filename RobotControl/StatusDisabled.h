@@ -2,6 +2,7 @@
 #define STATUS_DISABLED_H
 
 #include "RobotStatus.h"
+#include "StatusEnum.h"
 
 class StatusDisabled : RobotStatus {
 public:
