@@ -4,8 +4,10 @@
 #include "RobotStatus.h"
 #include "StatusEnum.h"
 
-class StatusDisabled : RobotStatus {
+class StatusDisabled : public RobotStatus {
 public:
     void update();
     void onTransition();
-}
+};
+
+#endif

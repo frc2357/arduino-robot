@@ -7,7 +7,7 @@ const unsigned int Robot::KEEP_ALIVE_MILLIS = 100;
 const unsigned long Robot::TEMP_FIRE_TIME_MILLIS = 100;
 
 Robot::Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress, int fireSolenoidPin,
-  StatusDisabled &disabled, StatusEnabled &enabled, StatusAdjusting &adjusting, StatusAdjusting &primed, StatusAdjusting &firing) :
+  StatusDisabled &disabled, StatusEnabled &enabled, StatusAdjusting &adjusting, StatusPrimed &primed, StatusFiring &firing) :
   m_payload(payload),
   m_statusLEDs(pinLedBuiltin),
   m_commsI2C(i2cHostAddress, i2cDeviceAddress, PREAMBLE_LEN)
@@ -95,7 +95,6 @@ void Robot::updatePayload(const uint8_t *data, const uint8_t len) {
 
   if (err > 0 || !success) {
     m_statusLEDs.setBlinkPattern(StatusLEDs::ERROR);
-    m_payload.setStatus(STATUS_DISABLED);
   } else {
     if (status == STATUS_DISABLED) {
       m_statusLEDs.setBlinkPattern(StatusLEDs::DISABLED);
@@ -173,7 +172,6 @@ void Robot::setStatus() {
   if(millis() - m_lastRecvTimeMillis > KEEP_ALIVE_MILLIS) {
     m_payload.setStatus(STATUS_DISABLED);
   }
-
 }
 
 int Robot::getAverageTickDuration() {

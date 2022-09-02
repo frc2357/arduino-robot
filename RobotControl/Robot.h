@@ -7,12 +7,12 @@
 #include "StatusLEDs.h"
 #include "Utils.h"
 #include "StatusEnum.h"
-#include "RobotStatus.h"
 #include "StatusDisabled.h"
 #include "StatusEnabled.h"
 #include "StatusAdjusting.h"
 #include "StatusPrimed.h"
 #include "StatusFiring.h"
+#include "RobotStatus.h"
 
 #define ROBOT_TICK_DURATION_BUFFER_LEN 5
 #define PAYLOAD_LEN 7
@@ -27,9 +27,11 @@ class Robot
 
   static const unsigned long TEMP_FIRE_TIME_MILLIS;
 
+  //friend RobotStatus;
+
 public:
   Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress, int fireSolenoidPin,
-    StatusDisabled &disabled, StatusEnabled &enabled, StatusAdjusting &adjusting, StatusAdjusting &primed, StatusAdjusting &firing);
+    StatusDisabled &disabled, StatusEnabled &enabled, StatusAdjusting &adjusting, StatusPrimed &primed, StatusFiring &firing);
 
   void init();
   void update();
