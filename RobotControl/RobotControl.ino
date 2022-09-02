@@ -39,7 +39,7 @@ StatusAdjusting adjusting;
 StatusPrimed primed;
 StatusFiring firing;
 
-Robot robot(payload, PIN_LED_BUILTIN, I2C_HOST_ADDRESS, I2C_DEVICE_ADDRESS, FIRE_SOLENOID_PIN
+Robot robot(payload, PIN_LED_BUILTIN, I2C_HOST_ADDRESS, I2C_DEVICE_ADDRESS, FIRE_SOLENOID_PIN,
   disabled, enabled, adjusting, primed, firing);
 
 // Primary Setup
