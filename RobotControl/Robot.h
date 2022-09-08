@@ -7,17 +7,18 @@
 #include "StatusLEDs.h"
 #include "Utils.h"
 #include "StatusEnum.h"
-#include "StatusDisabled.h"
-#include "StatusEnabled.h"
-#include "StatusAdjusting.h"
-#include "StatusPrimed.h"
-#include "StatusFiring.h"
 #include "RobotStatus.h"
 
 #define ROBOT_TICK_DURATION_BUFFER_LEN 5
 #define PAYLOAD_LEN 7
 #define SERIAL_BUFFER_LEN 50
 #define NUM_STATUSES 5
+
+class StatusDisabled;
+class StatusEnabled;
+class StatusAdjusting;
+class StatusPrimed;
+class StatusFiring;
 
 class Robot
 {
@@ -27,7 +28,11 @@ class Robot
 
   static const unsigned long TEMP_FIRE_TIME_MILLIS;
 
-  //friend RobotStatus;
+  friend StatusDisabled;
+  friend StatusEnabled;
+  friend StatusAdjusting;
+  friend StatusPrimed;
+  friend StatusEnabled;
 
 public:
   Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress, int fireSolenoidPin,
@@ -66,6 +71,36 @@ private:
 
   RobotStatus m_statuses[NUM_STATUSES];
   Status m_currentStatus;
+};
+
+class StatusDisabled : public RobotStatus {
+public:
+    void update();
+    void onTransition();
+};
+
+class StatusEnabled : public RobotStatus {
+public:
+    void update();
+    void onTransition();
+};
+
+class StatusAdjusting : public RobotStatus {
+public:
+    void update();
+    void onTransition();
+};
+
+class StatusPrimed : public RobotStatus {
+public:
+    void update();
+    void onTransition();
+};
+
+class StatusFiring : public RobotStatus {
+public:
+    void update();
+    void onTransition();
 };
 
 #endif // ROBOT_H
