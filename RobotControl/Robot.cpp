@@ -243,3 +243,48 @@ void Robot::setError(const char *format, ...)
   // Serial.print("ERROR: ");
   // Serial.println(message);
 }
+
+
+
+void StatusDisabled::update() {
+  m_robot->m_payload.getStatus();
+  //m_robot->transition(Status::STATUS_ENABLED);
+}
+
+void StatusDisabled::onTransition() {
+    
+}
+
+void StatusEnabled::update() {
+
+}
+
+void StatusEnabled::onTransition() {
+    
+}
+
+void StatusAdjusting::update() {
+
+}
+
+void StatusAdjusting::onTransition() {
+    
+}
+
+
+void StatusPrimed::update() {
+
+}
+
+void StatusPrimed::onTransition() {
+    
+}
+
+
+void StatusFiring::update() {
+
+}
+
+void StatusFiring::onTransition() {
+    
+}

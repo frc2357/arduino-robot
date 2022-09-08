@@ -10,11 +10,6 @@
 #include "Utils.h"
 #include "Robot.h"
 #include "StatusLEDs.h"
-#include "StatusDisabled.h"
-#include "StatusEnabled.h"
-#include "StatusAdjusting.h"
-#include "StatusPrimed.h"
-#include "StatusFiring.h"
 
 #define SOFTWARE_VERSION 1
 #define SERIAL_BAUD_RATE 115200
