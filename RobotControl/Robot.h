@@ -51,6 +51,10 @@ private:
   void updateTickDurations(int tickDurationMicros);
   int binToPWM(uint8_t value);
   void setError(const char *format, ...);
+  void setDrive();
+  void stopDriving();
+  void fire();
+  void stopFiring();
 
   TShirtCannonPayload &m_payload;
   StatusLEDs m_statusLEDs;
