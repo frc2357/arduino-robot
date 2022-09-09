@@ -19,11 +19,12 @@ Robot::Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress
   m_firing = false;
   m_isHoldingFire = false;
 
-  m_statuses[STATUS_DISABLED] = disabled;
-  m_statuses[STATUS_ENABLED] = enabled;
-  m_statuses[STATUS_ADJUSTING] = adjusting;
-  m_statuses[STATUS_PRIMED] = primed;
-  m_statuses[STATUS_FIRING] = firing;
+  m_currentStatus = STATUS_DISABLED;
+  m_statuses[STATUS_DISABLED] = &disabled;
+  m_statuses[STATUS_ENABLED] = &enabled;
+  m_statuses[STATUS_ADJUSTING] = &adjusting;
+  m_statuses[STATUS_PRIMED] = &primed;
+  m_statuses[STATUS_FIRING] = &firing;
 }
 
 void Robot::init() {
@@ -68,7 +69,6 @@ void Robot::update() {
 
 void Robot::transition(Status status) {
   m_currentStatus = status;
-  m_statuses[m_currentStatus].onTransition();
 }
 
 void Robot::updateSerial() {
@@ -80,9 +80,10 @@ void Robot::updateSerial() {
     //Serial.println("Bytes parsed");
   }
 
-  setStatus();
-  setRobot();
-  
+  transition(static_cast<Status>(m_payload.getStatus()));
+
+  m_statuses[m_currentStatus]->update();
+
   //m_payload.print();
   //Serial.println();
 }
@@ -203,44 +204,71 @@ void Robot::setError(const char *format, ...) {
 
 
 void StatusDisabled::update() {
+  Serial.println("HELP IM DISABLED");
   m_robot->m_payload.getStatus();
+
+  validateState();
+  robotAction();
+
   //m_robot->transition(Status::STATUS_ENABLED);
 }
 
-void StatusDisabled::onTransition() {
+void StatusDisabled::validateState() {
+    
+}
+
+void StatusDisabled::robotAction() {
     
 }
 
 void StatusEnabled::update() {
-
+  validateState();
+  robotAction();
 }
 
-void StatusEnabled::onTransition() {
+void StatusEnabled::validateState() {
+}
+
+void StatusEnabled::robotAction() {
     
 }
 
 void StatusAdjusting::update() {
-
+  validateState();
+  robotAction();
 }
 
-void StatusAdjusting::onTransition() {
+void StatusAdjusting::validateState() {
     
 }
 
-
-void StatusPrimed::update() {
-
+void StatusAdjusting::robotAction() {
+    
 }
 
-void StatusPrimed::onTransition() {
+void StatusPrimed::update() {
+  validateState();
+  robotAction();
+}
+
+void StatusPrimed::validateState() {
+    
+}
+
+void StatusPrimed::robotAction() {
     
 }
 
 
 void StatusFiring::update() {
-
+  validateState();
+  robotAction();
 }
 
-void StatusFiring::onTransition() {
+void StatusFiring::validateState() {
+    
+}
+
+void StatusFiring::robotAction() {
     
 }

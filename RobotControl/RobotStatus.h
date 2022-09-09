@@ -7,11 +7,13 @@ class RobotStatus {
 public:
     void setRobot(Robot *robot);
     virtual void update(); // What to do every loop
-    virtual void onTransition(); // What to do when switching to given status
+
+private:
+    virtual void validateState(); // Checks validity of called state, method will transition to another if necessary
+    virtual void robotAction(); // Implements what the robot does in a given state
 
 protected:
     Robot *m_robot;
-
 };
 
 #endif

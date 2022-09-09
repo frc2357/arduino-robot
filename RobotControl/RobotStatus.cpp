@@ -8,6 +8,10 @@ void RobotStatus::update() {
     return;
 }
 
-void RobotStatus::onTransition() {
+void RobotStatus::validateState() {
+    return;
+}
+
+void RobotStatus::robotAction() {
     return;
 }
