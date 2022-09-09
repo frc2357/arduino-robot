@@ -109,42 +109,55 @@ void Robot::updatePayload(const uint8_t *data, const uint8_t len) {
   }
 }
 
-void Robot::setRobot() {
-  uint8_t status = m_payload.getStatus();
-
-  if(m_firing) {
-    if(millis() - TEMP_FIRE_TIME_MILLIS >= m_solenoidOpenMillis) {
-      digitalWrite(m_fireSolenoidPin, LOW);
-      m_firing = false;
-      Serial.print("Open for: ");
-      Serial.println(millis() - m_solenoidOpenMillis);
-    }
-  }
-
-  if (status != STATUS_ENABLED) {
+  void Robot::stopDrive() {
     Serial.write((uint8_t)0);
     Serial.write((uint8_t)128);
-  } 
-
-  if (status != STATUS_FIRING && status != STATUS_ADJUSTING) {
-    digitalWrite(m_fireSolenoidPin, LOW);
-    m_firing = false;
-    m_isHoldingFire = false;
   }
 
-  if (status == STATUS_ENABLED) {
+  void Robot::setDrive() {
     Serial.write(m_payload.getControllerDriveLeft());
     Serial.write(m_payload.getControllerDriveRight());
-  } 
+  }
 
-  if (status == STATUS_FIRING) {
-    if(!m_isHoldingFire) {
+  void Robot::fire() {
       digitalWrite(m_fireSolenoidPin, HIGH);
       m_solenoidOpenMillis = millis();
       status = STATUS_ADJUSTING;
       Serial.println("Firing");
       m_firing = true;
       m_isHoldingFire = true;
+  }
+
+  void Robot::stopFiring() {
+    digitalWrite(m_fireSolenoidPin, LOW);
+    m_firing = false;
+  }
+
+void Robot::setRobot() {
+  uint8_t status = m_payload.getStatus();
+
+  if(m_firing) {
+    if(millis() - TEMP_FIRE_TIME_MILLIS >= m_solenoidOpenMillis) {
+      stopFiring();
+      }
+  }
+
+  if (status != STATUS_ENABLED) {
+    stopDrive();
+  } 
+
+  if (status != STATUS_FIRING && status != STATUS_ADJUSTING) {
+    stopFiring();
+    m_isHoldingFire = false;
+  }
+
+  if (status == STATUS_ENABLED) {
+    setDrive();
+    } 
+
+  if (status == STATUS_FIRING) {
+    if(!m_isHoldingFire) {
+      fire();
     }
   }
   m_payload.setStatus(status);
@@ -155,6 +168,7 @@ void Robot::setStatus() {
   if(m_payload.getStatus() == STATUS_DISABLED) {
     return;
   }
+
   // Broken here
   if (m_firing) {
     if(millis() - TEMP_FIRE_TIME_MILLIS < m_solenoidOpenMillis) {
@@ -204,9 +218,6 @@ void Robot::setError(const char *format, ...) {
 
 
 void StatusDisabled::update() {
-  Serial.println("HELP IM DISABLED");
-  m_robot->m_payload.getStatus();
-
   validateState();
   robotAction();
 
@@ -214,11 +225,11 @@ void StatusDisabled::update() {
 }
 
 void StatusDisabled::validateState() {
-    
+  return;
 }
 
 void StatusDisabled::robotAction() {
-    
+    stopDrive();
 }
 
 void StatusEnabled::update() {

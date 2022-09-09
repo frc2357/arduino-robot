@@ -50,6 +50,10 @@ private:
   int getAverageTickDuration();
   void updateTickDurations(int tickDurationMicros);
   void setError(const char *format, ...);
+  void setDrive();
+  void stopDriving();
+  void fire();
+  void stopFiring();
 
   TShirtCannonPayload &m_payload;
   StatusLEDs m_statusLEDs;
