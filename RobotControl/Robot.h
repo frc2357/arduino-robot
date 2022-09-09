@@ -75,38 +75,48 @@ private:
   bool m_firing;
   bool m_isHoldingFire;
 
-  RobotStatus m_statuses[NUM_STATUSES];
+  RobotStatus *m_statuses[NUM_STATUSES];
   Status m_currentStatus;
 };
 
 class StatusDisabled : public RobotStatus {
 public:
     void update();
-    void onTransition();
+private:
+    virtual void validateState();
+    virtual void robotAction();
 };
 
 class StatusEnabled : public RobotStatus {
 public:
     void update();
-    void onTransition();
+private:
+    virtual void validateState();
+    virtual void robotAction();
 };
 
 class StatusAdjusting : public RobotStatus {
 public:
     void update();
-    void onTransition();
+private:
+    virtual void validateState();
+    virtual void robotAction();
 };
 
 class StatusPrimed : public RobotStatus {
 public:
     void update();
-    void onTransition();
+private:
+    virtual void validateState();
+    virtual void robotAction();
 };
 
 class StatusFiring : public RobotStatus {
 public:
     void update();
-    void onTransition();
+private:
+    virtual void validateState();
+    virtual void robotAction();
 };
 
 #endif // ROBOT_H
