@@ -11,7 +11,3 @@ void RobotStatus::update() {
 void RobotStatus::validateState() {
     return;
 }
-
-void RobotStatus::robotAction() {
-    return;
-}

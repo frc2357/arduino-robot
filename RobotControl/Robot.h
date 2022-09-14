@@ -32,7 +32,7 @@ class Robot
   friend StatusEnabled;
   friend StatusAdjusting;
   friend StatusPrimed;
-  friend StatusEnabled;
+  friend StatusFiring;
 
 public:
   Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress, int fireSolenoidPin,
@@ -45,8 +45,6 @@ public:
 private:
   void updateSerial();
   void updatePayload(const uint8_t *data, const uint8_t len);
-  void setRobot();
-  void setStatus();
   int getAverageTickDuration();
   void updateTickDurations(int tickDurationMicros);
   int binToPWM(uint8_t value);
@@ -55,6 +53,8 @@ private:
   void stopDriving();
   void fire();
   void stopFiring();
+  void keepAlive();
+  void isFiring();
 
   TShirtCannonPayload &m_payload;
   StatusLEDs m_statusLEDs;
@@ -86,41 +86,31 @@ private:
 class StatusDisabled : public RobotStatus {
 public:
     void update();
-private:
-    virtual void validateState();
-    virtual void robotAction();
+    void validateState();
 };
 
 class StatusEnabled : public RobotStatus {
 public:
     void update();
-private:
-    virtual void validateState();
-    virtual void robotAction();
+    void validateState();
 };
 
 class StatusAdjusting : public RobotStatus {
 public:
     void update();
-private:
-    virtual void validateState();
-    virtual void robotAction();
+    void validateState();
 };
 
 class StatusPrimed : public RobotStatus {
 public:
     void update();
-private:
-    virtual void validateState();
-    virtual void robotAction();
+    void validateState();
 };
 
 class StatusFiring : public RobotStatus {
 public:
     void update();
-private:
-    virtual void validateState();
-    virtual void robotAction();
+    void validateState();
 };
 
 #endif // ROBOT_H
