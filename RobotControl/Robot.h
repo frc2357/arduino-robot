@@ -23,8 +23,6 @@ class Robot
   static const uint8_t STATUS_PRIMED;
   static const uint8_t STATUS_FIRING;
 
-  static const unsigned long TEMP_FIRE_TIME_MILLIS;
-
 public:
   Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress, int fireSolenoidPin);
 
@@ -57,6 +55,8 @@ private:
 
   bool m_firing;
   bool m_isHoldingFire;
+
+  unsigned long m_fireTimeMillis;
 };
 
 #endif // ROBOT_H

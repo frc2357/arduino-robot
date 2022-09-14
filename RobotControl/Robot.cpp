@@ -2,15 +2,13 @@
 
 const unsigned long Robot::TICK_DURATION_MILLIS = 100;
 const uint8_t Robot::PREAMBLE_LEN = 4;
-const unsigned int Robot::KEEP_ALIVE_MILLIS = 100;
+const unsigned int Robot::KEEP_ALIVE_MILLIS = 1000;
 
 const uint8_t Robot::STATUS_DISABLED = 0;
 const uint8_t Robot::STATUS_ENABLED = 1;
 const uint8_t Robot::STATUS_ADJUSTING = 2;
 const uint8_t Robot::STATUS_PRIMED = 3;
 const uint8_t Robot::STATUS_FIRING = 4;
-
-const unsigned long Robot::TEMP_FIRE_TIME_MILLIS = 100;
 
 Robot::Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress, int fireSolenoidPin) :
   m_payload(payload),
@@ -23,6 +21,8 @@ Robot::Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress
   m_fireSolenoidPin = fireSolenoidPin;
   m_firing = false;
   m_isHoldingFire = false;
+
+  m_fireTimeMillis = 100;
 }
 
 void Robot::init() {
@@ -56,7 +56,7 @@ void Robot::update() {
   updateSerial();
 
   if (tickDurationMillis > TICK_DURATION_MILLIS) {
-    setError("Tick %d ms", tickDurationMillis);
+    //setError("Tick %d ms", tickDurationMillis);
   }
 
   int timeLeftMillis = TICK_DURATION_MILLIS - (millis() - tickStartMillis);
@@ -106,12 +106,20 @@ void Robot::updatePayload(const uint8_t *data, const uint8_t len) {
 void Robot::setRobot() {
   uint8_t status = m_payload.getStatus();
 
+  uint8_t vlvTime = m_payload.getFiringTime();
+
+  if(vlvTime > 20) {
+    vlvTime = 0;
+  } else {
+    m_fireTimeMillis = 100 + (vlvTime * 10);
+  }
+
   if(m_firing) {
-    if(millis() - TEMP_FIRE_TIME_MILLIS >= m_solenoidOpenMillis) {
+    if(millis() - m_fireTimeMillis >= m_solenoidOpenMillis) {
       digitalWrite(m_fireSolenoidPin, LOW);
       m_firing = false;
-      Serial.print("Open for: ");
-      Serial.println(millis() - m_solenoidOpenMillis);
+      // Serial.print("Open for: ");
+      // Serial.println(millis() - m_solenoidOpenMillis);
     }
   }
 
@@ -136,7 +144,7 @@ void Robot::setRobot() {
       digitalWrite(m_fireSolenoidPin, HIGH);
       m_solenoidOpenMillis = millis();
       status = STATUS_ADJUSTING;
-      Serial.println("Firing");
+      //Serial.println("Firing");
       m_firing = true;
       m_isHoldingFire = true;
     }
@@ -149,11 +157,12 @@ void Robot::setStatus() {
   if(m_payload.getStatus() == STATUS_DISABLED) {
     return;
   }
+
   // Broken here
   if (m_firing) {
-    if(millis() - TEMP_FIRE_TIME_MILLIS < m_solenoidOpenMillis) {
+    if(millis() - m_fireTimeMillis < m_solenoidOpenMillis) {
       m_payload.setStatus(STATUS_ADJUSTING);
-      Serial.println("Forced adjusting");
+      //Serial.println("Forced adjusting");
     }
   }
 
@@ -167,7 +176,6 @@ void Robot::setStatus() {
   if(millis() - m_lastRecvTimeMillis > KEEP_ALIVE_MILLIS) {
     m_payload.setStatus(STATUS_DISABLED);
   }
-
 }
 
 int Robot::getAverageTickDuration() {
