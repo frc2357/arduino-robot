@@ -10,6 +10,10 @@ const uint8_t Robot::STATUS_ADJUSTING = 2;
 const uint8_t Robot::STATUS_PRIMED = 3;
 const uint8_t Robot::STATUS_FIRING = 4;
 
+const uin8_t Robot::MAX_PAYLOAD_FIRING_VALUE = 20;
+const int Robot::MIN_FIRE_TIME_MILLIS = 100;
+const int Robot::PAYLOAD_TO_MILLIS = 10;
+
 Robot::Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress, int fireSolenoidPin) :
   m_payload(payload),
   m_statusLEDs(pinLedBuiltin),
@@ -108,19 +112,17 @@ void Robot::setRobot() {
 
   uint8_t vlvTime = m_payload.getFiringTime();
 
-  if(vlvTime > 20) {
+  if(vlvTime > MAX_PAYLOAD_FIRING_VALUE) {
     vlvTime = 0;
   } else {
-    m_fireTimeMillis = 100 + (vlvTime * 10);
+    m_fireTimeMillis = millis() + MIN_FIRE_TIME_MILLIS + (vlvTime * PAYLOAD_TO_MILLIS);
   }
 
-  if(m_firing) {
-    if(millis() - m_fireTimeMillis >= m_solenoidOpenMillis) {
-      digitalWrite(m_fireSolenoidPin, LOW);
-      m_firing = false;
-      // Serial.print("Open for: ");
-      // Serial.println(millis() - m_solenoidOpenMillis);
-    }
+  if(m_firing && m_fireTimeMillis <= millis()) {
+    digitalWrite(m_fireSolenoidPin, LOW);
+    m_firing = false;
+    // Serial.print("Open for: ");
+    // Serial.println(millis() - m_solenoidOpenMillis);
   }
 
   if (status != STATUS_ENABLED) {
@@ -142,7 +144,6 @@ void Robot::setRobot() {
   if (status == STATUS_FIRING) {
     if(!m_isHoldingFire) {
       digitalWrite(m_fireSolenoidPin, HIGH);
-      m_solenoidOpenMillis = millis();
       status = STATUS_ADJUSTING;
       //Serial.println("Firing");
       m_firing = true;
@@ -158,12 +159,9 @@ void Robot::setStatus() {
     return;
   }
 
-  // Broken here
-  if (m_firing) {
-    if(millis() - m_fireTimeMillis < m_solenoidOpenMillis) {
-      m_payload.setStatus(STATUS_ADJUSTING);
-      //Serial.println("Forced adjusting");
-    }
+  if(m_firing && m_fireTimeMillis > millis()) {
+    m_payload.setStatus(STATUS_ADJUSTING);
+    //Serial.println("Forced adjusting");
   }
 
   // Second check if status should be Disabled

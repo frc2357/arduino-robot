@@ -23,6 +23,10 @@ class Robot
   static const uint8_t STATUS_PRIMED;
   static const uint8_t STATUS_FIRING;
 
+  static const uin8_t MAX_PAYLOAD_FIRING_VALUE = 20;
+  static const int MIN_FIRE_TIME_MILLIS = 100;
+  static const int PAYLOAD_TO_MILLIS = 10;
+
 public:
   Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress, int fireSolenoidPin);
 
@@ -51,11 +55,9 @@ private:
   uint8_t m_serialBuffer[SERIAL_BUFFER_LEN];
 
   int m_fireSolenoidPin;
-  unsigned long m_solenoidOpenMillis;
 
   bool m_firing;
   bool m_isHoldingFire;
-
   unsigned long m_fireTimeMillis;
 };
 
