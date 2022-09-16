@@ -10,7 +10,7 @@ const uint8_t Robot::STATUS_ADJUSTING = 2;
 const uint8_t Robot::STATUS_PRIMED = 3;
 const uint8_t Robot::STATUS_FIRING = 4;
 
-const uin8_t Robot::MAX_PAYLOAD_FIRING_VALUE = 20;
+const uint8_t Robot::MAX_PAYLOAD_FIRING_VALUE = 20;
 const int Robot::MIN_FIRE_TIME_MILLIS = 100;
 const int Robot::PAYLOAD_TO_MILLIS = 10;
 
@@ -112,11 +112,14 @@ void Robot::setRobot() {
 
   uint8_t vlvTime = m_payload.getFiringTime();
 
+
   if(vlvTime > MAX_PAYLOAD_FIRING_VALUE) {
     vlvTime = 0;
   } else {
     m_fireTimeMillis = millis() + MIN_FIRE_TIME_MILLIS + (vlvTime * PAYLOAD_TO_MILLIS);
   }
+
+  Serial.println(vlvTime);
 
   if(m_firing && m_fireTimeMillis <= millis()) {
     digitalWrite(m_fireSolenoidPin, LOW);
