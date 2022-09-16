@@ -59,6 +59,7 @@ private:
   bool m_firing;
   bool m_isHoldingFire;
   unsigned long m_fireTimeMillis;
+  unsigned long m_solendoidCloseMillis;
 };
 
 #endif // ROBOT_H

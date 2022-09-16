@@ -116,10 +116,10 @@ void Robot::setRobot() {
   if(vlvTime > MAX_PAYLOAD_FIRING_VALUE) {
     vlvTime = 0;
   } else {
-    m_fireTimeMillis = millis() + MIN_FIRE_TIME_MILLIS + (vlvTime * PAYLOAD_TO_MILLIS);
+    m_fireTimeMillis = MIN_FIRE_TIME_MILLIS + (vlvTime * PAYLOAD_TO_MILLIS);
   }
 
-  if(m_firing && m_fireTimeMillis <= millis()) {
+  if(m_firing &&  millis() >= m_solendoidCloseMillis) {
     digitalWrite(m_fireSolenoidPin, LOW);
     m_firing = false;
     // Serial.print("Open for: ");
@@ -146,6 +146,7 @@ void Robot::setRobot() {
     if(!m_isHoldingFire) {
       digitalWrite(m_fireSolenoidPin, HIGH);
       status = STATUS_ADJUSTING;
+      m_solendoidCloseMillis = millis() + m_fireTimeMillis;
       //Serial.println("Firing");
       m_firing = true;
       m_isHoldingFire = true;
@@ -160,7 +161,7 @@ void Robot::setStatus() {
     return;
   }
 
-  if(m_firing && m_fireTimeMillis > millis()) {
+  if(m_firing && millis() < m_solendoidCloseMillis) {
     m_payload.setStatus(STATUS_ADJUSTING);
     //Serial.println("Forced adjusting");
   }
