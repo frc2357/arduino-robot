@@ -119,8 +119,6 @@ void Robot::setRobot() {
     m_fireTimeMillis = millis() + MIN_FIRE_TIME_MILLIS + (vlvTime * PAYLOAD_TO_MILLIS);
   }
 
-  Serial.println(vlvTime);
-
   if(m_firing && m_fireTimeMillis <= millis()) {
     digitalWrite(m_fireSolenoidPin, LOW);
     m_firing = false;
