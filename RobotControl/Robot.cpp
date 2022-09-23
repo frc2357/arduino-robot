@@ -4,7 +4,7 @@ const unsigned long Robot::TICK_DURATION_MILLIS = 100;
 const uint8_t Robot::PREAMBLE_LEN = 4;
 const unsigned int Robot::KEEP_ALIVE_MILLIS = 100;
 
-const unsigned long Robot::TEMP_FIRE_TIME_MILLIS = 100;
+const unsigned long Robot::TEMP_FIRE_TIME_MILLIS = 10000;
 
 Robot::Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress, int fireSolenoidPin,
   StatusDisabled &disabled, StatusEnabled &enabled, StatusAdjusting &adjusting, StatusPrimed &primed, StatusFiring &firing) :
@@ -157,6 +157,7 @@ void Robot::updatePayload(const uint8_t *data, const uint8_t len) {
 
     if(millis() - m_lastRecvTimeMillis > KEEP_ALIVE_MILLIS) {
       m_payload.setStatus(STATUS_DISABLED);
+      Serial.println("Failing keep alive");
     }
   }
 
