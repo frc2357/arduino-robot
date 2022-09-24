@@ -4,12 +4,15 @@ TShirtCannonPayload cannon;
 void setup()
 {
     Serial.begin(115200);
+    cannon.setStatus(1);
+    cannon.setControllerDriveRight(128);
+    cannon.setFiringPressure(1);
 }
 
 void loop()
 {
-    // cannon.print();
-    uint8_t transmission[7];
+    uint8_t transmission[7] = {};
+    cannon.print();
     if (cannon.buildTransmission(transmission, sizeof(transmission)))
     {
         Serial.println("Transmit build successfull");
@@ -27,7 +30,5 @@ void loop()
     {
         Serial.println("Read fail");
     }
-
-    cannon.print();
     delay(2000);
 }

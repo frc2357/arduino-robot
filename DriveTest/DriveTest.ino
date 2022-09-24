@@ -45,6 +45,8 @@ JoystickAxis rightStick(JOYSTICK_PIN_VRX, DEAD_ZONE_SIZE, JOYSTICK_MAX);
 
 uint8_t buf[7];
 
+RotaryEncoder encoder(ENCODER_PIN_A, ENCODER_PIN_B, RotaryEncoder::LatchMode::FOUR3);
+
 RotaryKnobController encoder(ENCODER_PIN_A, ENCODER_PIN_B);
 
 SerLCD lcd;
@@ -98,8 +100,36 @@ void loop()
     turn = rightStick.getResult();
     speed = leftStick.getResult();
 
+    if (payload.getMessageIndex() + 1 > 31)
+    {
+        payload.setMessageIndex(0);
+    }
+    else
+    {
+        payload.setMessageIndex(payload.getMessageIndex() + 1);
+    }
+
     Utils::setMotors(payload, turn, speed);
     //Utils::setAngle(payload, encoder);
+
+    int dir = encoder.getValue();
+
+    if (encoder.getMode() == RotaryKnobController::FIRING_TIME_ADJUST_MODE)
+    {
+        uint8_t firingTime = payload.getFiringTime();
+        if(dir == 1) {
+            if(firingTime + 1 <= 20) {
+                firingTime++;
+                payload.setFiringTime(firingTime);
+
+                itoa((100 + (firingTime * 10)), strInt, 10);
+                memcpy(lcdText + 4, strInt, 5);
+                lcd.print(lcdText);
+            }
+        } else if (dir == -1) {
+            if(firingTime - 1 >= 0) {
+                firingTime--;
+                payload.setFiringTime(firingTime);
 
     int dir = encoder.getValue();
 
@@ -134,19 +164,7 @@ void loop()
 
     raw_driver.send(buf, sizeof(buf));
 
-    // Serial.print("Left motor speed: ");
-    // Serial.println(payload.getControllerDriveLeft());
-    // Serial.print("Right motor speed: ");
-    // Serial.println(payload.getControllerDriveRight());
-    // Serial.print("Status: ");
-    // Serial.println(payload.getStatus());
-    // Serial.print("Angle: ");
-    // Serial.println(payload.getAngle());
-    // Serial.print("Encoder value: ");
-    // Serial.println(encoder.getPosition());
-    // Serial.println();
-
-
+    Serial.println();
 }
 
 void onPinActivated(int pinNr)
