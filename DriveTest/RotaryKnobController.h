@@ -9,9 +9,11 @@ public:
     RotaryKnobController(unsigned int pinClk, unsigned int pinDt);
     ~RotaryKnobController();
     int getValue();
+    void nextMode();
 
 private:
     int m_pos = 0;
+    int m_mode = 0
     RotaryEncoder *m_encoder;
 };
 #endif
