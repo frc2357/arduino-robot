@@ -108,7 +108,7 @@ void loop()
     }
 
     Utils::setMotors(payload, turn, speed);
-    //Utils::setAngle(payload, encoder);
+    // Utils::setAngle(payload, encoder);
 
     char mode;
 
@@ -118,8 +118,10 @@ void loop()
     {
         mode = 'T';
         uint8_t firingTime = payload.getFiringTime();
-        if(dir == 1) {
-            if(firingTime + 1 <= 20) {
+        if (dir == 1)
+        {
+            if (firingTime + 1 <= 20)
+            {
                 firingTime++;
                 payload.setFiringTime(firingTime);
 
@@ -127,8 +129,11 @@ void loop()
                 memcpy(lcdText + 4, strInt, 5);
                 lcd.print(lcdText);
             }
-        } else if (dir == -1) {
-            if(firingTime - 1 >= 0) {
+        }
+        else if (dir == -1)
+        {
+            if (firingTime - 1 >= 0)
+            {
                 firingTime--;
                 payload.setFiringTime(firingTime);
 
@@ -143,7 +148,6 @@ void loop()
         mode = 'A';
         Utils::setAngle(payload, dir);
     }
-
 
     lcd.print(lcdText);
 
@@ -173,7 +177,7 @@ void onPinActivated(int pinNr)
     {
         payload.setStatus(4);
     }
-    else if (pinNr == ENCODER_PIN_SW) 
+    else if (pinNr == ENCODER_PIN_SW)
     {
         encoder.nextMode();
     }
