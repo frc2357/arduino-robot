@@ -51,3 +51,8 @@ void RotaryKnobController::nextMode()
         this->m_mode = MIN_MODE_VALUE;
     }
 }
+
+int RotaryKnobController::getMode()
+{
+    return this->m_mode;
+}

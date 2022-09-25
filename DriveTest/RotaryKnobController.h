@@ -10,7 +10,7 @@ public:
     ~RotaryKnobController();
     int getValue();
     void nextMode();
-
+    int getMode();
 private:
     int m_pos = 0;
     int m_mode = 0

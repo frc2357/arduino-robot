@@ -37,17 +37,15 @@ void Utils::setMotors(TShirtCannonPayload &payload, float turn, float speed)
     payload.setControllerDriveRight((1 << 7) | (rightDir << 6) | rightSpeed);
 }
 
-void Utils::setAngle(TShirtCannonPayload &payload, RotaryEncoder &encoder)
+void Utils::setAngle(TShirtCannonPayload &payload, int dir)
 {
-    int pos = encoder.getPosition();
-
     // 2 = Increase angle, 1 = Decrease angle, 0 = Stay at the current angle
 
-    if (pos > 0)
+    if (dir == 1)
     {
         payload.setAngle(2);
     }
-    else if (pos < 0)
+    else if (dir == -1)
     {
         payload.setAngle(1);
     }
