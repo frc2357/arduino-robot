@@ -112,29 +112,13 @@ void loop()
     Utils::setMotors(payload, turn, speed);
     //Utils::setAngle(payload, encoder);
 
-    int dir = encoder.getValue();
-
-    if (encoder.getMode() == RotaryKnobController::FIRING_TIME_ADJUST_MODE)
-    {
-        uint8_t firingTime = payload.getFiringTime();
-        if(dir == 1) {
-            if(firingTime + 1 <= 20) {
-                firingTime++;
-                payload.setFiringTime(firingTime);
-
-                itoa((100 + (firingTime * 10)), strInt, 10);
-                memcpy(lcdText + 4, strInt, 5);
-                lcd.print(lcdText);
-            }
-        } else if (dir == -1) {
-            if(firingTime - 1 >= 0) {
-                firingTime--;
-                payload.setFiringTime(firingTime);
+    char mode;
 
     int dir = encoder.getValue();
 
     if (encoder.getMode() == RotaryKnobController::FIRING_TIME_ADJUST_MODE)
     {
+        mode = 'T';
         uint8_t firingTime = payload.getFiringTime();
         if(dir == 1) {
             if(firingTime + 1 <= 20) {
@@ -158,8 +142,12 @@ void loop()
     }
     else if (encoder.getMode() == RotaryKnobController::ANGLE_ADJUST_MODE)
     {
+        mode = 'A';
         Utils::setAngle(payload, dir);
     }
+
+
+    lcd.print(lcdText);
 
     payload.buildTransmission(buf, 7);
 
