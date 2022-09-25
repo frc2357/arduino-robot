@@ -15,7 +15,7 @@ const int Robot::MIN_FIRE_TIME_MILLIS = 100;
 const int Robot::PAYLOAD_TO_MILLIS = 10;
 
 Robot::Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress,
-  int fireSolenoidPin. int en, int in1, int in2) :
+  int fireSolenoidPin, int en, int in1, int in2, uint8_t speed) :
   m_payload(payload),
   m_statusLEDs(pinLedBuiltin),
   m_commsI2C(i2cHostAddress, i2cDeviceAddress, PREAMBLE_LEN),

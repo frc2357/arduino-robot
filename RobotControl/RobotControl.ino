@@ -20,6 +20,7 @@
 #define ANGLE_EN 5
 #define ANGLE_IN1 10
 #define ANGLE_IN2 9
+#define ANGLE_SPEED 1
 
 
 #define LEFT_DRIVE_PWM 9
@@ -29,7 +30,7 @@
 TShirtCannonPayload payload;
 
 Robot robot(payload, PIN_LED_BUILTIN, I2C_HOST_ADDRESS, I2C_DEVICE_ADDRESS, FIRE_SOLENOID_PIN,
-  ANGLE_EN, ANGLE_IN1, ANGLE_IN2);
+  ANGLE_EN, ANGLE_IN1, ANGLE_IN2, ANGLE_SPEED);
 
 // Primary Setup
 void setup()

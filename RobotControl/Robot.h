@@ -29,7 +29,7 @@ class Robot
   static const int PAYLOAD_TO_MILLIS;
 
 public:
-  Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress, int fireSolenoidPin, int en, int in1, int in2);
+  Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress, int fireSolenoidPin, int en, int in1, int in2, uint8_t speed);
 
   void init();
   void update();
