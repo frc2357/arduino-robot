@@ -13,7 +13,7 @@ public:
     int getMode();
 private:
     int m_pos = 0;
-    int m_mode = 0
+    int m_mode = 0;
     RotaryEncoder *m_encoder;
 };
 #endif

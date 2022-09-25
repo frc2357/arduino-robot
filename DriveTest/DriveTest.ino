@@ -45,8 +45,6 @@ JoystickAxis rightStick(JOYSTICK_PIN_VRX, DEAD_ZONE_SIZE, JOYSTICK_MAX);
 
 uint8_t buf[7];
 
-RotaryEncoder encoder(ENCODER_PIN_A, ENCODER_PIN_B, RotaryEncoder::LatchMode::FOUR3);
-
 RotaryKnobController encoder(ENCODER_PIN_A, ENCODER_PIN_B);
 
 SerLCD lcd;

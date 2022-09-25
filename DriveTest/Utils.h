@@ -8,7 +8,7 @@ class Utils
 {
 public:
     static void setMotors(TShirtCannonPayload &payload, float x, float y);
-    static void setAngle(TShirtCannonPayload &payload, RotaryEncoder &encoder);
+    static void setAngle(TShirtCannonPayload &payload, int dir);
 };
 
 #endif
