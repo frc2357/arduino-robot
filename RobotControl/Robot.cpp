@@ -2,10 +2,11 @@
 
 const unsigned long Robot::TICK_DURATION_MILLIS = 100;
 const uint8_t Robot::PREAMBLE_LEN = 4;
-const unsigned int Robot::KEEP_ALIVE_MILLIS = 100;
+const unsigned int Robot::KEEP_ALIVE_MILLIS = 1000;
 
-const unsigned long Robot::TEMP_FIRE_TIME_MILLIS = 10000;
-
+const uint8_t Robot::MAX_PAYLOAD_FIRING_VALUE = 20;
+const int Robot::MIN_FIRE_TIME_MILLIS = 100;
+const int Robot::PAYLOAD_TO_MILLIS = 10;
 
 void RobotStatus::setRobot(Robot *robot) {
     m_robot = robot;
@@ -23,6 +24,7 @@ Robot::Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress
   m_fireSolenoidPin = fireSolenoidPin;
   m_firing = false;
   m_isHoldingFire = false;
+  m_fireTimeMillis = 100;
 
   m_currentStatus = STATUS_DISABLED;
   m_statuses[STATUS_DISABLED] = &disabled;
@@ -66,6 +68,8 @@ void Robot::update() {
 
   updateSerial();
 
+  setFireTime();
+  
   //Serial.print("Status from controller: ");
   //Serial.println(m_payload.getStatus());
   transition(static_cast<Status>(m_payload.getStatus()));
@@ -76,7 +80,7 @@ void Robot::update() {
   //Serial.println(m_payload.getStatus());
 
   if (tickDurationMillis > TICK_DURATION_MILLIS) {
-    setError("Tick %d ms", tickDurationMillis);
+    //setError("Tick %d ms", tickDurationMillis);
   }
 }
 
@@ -119,52 +123,60 @@ void Robot::updatePayload(const uint8_t *data, const uint8_t len) {
   }
 }
 
-  void Robot::stopDriving() {
-    Serial.write((uint8_t)0);
-    Serial.write((uint8_t)128);
+void Robot::setFireTime() {
+  uint8_t vlvTime = m_payload.getFiringTime();
+  if(vlvTime > MAX_PAYLOAD_FIRING_VALUE) {
+    vlvTime = 0;
+  } else {
+    m_fireTimeMillis = MIN_FIRE_TIME_MILLIS + (vlvTime * PAYLOAD_TO_MILLIS);
   }
+}
 
-  void Robot::setDrive() {
-    Serial.write(m_payload.getControllerDriveLeft());
-    Serial.write(m_payload.getControllerDriveRight());
+void Robot::stopDriving() {
+  Serial.write((uint8_t)0);
+  Serial.write((uint8_t)128);
+}
+
+void Robot::setDrive() {
+  Serial.write(m_payload.getControllerDriveLeft());
+  Serial.write(m_payload.getControllerDriveRight());
+}
+
+void Robot::fire() {
+  if (!m_isHoldingFire) {
+    digitalWrite(m_fireSolenoidPin, HIGH);
+    m_solenoidCloseMillis = millis() + m_fireTimeMillis;
+    m_firing = true;
+    m_isHoldingFire = true;
+    transition(STATUS_ADJUSTING);
+    //Serial.println("Firing");
   }
+}
 
-  void Robot::fire() {
-    if (!m_isHoldingFire) {
-      digitalWrite(m_fireSolenoidPin, HIGH);
-      m_solenoidOpenMillis = millis();
-      m_firing = true;
-      m_isHoldingFire = true;
+void Robot::stopFiring() {
+  digitalWrite(m_fireSolenoidPin, LOW);
+  m_firing = false;
+}
+
+void Robot::isFiring() {
+  if (m_firing) {
+    if(m_firing && millis() < m_solenoidCloseMillis) {
       transition(STATUS_ADJUSTING);
-      //Serial.println("Firing");
     }
   }
+}
 
-  void Robot::stopFiring() {
-    digitalWrite(m_fireSolenoidPin, LOW);
-    m_firing = false;
+void Robot::keepAlive() {
+  int currentIndex = m_payload.getMessageIndex();
+  if (m_lastRecvIndex != currentIndex) {
+    m_lastRecvTimeMillis = millis();
+    m_lastRecvIndex = currentIndex;
   }
-
-  void Robot::isFiring() {
-    if (m_firing) {
-      if(millis() - TEMP_FIRE_TIME_MILLIS < m_solenoidOpenMillis) {
-        transition(STATUS_ADJUSTING);
-      }
-    }
+  if(millis() - m_lastRecvTimeMillis > KEEP_ALIVE_MILLIS) {
+    m_payload.setStatus(STATUS_DISABLED);
+    //Serial.println("Failing keep alive");
   }
-
-  void Robot::keepAlive() {
-    int currentIndex = m_payload.getMessageIndex();
-    if (m_lastRecvIndex != currentIndex) {
-      m_lastRecvTimeMillis = millis();
-      m_lastRecvIndex = currentIndex;
-    }
-
-    if(millis() - m_lastRecvTimeMillis > KEEP_ALIVE_MILLIS) {
-      m_payload.setStatus(STATUS_DISABLED);
-      //Serial.println("Failing keep alive");
-    }
-  }
+}
 
 int Robot::getAverageTickDuration() {
   unsigned long total = 0;
@@ -218,10 +230,8 @@ void StatusAdjusting::validateState() {
 
 void StatusAdjusting::update() {
   m_robot->stopDriving();
-  if(m_robot->m_firing) {
-    if(millis() - m_robot->TEMP_FIRE_TIME_MILLIS >= m_robot->m_solenoidOpenMillis) {
+  if(m_robot->m_firing && millis() >= m_robot->m_solenoidCloseMillis) {
       m_robot->stopFiring();
-    }
   }
 }
 
