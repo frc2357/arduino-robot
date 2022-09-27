@@ -40,6 +40,10 @@ class Robot
 
   static const unsigned long TEMP_FIRE_TIME_MILLIS;
 
+  static const uint8_t MAX_PAYLOAD_FIRING_VALUE;
+  static const int MIN_FIRE_TIME_MILLIS;
+  static const int PAYLOAD_TO_MILLIS;
+
   friend StatusDisabled;
   friend StatusEnabled;
   friend StatusAdjusting;
@@ -61,6 +65,7 @@ private:
   void updateTickDurations(int tickDurationMicros);
   int binToPWM(uint8_t value);
   void setError(const char *format, ...);
+  void setFireTime();
   void setDrive();
   void stopDriving();
   void fire();
@@ -90,6 +95,8 @@ private:
 
   bool m_firing;
   bool m_isHoldingFire;
+  unsigned long m_fireTimeMillis;
+  unsigned long m_solenoidCloseMillis;
 
   RobotStatus *m_statuses[NUM_STATUSES];
   Status m_currentStatus;
