@@ -6,6 +6,11 @@ const unsigned int Robot::KEEP_ALIVE_MILLIS = 100;
 
 const unsigned long Robot::TEMP_FIRE_TIME_MILLIS = 10000;
 
+
+void RobotStatus::setRobot(Robot *robot) {
+    m_robot = robot;
+}
+
 Robot::Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress, int fireSolenoidPin,
   StatusDisabled &disabled, StatusEnabled &enabled, StatusAdjusting &adjusting, StatusPrimed &primed, StatusFiring &firing) :
   m_payload(payload),
@@ -61,14 +66,14 @@ void Robot::update() {
 
   updateSerial();
 
-  Serial.print("Status from controller: ");
-  Serial.println(m_payload.getStatus());
+  //Serial.print("Status from controller: ");
+  //Serial.println(m_payload.getStatus());
   transition(static_cast<Status>(m_payload.getStatus()));
 
   m_statuses[m_currentStatus]->update();
 
-  Serial.print("Status after calls: ");
-  Serial.println(m_payload.getStatus());
+  //Serial.print("Status after calls: ");
+  //Serial.println(m_payload.getStatus());
 
   if (tickDurationMillis > TICK_DURATION_MILLIS) {
     setError("Tick %d ms", tickDurationMillis);
@@ -131,7 +136,7 @@ void Robot::updatePayload(const uint8_t *data, const uint8_t len) {
       m_firing = true;
       m_isHoldingFire = true;
       transition(STATUS_ADJUSTING);
-      Serial.println("Firing");
+      //Serial.println("Firing");
     }
   }
 
@@ -157,7 +162,7 @@ void Robot::updatePayload(const uint8_t *data, const uint8_t len) {
 
     if(millis() - m_lastRecvTimeMillis > KEEP_ALIVE_MILLIS) {
       m_payload.setStatus(STATUS_DISABLED);
-      Serial.println("Failing keep alive");
+      //Serial.println("Failing keep alive");
     }
   }
 
