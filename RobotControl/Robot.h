@@ -6,13 +6,25 @@
 #include <CommsI2CMaster.h>
 #include "StatusLEDs.h"
 #include "Utils.h"
-#include "StatusEnum.h"
-#include "RobotStatus.h"
 
 #define ROBOT_TICK_DURATION_BUFFER_LEN 5
 #define PAYLOAD_LEN 7
 #define SERIAL_BUFFER_LEN 50
 #define NUM_STATUSES 5
+
+enum Status {STATUS_DISABLED = 0, STATUS_ENABLED = 1, STATUS_ADJUSTING = 2, STATUS_PRIMED = 3, STATUS_FIRING = 4};
+
+class Robot;
+
+class RobotStatus {
+public:
+    void setRobot(Robot *robot);
+    virtual void update(); // What to do to the robot every loop
+    virtual void validateState(); // Checks validity of called state, method will transition to another if necessary
+
+protected:
+    Robot *m_robot;
+};
 
 class StatusDisabled;
 class StatusEnabled;
