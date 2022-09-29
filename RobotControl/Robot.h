@@ -71,7 +71,7 @@ private:
   void fire();
   void stopFiring();
   void keepAlive();
-  void isFiring();
+  void handleFiring();
 
   TShirtCannonPayload &m_payload;
   StatusLEDs m_statusLEDs;

@@ -1,9 +1,9 @@
 #include "RotaryKnobController.h"
 
-RotaryKnobController::RotaryKnobController(unsigned int pinA, unsigned int pinB)
+RotaryKnobController::RotaryKnobController(unsigned int pinClk, unsigned int pinDt)
 {
     // Setup a RotaryEncoder with 2 steps per latch for the 2 signal input pins:
-    this->m_encoder = new RotaryEncoder(pinA, pinB, RotaryEncoder::LatchMode::TWO03);
+    this->m_encoder = new RotaryEncoder(pinClk, pinDt, RotaryEncoder::LatchMode::TWO03);
 
     this->m_pos = 0;
 }
@@ -17,7 +17,6 @@ int RotaryKnobController::getValue()
 {
     this->m_encoder->tick();
     int newPos = this->m_encoder->getPosition();
-    
     //Dials
     if (m_pos != newPos && newPos % 2 == 0)
     {

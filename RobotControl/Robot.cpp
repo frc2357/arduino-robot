@@ -70,22 +70,15 @@ void Robot::update()
   m_statusLEDs.update(tick);
 
   // TODO: Remove after timing is solved
-  // Serial.print("Tick time: ");
-  // Serial.println(tickDurationMillis);
   updateTickDurations(tickDurationMillis);
 
   updateSerial();
 
   setFireTime();
   
-  //Serial.print("Status from controller: ");
-  //Serial.println(m_payload.getStatus());
   transition(static_cast<Status>(m_payload.getStatus()));
 
   m_statuses[m_currentStatus]->update();
-
-  //Serial.print("Status after calls: ");
-  //Serial.println(m_payload.getStatus());
 
   if (tickDurationMillis > TICK_DURATION_MILLIS) {
     //setError("Tick %d ms", tickDurationMillis);
@@ -106,8 +99,6 @@ void Robot::updateSerial() {
   {
     updatePayload(m_payloadBytes, PAYLOAD_LEN);
   }
-  //m_payload.print();
-  //Serial.println();
 }
 
 void Robot::updatePayload(const uint8_t *data, const uint8_t len)
@@ -165,7 +156,6 @@ void Robot::fire() {
     m_firing = true;
     m_isHoldingFire = true;
     transition(STATUS_ADJUSTING);
-    //Serial.println("Firing");
   }
 }
 
@@ -174,11 +164,9 @@ void Robot::stopFiring() {
   m_firing = false;
 }
 
-void Robot::isFiring() {
+void Robot::handleFiring() {
   if (m_firing) {
-    if(m_firing && millis() < m_solenoidCloseMillis) {
-      transition(STATUS_ADJUSTING);
-    }
+    transition(STATUS_ADJUSTING);
   }
 }
 
@@ -190,7 +178,6 @@ void Robot::keepAlive() {
   }
   if(millis() - m_lastRecvTimeMillis > KEEP_ALIVE_MILLIS) {
     m_payload.setStatus(STATUS_DISABLED);
-    //Serial.println("Failing keep alive");
   }
 }
 
@@ -230,9 +217,6 @@ void Robot::setError(const char *format, ...)
   va_end(args);
 
   m_payload.setStatus(STATUS_DISABLED);
-
-  // Serial.print("ERROR: ");
-  // Serial.println(message);
 }
 
 void StatusDisabled::validateState() {
@@ -247,7 +231,7 @@ void StatusDisabled::update() {
 
 void StatusEnabled::validateState() {
   m_robot->keepAlive();
-  m_robot->isFiring();
+  m_robot->handleFiring();
 }
 
 void StatusEnabled::update() {
@@ -262,13 +246,13 @@ void StatusAdjusting::validateState() {
 void StatusAdjusting::update() {
   m_robot->stopDriving();
   if(m_robot->m_firing && millis() >= m_robot->m_solenoidCloseMillis) {
-      m_robot->stopFiring();
+    m_robot->stopFiring();
   }
 }
 
 void StatusPrimed::validateState() {
   m_robot->keepAlive();
-  m_robot->isFiring();
+  m_robot->handleFiring();
 }
 
 void StatusPrimed::update() {
@@ -278,7 +262,7 @@ void StatusPrimed::update() {
 
 void StatusFiring::validateState() {
   m_robot->keepAlive();
-  m_robot->isFiring();
+  m_robot->handleFiring();
 }
 
 void StatusFiring::update() {
