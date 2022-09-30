@@ -62,7 +62,7 @@ void setup()
     lcd.begin(Wire);
     lcd.disableSystemMessages();
 
-    lcd.setBacklight(0, 0, 255);
+    lcd.setBacklight(255, 255, 255);
     lcd.setContrast(5);
 
     if (!raw_driver.init())

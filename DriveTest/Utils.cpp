@@ -6,15 +6,22 @@ void Utils::setMotors(TShirtCannonPayload &payload, float turn, float speed)
 {
     double left, right;
     uint8_t leftSpeed, rightSpeed, leftDir, rightDir;
+    int leftTrim, rightTrim;
 
-    left = (-1 * turn) + (-1 * speed);
-    right = turn + (-1 * speed);
+    leftTrim = 25;
+    rightTrim = -25;
+
+    right = (-1 * turn) + (-1 * speed);
+    left = turn + (-1 * speed);
 
     leftDir = left < 0 ? 1 : 0;
     rightDir = right < 0 ? 1 : 0;
 
     leftSpeed = MAX_DRIVE_SPEED * abs(left);
     rightSpeed = MAX_DRIVE_SPEED * abs(right);
+
+    // leftSpeed += leftTrim;
+    // rightSpeed += rightTrim;
 
     if (leftSpeed > MAX_DRIVE_SPEED)
     {
