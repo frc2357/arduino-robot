@@ -12,12 +12,13 @@ void RobotStatus::setRobot(Robot *robot) {
     m_robot = robot;
 }
 
-Robot::Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress, int fireSolenoidPin,
+Robot::Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress,
+  int fireSolenoidPin, int in1, int in2,
   StatusDisabled &disabled, StatusEnabled &enabled, StatusAdjusting &adjusting, StatusPrimed &primed, StatusFiring &firing) :
   m_payload(payload),
   m_statusLEDs(pinLedBuiltin),
   m_commsI2C(i2cHostAddress, i2cDeviceAddress, PREAMBLE_LEN),
-  m_actuator(en, in1, in2, speed)
+  m_actuator(in1, in2)
 {
   m_initTimeSeconds = 0;
   m_lastRecvIndex = -1;
