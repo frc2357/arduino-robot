@@ -106,32 +106,43 @@ void loop()
     speed = leftStick.getResult();
 
     Utils::setMotors(payload, turn, speed);
-    //Utils::setAngle(payload, encoder);3
+    // Utils::setAngle(payload, encoder);
 
     int dir = encoder.getValue();
     uint8_t time = payload.getFiringTime();
 
-    memset(lcdText, ' ', 16 * 2);
+    memset(lcdText, ' ', 32);
 
-    if(dir == 1) {
-        if(time + 1 <= 20) {
+    if (dir == 1)
+    {
+        if (time + 1 <= 20)
+        {
             time++;
             payload.setFiringTime(time);
-
-            itoa((100 + (time * 10)), strInt, 10);
-            memcpy(lcdText, strInt, strlen(strInt));
-            lcd.print(lcdText);
-        }
-    } else if (dir == -1) {
-        if(time - 1 >= 0) {
-            time--;
-            payload.setFiringTime(time);
-
-            itoa((100 + (time * 10)), strInt, 10);
-            memcpy(lcdText, strInt, strlen(strInt));
-            lcd.print(lcdText);
         }
     }
+    else if (dir == -1)
+    {
+        if (time - 1 >= 0)
+        {
+            time--;
+            payload.setFiringTime(time);
+        }
+    }
+
+    memcpy(lcdText + 0, "R:", 2);
+    memcpy(lcdText + 16, "L:", 2);
+
+    itoa(payload.getControllerDriveLeft(), strInt, 10);
+    memcpy(lcdText + 3, strInt, strlen(strInt));
+
+    itoa(payload.getControllerDriveRight(), strInt, 10);
+    memcpy(lcdText + 19, strInt, strlen(strInt));
+
+    itoa((100 + (time * 10)), strInt, 10);
+    memcpy(lcdText + 8, strInt, strlen(strInt));
+    lcd.print(lcdText);
+
     payload.buildTransmission(buf, 7);
 
     // for (int i = 0; i < sizeof(buf); i++)
@@ -153,7 +164,8 @@ void loop()
     // Serial.println(encoder.getPosition());
     // Serial.println();
 
-
+    Serial.println(lcdText);
+    lcd.print(lcdText);
 }
 
 void onPinActivated(int pinNr)

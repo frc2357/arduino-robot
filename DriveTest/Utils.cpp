@@ -4,6 +4,9 @@
 
 void Utils::setMotors(TShirtCannonPayload &payload, float turn, float speed)
 {
+    turn = turn * turn;
+    speed = speed * speed;
+
     double left, right;
     uint8_t leftSpeed, rightSpeed, leftDir, rightDir;
     int leftTrim, rightTrim;
