@@ -82,7 +82,7 @@ void HumanControls::update()
     turn = m_rightStick.getResult();
     speed = m_leftStick.getResult();
 
-    Utils.setMotors(m_payload, turn, speed);
+    Utils::setMotors(m_payload, turn, speed);
 
     Serial.print("DriveLeft: ");
     Serial.println(m_payload.getControllerDriveLeft());
