@@ -130,8 +130,8 @@ void loop()
         }
     }
 
-    memcpy(lcdText + 0, "R:", 2);
-    memcpy(lcdText + 16, "L:", 2);
+    memcpy(lcdText + 0, "L:", 2);
+    memcpy(lcdText + 16, "R:", 2);
 
     itoa(payload.getControllerDriveLeft(), strInt, 10);
     memcpy(lcdText + 3, strInt, strlen(strInt));
@@ -164,7 +164,6 @@ void loop()
     // Serial.println(encoder.getPosition());
     // Serial.println();
 
-    Serial.println(lcdText);
     lcd.print(lcdText);
 }
 
