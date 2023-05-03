@@ -6,6 +6,7 @@
 #include "RotaryEncoder.h"
 #include <SerLCD.h>
 #include "RotaryKnobController.h"
+#include "DisplayController.h"
 
 // Pins
 #define JOYSTICK_PIN_VRX 0
@@ -47,9 +48,10 @@ uint8_t buf[7];
 
 RotaryKnobController encoder(ENCODER_PIN_A, ENCODER_PIN_B);
 
-SerLCD lcd;
-char lcdText[33];
-char strInt[8];
+DisplayController display;
+// SerLCD lcd;
+// char lcdText[33];
+// char strInt[8];
 void setup()
 {
     // ! UNCOMMENT THE LINES BELOW IF USING CONTROLLER
@@ -59,11 +61,12 @@ void setup()
     Serial.begin(115200);
 
     Wire.begin();
-    lcd.begin(Wire);
-    lcd.disableSystemMessages();
+    // lcd.begin(Wire);
+    // lcd.disableSystemMessages();
 
-    lcd.setBacklight(255, 255, 255);
-    lcd.setContrast(5);
+    // lcd.setBacklight(255, 255, 255);
+    // lcd.setContrast(5);
+    display.init();
 
     if (!raw_driver.init())
     {
@@ -111,7 +114,8 @@ void loop()
     int dir = encoder.getValue();
     uint8_t time = payload.getFiringTime();
 
-    memset(lcdText, ' ', 32);
+    // memset(lcdText, ' ', 32);
+    display.clear();
 
     if (dir == 1)
     {
@@ -130,18 +134,23 @@ void loop()
         }
     }
 
-    memcpy(lcdText + 0, "L:", 2);
-    memcpy(lcdText + 16, "R:", 2);
+    display.stringSetRegion(0, 0, "L:");
+    display.stringSetRegion(0, 1, "R:");
+    // memcpy(lcdText + 0, "L:", 2);
+    // memcpy(lcdText + 16, "R:", 2);
 
-    itoa(payload.getControllerDriveLeft(), strInt, 10);
-    memcpy(lcdText + 3, strInt, strlen(strInt));
+    display.intSetRegion(3, 0, payload.getControllerDriveLeft());
+    // itoa(payload.getControllerDriveLeft(), strInt, 10);
+    // memcpy(lcdText + 3, strInt, strlen(strInt));
 
-    itoa(payload.getControllerDriveRight(), strInt, 10);
-    memcpy(lcdText + 19, strInt, strlen(strInt));
+    display.intSetRegion(3, 1, payload.getControllerDriveRight());
+    // itoa(payload.getControllerDriveRight(), strInt, 10);
+    // memcpy(lcdText + 19, strInt, strlen(strInt));
 
-    itoa((100 + (time * 10)), strInt, 10);
-    memcpy(lcdText + 8, strInt, strlen(strInt));
-    lcd.print(lcdText);
+    display.intSetRegion(8, 0, (100 + (time * 10)));
+    // itoa((100 + (time * 10)), strInt, 10);
+    // memcpy(lcdText + 8, strInt, strlen(strInt));
+    // lcd.print(lcdText);
 
     payload.buildTransmission(buf, 7);
 
@@ -164,7 +173,9 @@ void loop()
     // Serial.println(encoder.getPosition());
     // Serial.println();
 
-    lcd.print(lcdText);
+    // lcd.print(lcdText);
+    display.print();
+    delay(50);
 }
 
 void onPinActivated(int pinNr)
