@@ -24,22 +24,29 @@ void DisplayController::clear()
 {
     memset(m_lcdText, ' ', 32);
     this->m_lcd.clear();
+    m_hasChanged = true;
 }
 
 void DisplayController::stringSetRegion(int x, int y, const char *text)
 {
     memcpy(m_lcdText + ((y * 16) + x), text, strlen(text));
+    m_hasChanged = true;
 }
 
 void DisplayController::intSetRegion(int x, int y, int num)
 {
     itoa(num, m_strInt, 10);
     stringSetRegion(x, y, m_strInt);
+    m_hasChanged = true;
 }
 
 void DisplayController::print()
 {
+  Serial.println(m_hasChanged);
+  if (m_hasChanged) {
     m_lcd.print(m_lcdText);
+  }
+  m_hasChanged = false;
 }
 
 // void DisplayController::printRegion(int x, int y, String text)

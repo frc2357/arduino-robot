@@ -1,11 +1,9 @@
 #include <LiquidCrystal_I2C.h>
 #include <JsonElement.h>
 #include "RotaryKnobController.h"
-#include "CharacterDisplay.h"
 #include "MenuController.h"
 #include "DisplayController.h"
 #include "Page.h"
-#include "CharacterDisplay.h"
 #include "JoystickAxis.h"
 #include "EnableController.h"
 #include "FireController.h"
@@ -18,9 +16,9 @@
 // Pins
 #define JOYSTICK_PIN_VRX 0 // Analog Pin for joystick x
 #define JOYSTICK_PIN_VRY 1 // Analog Pin for joystick y
-#define ENCODER_PIN_CLK 2  // CLK gets degrees for rotary knob
-#define ENCODER_PIN_DT 3   // DT gets direction for rotary knob
-#define ENCODER_PIN_SW 5   // Gets the button for rotary knob
+#define ENCODER_PIN_SW 13   // Gets the button for rotary knob
+#define ENCODER_PIN_A 5  // CLK gets degrees for rotary knob
+#define ENCODER_PIN_B 6   // DT gets direction for rotary knob
 #define ENABLE_PIN 10      // Digital Pin for the enable button
 #define PRIME_PIN 11       // Digital Pin for prime button
 #define FIRE_PIN 12        // Digital Pin for the fire button
@@ -48,7 +46,7 @@
 #define PRESSURE_MAX 120      // Maximum shot pressure
 #define DURATION_INCREMENT 10 // Increment amount for valve duration
 #define DURATION_MIN 100      // Minimum valve duration
-#define DURATION_MAX 300      // Maximum valve duration
+#define DURATION_MAX 250      // Maximum valve duration
 
 // Joystick deadzones and max
 #define X_DEAD_ZONE_SIZE 100 // Total size of the X deadzone
@@ -58,11 +56,10 @@
 // Create payload object
 TShirtCannonPayload payload;
 
-HumanControls humanControls(payload, ENCODER_PIN_CLK, ENCODER_PIN_DT, DISPLAY_ADDRESS, DISPLAY_LENGTH, DISPLAY_WIDTH,
-                            ANGLE_INCREMENT, ANGLE_MIN, ANGLE_MAX, PRESSURE_INCREMENT, PRESSURE_MIN, PRESSURE_MAX,
-                            DURATION_INCREMENT, DURATION_MIN, DURATION_MAX, HANG_TIMER_DURATION, DOWN_ARROW,
-                            UP_ARROW, ROBOT_BATTERY_CHAR, CONTROLLER_BATTERY_CHAR, NUM_BUTTONS, ENCODER_PIN_SW,
-                            ENABLE_PIN, PRIME_PIN, FIRE_PIN, JOYSTICK_PIN_VRX, X_DEAD_ZONE_SIZE, JOYSTICK_MAX,
+HumanControls humanControls(payload, ENCODER_PIN_A, ENCODER_PIN_B, ANGLE_INCREMENT, ANGLE_MIN, ANGLE_MAX,
+                            PRESSURE_INCREMENT, PRESSURE_MIN, PRESSURE_MAX, DURATION_INCREMENT, DURATION_MIN,
+                            DURATION_MAX, HANG_TIMER_DURATION, NUM_BUTTONS, ENCODER_PIN_SW, ENABLE_PIN, 
+                            PRIME_PIN, FIRE_PIN, JOYSTICK_PIN_VRX, X_DEAD_ZONE_SIZE, JOYSTICK_MAX,
                             JOYSTICK_PIN_VRY, Y_DEAD_ZONE_SIZE);
 
 void setup()

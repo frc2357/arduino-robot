@@ -1,5 +1,5 @@
-#ifndef HUMAN_CONTROLS_H
-#define HUMAN_CONTROLS_H
+#ifndef HUMAN_CONTROLS
+#define HUMAN_CONTROLS
 
 #include <Arduino.h>
 #include <JsonElement.h>
@@ -8,14 +8,13 @@
 #include "EnableController.h"
 #include "FireController.h"
 #include "JoystickAxis.h"
-#include "Utils.h"
 
 class HumanControls
 {
 public:
     HumanControls(TShirtCannonPayload &payload,
-                  unsigned int encoderPinA,
-                  unsigned int encoderPinB,
+                  unsigned int encoderPinClk,
+                  unsigned int encoderPinDt,
                   unsigned int angleIncrement,
                   unsigned int angleMin,
                   unsigned int angleMax,
@@ -43,14 +42,17 @@ public:
     void onPinDeactivated(int pinNr);
     void connect();
 
-    static Utils::ControllerStatus status;
+    static const uint8_t STATUS_DISABLED;
+    static const uint8_t STATUS_ENABLED;
+    static const uint8_t STATUS_PRIMED;
+    static uint8_t status;
 
 private:
     void setError(const char *format, ...);
 
     int m_encoderPinSW, m_enablePin, m_primePin, m_firePin;
     bool m_isConnected;
-    static Utils::ControllerStatus lastStatus;
+    static uint8_t lastStatus;
 
     TShirtCannonPayload &m_payload;
 

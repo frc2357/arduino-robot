@@ -24,5 +24,6 @@ private:
     SerLCD m_lcd;
     char m_lcdText[33];
     char m_strInt[8];
+    bool m_hasChanged;
 };
 #endif

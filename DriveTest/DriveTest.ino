@@ -48,6 +48,8 @@ uint8_t buf[7];
 
 RotaryKnobController encoder(ENCODER_PIN_A, ENCODER_PIN_B);
 
+
+
 DisplayController display;
 // SerLCD lcd;
 // char lcdText[33];
@@ -134,23 +136,7 @@ void loop()
         }
     }
 
-    display.stringSetRegion(0, 0, "L:");
-    display.stringSetRegion(0, 1, "R:");
-    // memcpy(lcdText + 0, "L:", 2);
-    // memcpy(lcdText + 16, "R:", 2);
-
-    display.intSetRegion(3, 0, payload.getControllerDriveLeft());
-    // itoa(payload.getControllerDriveLeft(), strInt, 10);
-    // memcpy(lcdText + 3, strInt, strlen(strInt));
-
-    display.intSetRegion(3, 1, payload.getControllerDriveRight());
-    // itoa(payload.getControllerDriveRight(), strInt, 10);
-    // memcpy(lcdText + 19, strInt, strlen(strInt));
-
-    display.intSetRegion(8, 0, (100 + (time * 10)));
-    // itoa((100 + (time * 10)), strInt, 10);
-    // memcpy(lcdText + 8, strInt, strlen(strInt));
-    // lcd.print(lcdText);
+    
 
     payload.buildTransmission(buf, 7);
 
@@ -175,7 +161,6 @@ void loop()
 
     // lcd.print(lcdText);
     display.print();
-    delay(50);
 }
 
 void onPinActivated(int pinNr)

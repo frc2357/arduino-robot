@@ -1,11 +1,14 @@
 #include "HumanControls.h"
 #include "Utils.h"
 
-Utils::ControllerStatus HumanControls::status = Utils::ControllerStatus::DISABLED;
-Utils::ControllerStatus HumanControls::lastStatus = Utils::ControllerStatus::DISABLED;
+const uint8_t HumanControls::STATUS_DISABLED = 0;
+const uint8_t HumanControls::STATUS_ENABLED = 1;
+const uint8_t HumanControls::STATUS_PRIMED = 3;
+uint8_t HumanControls::status = HumanControls::STATUS_DISABLED;
+uint8_t HumanControls::lastStatus = HumanControls::STATUS_DISABLED;
 
-HumanControls::HumanControls(TShirtCannonPayload &payload, unsigned int encoderPinA,
-                             unsigned int encoderPinB,
+HumanControls::HumanControls(TShirtCannonPayload &payload, unsigned int encoderPinClk,
+                             unsigned int encoderPinDt,
                              unsigned int angleIncrement,
                              unsigned int angleMin,
                              unsigned int angleMax,
@@ -27,8 +30,7 @@ HumanControls::HumanControls(TShirtCannonPayload &payload, unsigned int encoderP
                              unsigned int joystickPinVRY,
                              unsigned int yDeadZoneSize)
     : m_payload(payload),
-      m_menuController(encoderPinA, encoderPinB,
-                       angleIncrement, angleMin, angleMax, pressureIncrement, pressureMin,
+      m_menuController(encoderPinClk, encoderPinDt, angleIncrement, angleMin, angleMax, pressureIncrement, pressureMin,
                        pressureMax, durationIncrement, durationMin, durationMax, hangTimerDuration),
       m_pinDebouncer(numButtons), m_enableController(), m_fireController(),
       m_leftStick(joystickPinVRX, xDeadZoneSize, joystickMax),
@@ -61,7 +63,7 @@ void HumanControls::update()
 
     this->setStatus();
 
-    m_menuController.menuUpdate(m_payload, status == Utils::ControllerStatus::ENABLED);
+    m_menuController.menuUpdate(m_payload, status == HumanControls::STATUS_ENABLED);
     m_pinDebouncer.update();
 
     m_rightStick.update();
@@ -73,12 +75,12 @@ void HumanControls::update()
 
     Utils::setMotors(m_payload, turn, speed);
 
-    // Serial.print("DriveLeft: ");
-    // Serial.println(m_payload.getControllerDriveLeft());
-    // Serial.print("DriveRight: ");
-    // Serial.println(m_payload.getControllerDriveRight());
+    Serial.print("DriveLeft: ");
+    Serial.println(m_payload.getControllerDriveLeft());
+    Serial.print("DriveRight: ");
+    Serial.println(m_payload.getControllerDriveRight());
 
-    // Serial.println("vel: " + String(m_rightStick.getResult()));
+    Serial.println("vel: " + String(m_rightStick.getResult()));
     // Serial.println("turn: " + String(m_leftStick.getResult()));
 }
 
@@ -98,31 +100,31 @@ void HumanControls::setStatus()
             {
                 if (m_fireController.getIsPrimed())
                 {
-                    status = Utils::ControllerStatus::PRIMED;
+                    status = HumanControls::STATUS_PRIMED;
                 }
                 else
                 {
-                    status = Utils::ControllerStatus::ENABLED;
+                    status = HumanControls::STATUS_ENABLED;
                 }
             }
             else
             {
-                status = Utils::ControllerStatus::DISABLED;
+                status = HumanControls::STATUS_DISABLED;
             }
         }
         else
         {
-            status = Utils::ControllerStatus::DISABLED;
+            status = HumanControls::STATUS_DISABLED;
         }
     }
     else
     {
-        status = Utils::ControllerStatus::DISABLED;
+        status = HumanControls::STATUS_DISABLED;
     }
 
     if (status != lastStatus)
     {
-        // Serial.println(status);
+        Serial.println(status);
         lastStatus = status;
         m_payload.setStatus(status);
         m_menuController.menuRefresh(m_payload);
@@ -134,13 +136,17 @@ void HumanControls::setStatus()
 // Methods for debouncer
 void HumanControls::onPinActivated(int pinNr)
 {
-    if (pinNr == m_enablePin)
+    if (pinNr == m_encoderPinSW)
+    {
+        m_menuController.menuPress(m_payload, (status == HumanControls::STATUS_ENABLED));
+    }
+    else if (pinNr == m_enablePin)
     {
         m_enableController.setIsEnabled(true);
     }
     else if (pinNr == m_primePin)
     {
-        if (status == Utils::ControllerStatus::ENABLED)
+        if (status == HumanControls::STATUS_ENABLED)
         {
             m_fireController.setIsPrimed(true);
         }
@@ -151,7 +157,7 @@ void HumanControls::onPinActivated(int pinNr)
     }
     else if (pinNr == m_firePin)
     {
-        if (HumanControls::status == Utils::ControllerStatus::PRIMED && m_isConnected)
+        if (HumanControls::status == HumanControls::STATUS_PRIMED && m_isConnected)
         {
             m_fireController.initiateFiring(true);
             m_fireController.setIsPrimed(false);
@@ -161,15 +167,10 @@ void HumanControls::onPinActivated(int pinNr)
 
 void HumanControls::onPinDeactivated(int pinNr)
 {
-  
     if (pinNr == m_enablePin)
     {
         m_enableController.setIsEnabled(false);
         m_fireController.setIsPrimed(false);
-    }
-    else if (pinNr == m_encoderPinSW)
-    {
-        m_menuController.menuPress(m_payload, (status == Utils::ControllerStatus::ENABLED));
     }
 }
 
@@ -187,8 +188,8 @@ void HumanControls::setError(const char *format, ...)
     vsprintf(message, format, args);
     va_end(args);
 
-    status = Utils::ControllerStatus::DISABLED;
-    m_payload.setStatus(Utils::ControllerStatus::DISABLED);
+    status = HumanControls::STATUS_DISABLED;
+    m_payload.setStatus(HumanControls::STATUS_DISABLED);
 
     Serial.print("ERROR: ");
     Serial.println(message);

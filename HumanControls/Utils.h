@@ -6,7 +6,13 @@
 class Utils
 {
 public:
-    static void setMotors(TShirtCannonPayload &payload, float x, float y);
+  enum ControllerStatus
+  {
+    DISABLED = 0,
+    ENABLED = 1,
+    PRIMED = 2
+  };
+  static void setMotors(TShirtCannonPayload &payload, float x, float y);
 };
 
 #endif
