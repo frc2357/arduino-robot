@@ -4,7 +4,8 @@
 Utils::ControllerStatus HumanControls::status = Utils::ControllerStatus::DISABLED;
 Utils::ControllerStatus HumanControls::lastStatus = Utils::ControllerStatus::DISABLED;
 
-HumanControls::HumanControls(TShirtCannonPayload &payload, unsigned int encoderPinA,
+HumanControls::HumanControls(TShirtCannonPayload &payload, LinkedList &messageQueue, 
+                             unsigned int encoderPinA,
                              unsigned int encoderPinB,
                              unsigned int angleIncrement,
                              unsigned int angleMin,
@@ -25,25 +26,36 @@ HumanControls::HumanControls(TShirtCannonPayload &payload, unsigned int encoderP
                              unsigned int xDeadZoneSize,
                              unsigned int joystickMax,
                              unsigned int joystickPinVRY,
-                             unsigned int yDeadZoneSize)
+                             unsigned int yDeadZoneSize,
+                             unsigned int rfm95_cs,
+                             unsigned int rfm95_int,
+                             unsigned int rfm95_freq,
+                             unsigned int rfm95_txPower)
     : m_payload(payload),
       m_menuController(encoderPinA, encoderPinB,
                        angleIncrement, angleMin, angleMax, pressureIncrement, pressureMin,
                        pressureMax, durationIncrement, durationMin, durationMax, hangTimerDuration),
       m_pinDebouncer(numButtons), m_enableController(), m_fireController(),
       m_leftStick(joystickPinVRX, xDeadZoneSize, joystickMax),
-      m_rightStick(joystickPinVRY, yDeadZoneSize, joystickMax)
+      m_rightStick(joystickPinVRY, yDeadZoneSize, joystickMax), 
+      m_messageQueue(messageQueue),
+      m_commDriver(messageQueue, rfm95_freq, rfm95_txPower, rfm95_cs, rfm95_int)
 {
     this->m_encoderPinSW = encoderPinSW;
     this->m_enablePin = enablePin;
     this->m_primePin = primePin;
     this->m_firePin = firePin;
+
+    this->m_rfm95Freq = rfm95_freq;
+    this->m_rfm95TxPower = rfm95_txPower;
+    // this->m_messageQueue = messageQueue;
+
     this->m_isConnected = false;
 }
 
-void HumanControls::init(unsigned int downArrow, unsigned int upArrow)
+void HumanControls::init()
 {
-    connect();
+  Serial.println("HumanControls::init()");
     m_pinDebouncer.addPin(this->m_encoderPinSW, HIGH, INPUT_PULLUP);
     m_pinDebouncer.addPin(this->m_enablePin, HIGH, INPUT_PULLUP);
     m_pinDebouncer.addPin(this->m_primePin, HIGH, INPUT_PULLUP);
@@ -54,8 +66,10 @@ void HumanControls::init(unsigned int downArrow, unsigned int upArrow)
 
 void HumanControls::update()
 {
-    if (m_isConnected == false)
+    // Serial.println(m_isConnected);
+    // if (!m_isConnected)
     {
+        Serial.println("Connecting...");
         this->connect();
     }
 
@@ -72,14 +86,6 @@ void HumanControls::update()
     speed = m_leftStick.getResult();
 
     Utils::setMotors(m_payload, turn, speed);
-
-    // Serial.print("DriveLeft: ");
-    // Serial.println(m_payload.getControllerDriveLeft());
-    // Serial.print("DriveRight: ");
-    // Serial.println(m_payload.getControllerDriveRight());
-
-    // Serial.println("vel: " + String(m_rightStick.getResult()));
-    // Serial.println("turn: " + String(m_leftStick.getResult()));
 }
 
 void HumanControls::setStatus()
@@ -131,6 +137,44 @@ void HumanControls::setStatus()
     // Enventually will set the robot's status here
 }
 
+void HumanControls::connect()
+{
+    // Connect to the robot
+    // Serial.println("Connect");
+    // if (!m_rawDriver.init())
+    // {
+    //     Serial.println("Driver init failed");
+    //     return;
+    // }
+    // Serial.println("Driver init successful");
+
+    // if (!m_rawDriver.setFrequency(m_rfm95Freq))
+    // {
+    //     Serial.println("Could not set driver frequency");
+    //     return;
+    // }
+
+    // m_rawDriver.setTxPower(m_rfm95TxPower, false);
+    // Serial.println("Driver transmission power set");
+
+    this->m_isConnected = true;
+}
+
+void HumanControls::setError(const char *format, ...)
+{
+    va_list args;
+    char message[32];
+    va_start(args, format);
+    vsprintf(message, format, args);
+    va_end(args);
+
+    status = Utils::ControllerStatus::DISABLED;
+    m_payload.setStatus(Utils::ControllerStatus::DISABLED);
+
+    Serial.print("ERROR: ");
+    Serial.println(message);
+}
+
 // Methods for debouncer
 void HumanControls::onPinActivated(int pinNr)
 {
@@ -161,7 +205,7 @@ void HumanControls::onPinActivated(int pinNr)
 
 void HumanControls::onPinDeactivated(int pinNr)
 {
-  
+
     if (pinNr == m_enablePin)
     {
         m_enableController.setIsEnabled(false);
@@ -171,25 +215,4 @@ void HumanControls::onPinDeactivated(int pinNr)
     {
         m_menuController.menuPress(m_payload, (status == Utils::ControllerStatus::ENABLED));
     }
-}
-
-void HumanControls::connect()
-{
-    // Connect to the robot
-    this->m_isConnected = true;
-}
-
-void HumanControls::setError(const char *format, ...)
-{
-    va_list args;
-    char message[32];
-    va_start(args, format);
-    vsprintf(message, format, args);
-    va_end(args);
-
-    status = Utils::ControllerStatus::DISABLED;
-    m_payload.setStatus(Utils::ControllerStatus::DISABLED);
-
-    Serial.print("ERROR: ");
-    Serial.println(message);
 }

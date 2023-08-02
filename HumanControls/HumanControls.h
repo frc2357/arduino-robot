@@ -8,12 +8,15 @@
 #include "EnableController.h"
 #include "FireController.h"
 #include "JoystickAxis.h"
+#include "RFM95C.h"
 #include "Utils.h"
+#include "LinkedList.h"
+#include "CommunicationDriver.h"
 
 class HumanControls
 {
 public:
-    HumanControls(TShirtCannonPayload &payload,
+    HumanControls(TShirtCannonPayload &payload, LinkedList &messageQueue,
                   unsigned int encoderPinA,
                   unsigned int encoderPinB,
                   unsigned int angleIncrement,
@@ -35,8 +38,12 @@ public:
                   unsigned int xDeadZoneSize,
                   unsigned int joystickMax,
                   unsigned int joystickPinVRY,
-                  unsigned int yDeadZoneSize);
-    void init(unsigned int downArrow, unsigned int upArrow);
+                  unsigned int yDeadZoneSize,
+                  unsigned int rfm95_cs,
+                  unsigned int rfm95_int,
+                  unsigned int rfm95_freq,
+                  unsigned int rfm95_txPower);
+    void init();
     void update();
     void setStatus();
     void onPinActivated(int pinNr);
@@ -52,6 +59,10 @@ private:
     bool m_isConnected;
     static Utils::ControllerStatus lastStatus;
 
+    // RFM_95C m_rawDriver;
+    CommunicationDriver m_commDriver;
+    int m_rfm95Freq, m_rfm95TxPower;
+
     TShirtCannonPayload &m_payload;
 
     MenuController m_menuController;
@@ -59,6 +70,7 @@ private:
     EnableController m_enableController;
     FireController m_fireController;
     JoystickAxis m_leftStick, m_rightStick;
+    LinkedList m_messageQueue;
 };
 
 #endif

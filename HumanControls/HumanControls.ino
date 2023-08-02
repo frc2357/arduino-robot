@@ -9,6 +9,7 @@
 #include "FireController.h"
 #include "HumanControls.h"
 #include "TShirtCannonPayload.h"
+#include "LinkedList.h"
 
 // Version
 #define SOFTWARE_VERSION 1
@@ -24,6 +25,9 @@
 #define FIRE_PIN 12        // Digital Pin for the fire button
 #define I2C_SDA 20         // I2C used by LCD
 #define I2C_SCL 21         // I2C used by LCD
+#define RFM95_CS 8
+#define RFM95_INT 3
+
 
 // Other constraints
 #define DISPLAY_ADDRESS 0X27      // I2c address of the lcd display
@@ -32,10 +36,11 @@
 #define NUM_BUTTONS 3             // Number of buttons to give the debouncer
 #define HANG_TIMER_DURATION 10000 // Amount in milliseconds to stay on a page before going to dash
 #define USB_BAUDRATE 115200
-#define DOWN_ARROW 0              // Custom char code for down arrow
-#define UP_ARROW 1                // Custom char code for up arrow
 #define ROBOT_BATTERY_CHAR 2      // Custom char code for robot battery bar
 #define CONTROLLER_BATTERY_CHAR 3 // Custom char code for controller battery bar
+#define RFM95_FREQ 915.0
+#define RFM95_TX_POWER 23
+#define LINKED_LIST_MAX_SIZE 128
 
 // Min - Max
 #define ANGLE_INCREMENT 1     // Increment amount for elevator angle
@@ -55,17 +60,18 @@
 
 // Create payload object
 TShirtCannonPayload payload;
+LinkedList messageQueue(LINKED_LIST_MAX_SIZE);
 
-HumanControls humanControls(payload, ENCODER_PIN_A, ENCODER_PIN_B, ANGLE_INCREMENT, ANGLE_MIN, ANGLE_MAX,
+HumanControls humanControls(payload, messageQueue, ENCODER_PIN_A, ENCODER_PIN_B, ANGLE_INCREMENT, ANGLE_MIN, ANGLE_MAX,
                             PRESSURE_INCREMENT, PRESSURE_MIN, PRESSURE_MAX, DURATION_INCREMENT, DURATION_MIN,
                             DURATION_MAX, HANG_TIMER_DURATION, NUM_BUTTONS, ENCODER_PIN_SW, ENABLE_PIN, 
                             PRIME_PIN, FIRE_PIN, JOYSTICK_PIN_VRX, X_DEAD_ZONE_SIZE, JOYSTICK_MAX,
-                            JOYSTICK_PIN_VRY, Y_DEAD_ZONE_SIZE);
+                            JOYSTICK_PIN_VRY, Y_DEAD_ZONE_SIZE, RFM95_CS, RFM95_INT, RFM95_FREQ, RFM95_TX_POWER);
 
 void setup()
 {
     Serial.begin(USB_BAUDRATE);
-    humanControls.init(DOWN_ARROW, UP_ARROW);
+    humanControls.init();
 }
 
 void loop()
