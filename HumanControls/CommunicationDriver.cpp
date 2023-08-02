@@ -1,7 +1,7 @@
 #include "CommunicationDriver.h"
 
-CommunicationDriver::CommunicationDriver(LinkedList &messageQueue, int freq, int txPower, uint8_t rfm95_cs, uint8_t rfm95_int)
-        : m_driver(rfm95_cs, rfm95_int), m_messageQueue(messageQueue)
+CommunicationDriver::CommunicationDriver(TShirtCannonPayload &payload, LinkedList &messageQueue, int freq, int txPower, uint8_t rfm95_cs, uint8_t rfm95_int)
+        : m_driver(rfm95_cs, rfm95_int), m_messageQueue(messageQueue), m_payload(payload)
 {
     this->m_rfm95Freq = freq;
     this->m_rfm95TxPower = txPower;
@@ -24,4 +24,10 @@ void CommunicationDriver::connect()
     m_driver.setTxPower(m_rfm95TxPower, false);
 
     this->m_isConnected = true;
+}
+
+void CommunicationDriver::sendNextMessage() 
+{
+  uint8_t* data = m_messageQueue.pull();
+  m_driver.send(data, sizeof(data));
 }

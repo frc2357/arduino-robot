@@ -8,8 +8,8 @@ class LinkedList
   public:
     LinkedList(int maxSize);
 
-    void push(uint8_t data);
-    uint8_t pull();
+    void push(uint8_t* data);
+    uint8_t* pull();
 
   private:
     int m_maxSize;
@@ -17,7 +17,7 @@ class LinkedList
 
     struct Node
     {
-      uint8_t data;
+      uint8_t* data;
       struct Node** next;
       struct Node** prev;
     };

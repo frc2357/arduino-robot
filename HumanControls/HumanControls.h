@@ -38,11 +38,7 @@ public:
                   unsigned int xDeadZoneSize,
                   unsigned int joystickMax,
                   unsigned int joystickPinVRY,
-                  unsigned int yDeadZoneSize,
-                  unsigned int rfm95_cs,
-                  unsigned int rfm95_int,
-                  unsigned int rfm95_freq,
-                  unsigned int rfm95_txPower);
+                  unsigned int yDeadZoneSize);
     void init();
     void update();
     void setStatus();
@@ -59,10 +55,6 @@ private:
     bool m_isConnected;
     static Utils::ControllerStatus lastStatus;
 
-    // RFM_95C m_rawDriver;
-    CommunicationDriver m_commDriver;
-    int m_rfm95Freq, m_rfm95TxPower;
-
     TShirtCannonPayload &m_payload;
 
     MenuController m_menuController;
@@ -70,6 +62,8 @@ private:
     EnableController m_enableController;
     FireController m_fireController;
     JoystickAxis m_leftStick, m_rightStick;
+
+    uint8_t *m_messageBuffer;
     LinkedList m_messageQueue;
 };
 

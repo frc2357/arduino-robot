@@ -26,11 +26,7 @@ HumanControls::HumanControls(TShirtCannonPayload &payload, LinkedList &messageQu
                              unsigned int xDeadZoneSize,
                              unsigned int joystickMax,
                              unsigned int joystickPinVRY,
-                             unsigned int yDeadZoneSize,
-                             unsigned int rfm95_cs,
-                             unsigned int rfm95_int,
-                             unsigned int rfm95_freq,
-                             unsigned int rfm95_txPower)
+                             unsigned int yDeadZoneSize)
     : m_payload(payload),
       m_menuController(encoderPinA, encoderPinB,
                        angleIncrement, angleMin, angleMax, pressureIncrement, pressureMin,
@@ -38,17 +34,14 @@ HumanControls::HumanControls(TShirtCannonPayload &payload, LinkedList &messageQu
       m_pinDebouncer(numButtons), m_enableController(), m_fireController(),
       m_leftStick(joystickPinVRX, xDeadZoneSize, joystickMax),
       m_rightStick(joystickPinVRY, yDeadZoneSize, joystickMax), 
-      m_messageQueue(messageQueue),
-      m_commDriver(messageQueue, rfm95_freq, rfm95_txPower, rfm95_cs, rfm95_int)
+      m_messageQueue(messageQueue)
 {
     this->m_encoderPinSW = encoderPinSW;
     this->m_enablePin = enablePin;
     this->m_primePin = primePin;
     this->m_firePin = firePin;
 
-    this->m_rfm95Freq = rfm95_freq;
-    this->m_rfm95TxPower = rfm95_txPower;
-    // this->m_messageQueue = messageQueue;
+    this->m_messageQueue = messageQueue;
 
     this->m_isConnected = false;
 }
@@ -86,6 +79,9 @@ void HumanControls::update()
     speed = m_leftStick.getResult();
 
     Utils::setMotors(m_payload, turn, speed);
+
+    m_payload.buildTransmission(m_messageBuffer, 7);
+    m_messageQueue.push(m_messageBuffer);
 }
 
 void HumanControls::setStatus()
