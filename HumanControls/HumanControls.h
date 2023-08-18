@@ -16,7 +16,7 @@
 class HumanControls
 {
 public:
-    HumanControls(TShirtCannonPayload &payload, LinkedList &messageQueue, boolean &isConnected,
+    HumanControls(TShirtCannonPayload &payload, LinkedList &messageQueue,
                   unsigned int encoderPinA,
                   unsigned int encoderPinB,
                   unsigned int angleIncrement,
@@ -52,8 +52,6 @@ private:
 
     int m_encoderPinSW, m_enablePin, m_primePin, m_firePin;
     static Utils::ControllerStatus lastStatus;
-
-    boolean m_isConnected;
 
     TShirtCannonPayload &m_payload;
 

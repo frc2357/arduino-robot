@@ -45,7 +45,6 @@ MenuController::MenuController(unsigned int encoderPinA,
 
 void MenuController::init(TShirtCannonPayload &payload)
 {
-    Serial.println("Menu Init");
     this->m_display.init();
     payload.setFiringTime(this->m_valvePage.rangeFilter(payload.getFiringTime()));
     payload.setAngle(this->m_elevatorPage.rangeFilter(payload.getAngle()));
@@ -65,7 +64,6 @@ void MenuController::menuRefresh(TShirtCannonPayload &payload)
 void MenuController::menuUpdate(TShirtCannonPayload &payload, bool isEnabled)
 {
     this->m_rotation = this->m_rotaryKnob.getValue();
-    Serial.println(this->m_rotation);
     
     if (m_isActive && isEnabled)
     {

@@ -4,7 +4,7 @@
 Utils::ControllerStatus HumanControls::status = Utils::ControllerStatus::DISABLED;
 Utils::ControllerStatus HumanControls::lastStatus = Utils::ControllerStatus::DISABLED;
 
-HumanControls::HumanControls(TShirtCannonPayload &payload, LinkedList &messageQueue, boolean &isConnected, 
+HumanControls::HumanControls(TShirtCannonPayload &payload, LinkedList &messageQueue, 
                              unsigned int encoderPinA,
                              unsigned int encoderPinB,
                              unsigned int angleIncrement,
@@ -34,7 +34,7 @@ HumanControls::HumanControls(TShirtCannonPayload &payload, LinkedList &messageQu
       m_pinDebouncer(numButtons), m_enableController(), m_fireController(),
       m_leftStick(joystickPinVRX, xDeadZoneSize, joystickMax),
       m_rightStick(joystickPinVRY, yDeadZoneSize, joystickMax), 
-      m_messageQueue(messageQueue), m_isConnected(isConnected)
+      m_messageQueue(messageQueue)
 {
     this->m_encoderPinSW = encoderPinSW;
     this->m_enablePin = enablePin;
@@ -46,7 +46,6 @@ HumanControls::HumanControls(TShirtCannonPayload &payload, LinkedList &messageQu
 
 void HumanControls::init()
 {
-  Serial.println("HumanControls::init()");
     m_pinDebouncer.addPin(this->m_encoderPinSW, HIGH, INPUT_PULLUP);
     m_pinDebouncer.addPin(this->m_enablePin, HIGH, INPUT_PULLUP);
     m_pinDebouncer.addPin(this->m_primePin, HIGH, INPUT_PULLUP);
@@ -78,7 +77,7 @@ void HumanControls::update()
 void HumanControls::setStatus()
 {
 
-    if (this->m_isConnected)
+    if (m_payload.getStatus() != Utils::ControllerStatus::DISCONNECTED)
     {
         if (m_payload.getError() == 0)
         {
@@ -115,13 +114,10 @@ void HumanControls::setStatus()
 
     if (status != lastStatus)
     {
-        // Serial.println(status);
         lastStatus = status;
         m_payload.setStatus(status);
         m_menuController.menuRefresh(m_payload);
     }
-
-    // Enventually will set the robot's status here
 }
 
 void HumanControls::setError(const char *format, ...)
@@ -159,7 +155,7 @@ void HumanControls::onPinActivated(int pinNr)
     }
     else if (pinNr == m_firePin)
     {
-        if (HumanControls::status == Utils::ControllerStatus::PRIMED && this->m_isConnected)
+        if (HumanControls::status == Utils::ControllerStatus::PRIMED)
         {
             m_fireController.initiateFiring(true);
             m_fireController.setIsPrimed(false);

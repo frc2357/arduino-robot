@@ -15,8 +15,8 @@
 #define SOFTWARE_VERSION 1
 
 // Pins
-#define JOYSTICK_PIN_VRX 0 // Analog Pin for joystick x
-#define JOYSTICK_PIN_VRY 1 // Analog Pin for joystick y
+#define JOYSTICK_PIN_VRX A0 // Analog Pin for joystick x
+#define JOYSTICK_PIN_VRY A1 // Analog Pin for joystick y
 #define ENCODER_PIN_SW 13   // Gets the button for rotary knob
 #define ENCODER_PIN_A 5  // CLK gets degrees for rotary knob
 #define ENCODER_PIN_B 6   // DT gets direction for rotary knob
@@ -58,15 +58,12 @@
 #define JOYSTICK_MAX 1023    // Maximum joystick value that comes from the sensor
 #define Y_DEAD_ZONE_SIZE 100 // Total size of the y deadzone
 
-// Read by HumanControls, written to by CommunicationDriver
-boolean isConnected = false;
-
 // Create payload object
 TShirtCannonPayload payload;
 LinkedList messageQueue(LINKED_LIST_MAX_SIZE);
 
-CommunicationDriver commDriver(payload, messageQueue, isConnected, RFM95_FREQ, RFM95_TX_POWER, RFM95_CS, RFM95_INT);
-HumanControls humanControls(payload, messageQueue, isConnected, ENCODER_PIN_A, ENCODER_PIN_B, ANGLE_INCREMENT, ANGLE_MIN, ANGLE_MAX,
+CommunicationDriver commDriver(messageQueue, RFM95_FREQ, RFM95_TX_POWER, RFM95_CS, RFM95_INT);
+HumanControls humanControls(payload, messageQueue, ENCODER_PIN_A, ENCODER_PIN_B, ANGLE_INCREMENT, ANGLE_MIN, ANGLE_MAX,
                             PRESSURE_INCREMENT, PRESSURE_MIN, PRESSURE_MAX, DURATION_INCREMENT, DURATION_MIN,
                             DURATION_MAX, HANG_TIMER_DURATION, NUM_BUTTONS, ENCODER_PIN_SW, ENABLE_PIN, 
                             PRIME_PIN, FIRE_PIN, JOYSTICK_PIN_VRX, X_DEAD_ZONE_SIZE, JOYSTICK_MAX,
@@ -77,30 +74,30 @@ void setup()
 {
     Serial.begin(USB_BAUDRATE);
     humanControls.init();
-    Serial.println("Test");
 }
 
 void loop()
 {
     humanControls.update();
-    Serial.println(isConnected);
-    delay(1000);
 }
 
-// void setup1()
-// {
-//   Serial.println("Connecting...");
-// }
+void setup1()
+{
+}
 
-// void loop1()
-// {
-//   if (!isConnected) {
-//     commDriver.connect();
-//   } 
-//   Serial.println("Loop1");
-//   delay(5000);
-//   // commDriver.sendNextMessage();
-// }
+int i = 0;
+void loop1()
+{
+  if (payload.getStatus() == Utils::ControllerStatus::DISCONNECTED) {
+    commDriver.connect(payload);
+  }
+  // while (1)
+  // {
+  //   Serial.println(i++);
+  //   delay(100);
+  // }
+  // commDriver.sendNextMessage();
+}
 
 void onPinActivated(int pinNr)
 {

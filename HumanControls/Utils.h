@@ -8,9 +8,10 @@ class Utils
 public:
   enum ControllerStatus
   {
-    DISABLED = 0,
-    ENABLED = 1,
-    PRIMED = 2
+    DISCONNECTED = 0,
+    DISABLED = 1,
+    ENABLED = 2,
+    PRIMED = 3
   };
   static void setMotors(TShirtCannonPayload &payload, float x, float y);
 };

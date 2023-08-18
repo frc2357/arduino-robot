@@ -23,7 +23,6 @@ void DashPage::paint(DisplayController &display, bool isActivated, TShirtCannonP
         {
             display.stringSetRegion(0, 0, "Status:");
             display.intSetRegion(7, 0, payload.getStatus());
-            // Serial.println("Status: " + payload.getStatus());
         }
 
         display.stringSetRegion(9, 0, "R:");
