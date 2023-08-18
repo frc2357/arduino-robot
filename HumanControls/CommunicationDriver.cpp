@@ -9,8 +9,10 @@ CommunicationDriver::CommunicationDriver(LinkedList &messageQueue, int freq, int
 
 void CommunicationDriver::connect(TShirtCannonPayload &payload)
 {
+    // Uncomment following lines if testing controller without cannon
     // if (payload.getStatus() == Utils::ControllerStatus::DISCONNECTED) {
     //   payload.setStatus(Utils::ControllerStatus::DISABLED);
+    //   return;
     // }
 
     if (!m_driver.init())

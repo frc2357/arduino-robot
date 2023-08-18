@@ -34,7 +34,7 @@
 #define DISPLAY_LENGTH 16         // Length of the lcd display
 #define DISPLAY_WIDTH 2           // width of the lcd display
 #define NUM_BUTTONS 3             // Number of buttons to give the debouncer
-#define HANG_TIMER_DURATION 10000 // Amount in milliseconds to stay on a page before going to dash
+#define HANG_TIMER_DURATION 20000 // Amount in milliseconds to stay on a page before going to dash
 #define USB_BAUDRATE 115200
 #define ROBOT_BATTERY_CHAR 2      // Custom char code for robot battery bar
 #define CONTROLLER_BATTERY_CHAR 3 // Custom char code for controller battery bar
@@ -83,20 +83,12 @@ void loop()
 
 void setup1()
 {
+    commDriver.connect(payload);
 }
 
-int i = 0;
 void loop1()
 {
-  if (payload.getStatus() == Utils::ControllerStatus::DISCONNECTED) {
-    commDriver.connect(payload);
-  }
-  // while (1)
-  // {
-  //   Serial.println(i++);
-  //   delay(100);
-  // }
-  // commDriver.sendNextMessage();
+  commDriver.sendNextMessage();
 }
 
 void onPinActivated(int pinNr)
