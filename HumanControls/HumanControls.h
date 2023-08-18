@@ -16,7 +16,7 @@
 class HumanControls
 {
 public:
-    HumanControls(TShirtCannonPayload &payload, LinkedList &messageQueue,
+    HumanControls(TShirtCannonPayload &payload, LinkedList &messageQueue, boolean &isConnected,
                   unsigned int encoderPinA,
                   unsigned int encoderPinB,
                   unsigned int angleIncrement,
@@ -44,7 +44,6 @@ public:
     void setStatus();
     void onPinActivated(int pinNr);
     void onPinDeactivated(int pinNr);
-    void connect();
 
     static Utils::ControllerStatus status;
 
@@ -52,8 +51,9 @@ private:
     void setError(const char *format, ...);
 
     int m_encoderPinSW, m_enablePin, m_primePin, m_firePin;
-    bool m_isConnected;
     static Utils::ControllerStatus lastStatus;
+
+    boolean m_isConnected;
 
     TShirtCannonPayload &m_payload;
 

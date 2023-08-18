@@ -8,7 +8,7 @@
 class CommunicationDriver
 {
 public:
-  CommunicationDriver(TShirtCannonPayload &payload, LinkedList &messageQueue, int freq, int txPower, uint8_t rfm95_cs, uint8_t rfm95_int);
+  CommunicationDriver(TShirtCannonPayload &payload, LinkedList &messageQueue, boolean &isConnected, int freq, int txPower, uint8_t rfm95_cs, uint8_t rfm95_int);
   void connect();
   void sendNextMessage();
 

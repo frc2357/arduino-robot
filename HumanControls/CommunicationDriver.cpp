@@ -1,7 +1,7 @@
 #include "CommunicationDriver.h"
 
-CommunicationDriver::CommunicationDriver(TShirtCannonPayload &payload, LinkedList &messageQueue, int freq, int txPower, uint8_t rfm95_cs, uint8_t rfm95_int)
-        : m_driver(rfm95_cs, rfm95_int), m_messageQueue(messageQueue), m_payload(payload)
+CommunicationDriver::CommunicationDriver(TShirtCannonPayload &payload, LinkedList &messageQueue, boolean &isConnected, int freq, int txPower, uint8_t rfm95_cs, uint8_t rfm95_int)
+        : m_driver(rfm95_cs, rfm95_int), m_messageQueue(messageQueue), m_payload(payload), m_isConnected(isConnected)
 {
     this->m_rfm95Freq = freq;
     this->m_rfm95TxPower = txPower;

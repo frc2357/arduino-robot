@@ -4,7 +4,7 @@
 Utils::ControllerStatus HumanControls::status = Utils::ControllerStatus::DISABLED;
 Utils::ControllerStatus HumanControls::lastStatus = Utils::ControllerStatus::DISABLED;
 
-HumanControls::HumanControls(TShirtCannonPayload &payload, LinkedList &messageQueue, 
+HumanControls::HumanControls(TShirtCannonPayload &payload, LinkedList &messageQueue, boolean &isConnected, 
                              unsigned int encoderPinA,
                              unsigned int encoderPinB,
                              unsigned int angleIncrement,
@@ -34,7 +34,7 @@ HumanControls::HumanControls(TShirtCannonPayload &payload, LinkedList &messageQu
       m_pinDebouncer(numButtons), m_enableController(), m_fireController(),
       m_leftStick(joystickPinVRX, xDeadZoneSize, joystickMax),
       m_rightStick(joystickPinVRY, yDeadZoneSize, joystickMax), 
-      m_messageQueue(messageQueue)
+      m_messageQueue(messageQueue), m_isConnected(isConnected)
 {
     this->m_encoderPinSW = encoderPinSW;
     this->m_enablePin = enablePin;
@@ -42,8 +42,6 @@ HumanControls::HumanControls(TShirtCannonPayload &payload, LinkedList &messageQu
     this->m_firePin = firePin;
 
     this->m_messageQueue = messageQueue;
-
-    this->m_isConnected = false;
 }
 
 void HumanControls::init()
@@ -59,13 +57,6 @@ void HumanControls::init()
 
 void HumanControls::update()
 {
-    // Serial.println(m_isConnected);
-    // if (!m_isConnected)
-    {
-        Serial.println("Connecting...");
-        this->connect();
-    }
-
     this->setStatus();
 
     m_menuController.menuUpdate(m_payload, status == Utils::ControllerStatus::ENABLED);
@@ -133,29 +124,6 @@ void HumanControls::setStatus()
     // Enventually will set the robot's status here
 }
 
-void HumanControls::connect()
-{
-    // Connect to the robot
-    // Serial.println("Connect");
-    // if (!m_rawDriver.init())
-    // {
-    //     Serial.println("Driver init failed");
-    //     return;
-    // }
-    // Serial.println("Driver init successful");
-
-    // if (!m_rawDriver.setFrequency(m_rfm95Freq))
-    // {
-    //     Serial.println("Could not set driver frequency");
-    //     return;
-    // }
-
-    // m_rawDriver.setTxPower(m_rfm95TxPower, false);
-    // Serial.println("Driver transmission power set");
-
-    this->m_isConnected = true;
-}
-
 void HumanControls::setError(const char *format, ...)
 {
     va_list args;
@@ -191,7 +159,7 @@ void HumanControls::onPinActivated(int pinNr)
     }
     else if (pinNr == m_firePin)
     {
-        if (HumanControls::status == Utils::ControllerStatus::PRIMED && m_isConnected)
+        if (HumanControls::status == Utils::ControllerStatus::PRIMED && this->m_isConnected)
         {
             m_fireController.initiateFiring(true);
             m_fireController.setIsPrimed(false);
