@@ -25,8 +25,9 @@
 #define FIRE_PIN 12        // Digital Pin for the fire button
 #define I2C_SDA 20         // I2C used by LCD
 #define I2C_SCL 21         // I2C used by LCD
-#define RFM95_CS 8
-#define RFM95_INT 3
+#define RFM95_CS PIN_RFM_CS
+#define RFM95_INT PIN_RFM_DIO0
+#define RFM95_RST PIN_RFM_RST
 
 
 // Other constraints
@@ -62,7 +63,7 @@
 TShirtCannonPayload payload;
 LinkedList messageQueue(LINKED_LIST_MAX_SIZE);
 
-CommunicationDriver commDriver(messageQueue, RFM95_FREQ, RFM95_TX_POWER, RFM95_CS, RFM95_INT);
+CommunicationDriver commDriver(messageQueue, RFM95_FREQ, RFM95_TX_POWER, RFM95_CS, RFM95_INT, RFM95_RST);
 HumanControls humanControls(payload, messageQueue, ENCODER_PIN_A, ENCODER_PIN_B, ANGLE_INCREMENT, ANGLE_MIN, ANGLE_MAX,
                             PRESSURE_INCREMENT, PRESSURE_MIN, PRESSURE_MAX, DURATION_INCREMENT, DURATION_MIN,
                             DURATION_MAX, HANG_TIMER_DURATION, NUM_BUTTONS, ENCODER_PIN_SW, ENABLE_PIN, 
@@ -73,22 +74,23 @@ HumanControls humanControls(payload, messageQueue, ENCODER_PIN_A, ENCODER_PIN_B,
 void setup()
 {
     Serial.begin(USB_BAUDRATE);
-    humanControls.init();
+    commDriver.connect(payload);
 }
 
 void loop()
 {
-    humanControls.update();
+  commDriver.sendNextMessage(payload);
 }
 
 void setup1()
 {
-    commDriver.connect(payload);
+    humanControls.init();
 }
 
 void loop1()
 {
-  commDriver.sendNextMessage();
+    humanControls.update();
+    delay(10);
 }
 
 void onPinActivated(int pinNr)
