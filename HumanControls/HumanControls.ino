@@ -9,7 +9,6 @@
 #include "FireController.h"
 #include "HumanControls.h"
 #include "TShirtCannonPayload.h"
-#include "LinkedList.h"
 
 // Version
 #define SOFTWARE_VERSION 1
@@ -18,17 +17,16 @@
 #define JOYSTICK_PIN_VRX A0 // Analog Pin for joystick x
 #define JOYSTICK_PIN_VRY A1 // Analog Pin for joystick y
 #define ENCODER_PIN_SW 13   // Gets the button for rotary knob
-#define ENCODER_PIN_A 5  // CLK gets degrees for rotary knob
-#define ENCODER_PIN_B 6   // DT gets direction for rotary knob
-#define ENABLE_PIN 10      // Digital Pin for the enable button
-#define PRIME_PIN 11       // Digital Pin for prime button
-#define FIRE_PIN 12        // Digital Pin for the fire button
-#define I2C_SDA 20         // I2C used by LCD
-#define I2C_SCL 21         // I2C used by LCD
+#define ENCODER_PIN_A 5     // CLK gets degrees for rotary knob
+#define ENCODER_PIN_B 6     // DT gets direction for rotary knob
+#define ENABLE_PIN 10       // Digital Pin for the enable button
+#define PRIME_PIN 11        // Digital Pin for prime button
+#define FIRE_PIN 12         // Digital Pin for the fire button
+#define I2C_SDA 20          // I2C used by LCD
+#define I2C_SCL 21          // I2C used by LCD
 #define RFM95_CS PIN_RFM_CS
 #define RFM95_INT PIN_RFM_DIO0
 #define RFM95_RST PIN_RFM_RST
-
 
 // Other constraints
 #define DISPLAY_ADDRESS 0X27      // I2c address of the lcd display
@@ -41,7 +39,9 @@
 #define CONTROLLER_BATTERY_CHAR 3 // Custom char code for controller battery bar
 #define RFM95_FREQ 915.0
 #define RFM95_TX_POWER 23
-#define LINKED_LIST_MAX_SIZE 128
+#define PAYLOAD_LENGTH 7
+#define WAIT_FOR_CONTROLS_DATA_DELAY_MILLIS 5
+#define WAIT_FOR_ROBOT_MESSAGE_DELAY_MILLIS 5
 
 // Min - Max
 #define ANGLE_INCREMENT 1     // Increment amount for elevator angle
@@ -59,46 +59,91 @@
 #define JOYSTICK_MAX 1023    // Maximum joystick value that comes from the sensor
 #define Y_DEAD_ZONE_SIZE 100 // Total size of the y deadzone
 
+// Global communication variables
+boolean hasRobotMessage = false;
+boolean hasRobotDataChanged = false;
+boolean hasControllerMessage = false;
+boolean hasControllerDataChanged = false;
+
+uint8_t currentControllerMessage[7];
+uint8_t lastControllerMessage[7];
+uint8_t currentRobotMessage[7];
+uint8_t lastRobotMessage[7];
+
 // Create payload object
 TShirtCannonPayload payload;
-LinkedList messageQueue(LINKED_LIST_MAX_SIZE);
 
-CommunicationDriver commDriver(messageQueue, RFM95_FREQ, RFM95_TX_POWER, RFM95_CS, RFM95_INT, RFM95_RST);
-HumanControls humanControls(payload, messageQueue, ENCODER_PIN_A, ENCODER_PIN_B, ANGLE_INCREMENT, ANGLE_MIN, ANGLE_MAX,
+CommunicationDriver commDriver(RFM95_FREQ, RFM95_TX_POWER, PAYLOAD_LENGTH, RFM95_CS, RFM95_INT, RFM95_RST);
+HumanControls humanControls(payload, ENCODER_PIN_A, ENCODER_PIN_B, ANGLE_INCREMENT, ANGLE_MIN, ANGLE_MAX,
                             PRESSURE_INCREMENT, PRESSURE_MIN, PRESSURE_MAX, DURATION_INCREMENT, DURATION_MIN,
-                            DURATION_MAX, HANG_TIMER_DURATION, NUM_BUTTONS, ENCODER_PIN_SW, ENABLE_PIN, 
+                            DURATION_MAX, HANG_TIMER_DURATION, NUM_BUTTONS, ENCODER_PIN_SW, ENABLE_PIN,
                             PRIME_PIN, FIRE_PIN, JOYSTICK_PIN_VRX, X_DEAD_ZONE_SIZE, JOYSTICK_MAX,
                             JOYSTICK_PIN_VRY, Y_DEAD_ZONE_SIZE);
 
-
+// Comms core
 void setup()
 {
-    Serial.begin(USB_BAUDRATE);
-    commDriver.connect(payload);
+  Serial.begin(USB_BAUDRATE);
+  commDriver.connect(payload);
 }
 
 void loop()
 {
-  commDriver.sendNextMessage(payload);
+  if (hasControllerMessage)
+  {
+    commDriver.sendControllerMessage(currentControllerMessage);
+    hasControllerMessage = false;
+    delay(WAIT_FOR_CONTROLS_DATA_DELAY_MILLIS);
+  }
+  if (hasRobotMessage)
+  {
+    // TODO: log error. Control loop taking too long with robot message
+  }
+  delay(WAIT_FOR_ROBOT_MESSAGE_DELAY_MILLIS);
+  hasRobotMessage = commDriver.recvRobotMessage(currentRobotMessage);
 }
 
+// Controls core
 void setup1()
 {
-    humanControls.init();
+  humanControls.init();
 }
 
 void loop1()
 {
-    humanControls.update();
-    delay(10);
+  if (hasRobotMessage)
+  {
+    if (memcmp(currentRobotMessage, lastRobotMessage, PAYLOAD_LENGTH) != 0)
+    {
+      hasRobotDataChanged = true;
+    }
+    memcpy(lastRobotMessage, currentRobotMessage, PAYLOAD_LENGTH);
+    hasRobotMessage = false;
+    if (hasRobotDataChanged)
+    {
+      payload.readMessage(currentRobotMessage, PAYLOAD_LENGTH);
+      hasRobotDataChanged = false;
+    }
+  }
+  humanControls.update(currentControllerMessage);
+  if (!hasControllerMessage)
+  {
+    // memcmp is 1 when no data has changed because of messageIndex
+    if (memcmp(currentControllerMessage, lastControllerMessage, sizeof(currentControllerMessage)) != 1)
+    {
+      hasControllerMessage = true;
+      payload.setMessageIndex((payload.getMessageIndex() + 1) % 32);
+      memcpy(lastControllerMessage, currentControllerMessage, PAYLOAD_LENGTH);
+    }
+  }
 }
 
 void onPinActivated(int pinNr)
 {
-    humanControls.onPinActivated(pinNr);
+  humanControls.onPinActivated(pinNr);
 }
 
 void onPinDeactivated(int pinNr)
 {
-    humanControls.onPinDeactivated(pinNr);
+  humanControls.onPinDeactivated(pinNr);
 }

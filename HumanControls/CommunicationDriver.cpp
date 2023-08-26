@@ -1,7 +1,7 @@
 #include "CommunicationDriver.h"
 
-CommunicationDriver::CommunicationDriver(LinkedList &messageQueue, int freq, int txPower, uint8_t rfm95_cs, uint8_t rfm95_int, uint8_t rfm95_rst)
-        : m_driver(rfm95_cs, rfm95_int), m_messageQueue(messageQueue)
+CommunicationDriver::CommunicationDriver(int freq, int txPower, uint8_t payloadLength, uint8_t rfm95_cs, uint8_t rfm95_int, uint8_t rfm95_rst)
+        : m_driver(rfm95_cs, rfm95_int), m_payloadLength(payloadLength)
 {
     this->m_rfm95_rst = rfm95_rst;
     this->m_rfm95Freq = freq;
@@ -32,15 +32,12 @@ void CommunicationDriver::connect(TShirtCannonPayload &payload)
     }
 }
 
-void CommunicationDriver::sendNextMessage(TShirtCannonPayload &payload) 
+void CommunicationDriver::sendControllerMessage(uint8_t *message) 
 {
-  if (payload.getStatus() == Utils::ControllerStatus::DISCONNECTED) {
-    connect(payload);
-    return;
-  }
+  m_driver.send(message, m_payloadLength);
+}
 
-  // Serial.println("CommunicationDriver::sendNextMessage()");
-  // uint8_t* data = m_messageQueue.pull();
-  // Serial.println(*data);
-  // m_driver.send(data, sizeof(*data));
+boolean CommunicationDriver::recvRobotMessage(uint8_t *messageBuffer)
+{
+  return m_driver.recv(messageBuffer, &m_payloadLength);
 }

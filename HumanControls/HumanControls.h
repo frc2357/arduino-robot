@@ -10,13 +10,12 @@
 #include "JoystickAxis.h"
 #include "RFM95C.h"
 #include "Utils.h"
-#include "LinkedList.h"
 #include "CommunicationDriver.h"
 
 class HumanControls
 {
 public:
-    HumanControls(TShirtCannonPayload &payload, LinkedList &messageQueue,
+    HumanControls(TShirtCannonPayload &payload,
                   unsigned int encoderPinA,
                   unsigned int encoderPinB,
                   unsigned int angleIncrement,
@@ -40,7 +39,7 @@ public:
                   unsigned int joystickPinVRY,
                   unsigned int yDeadZoneSize);
     void init();
-    void update();
+    void update(uint8_t *messageBuffer);
     void setStatus();
     void onPinActivated(int pinNr);
     void onPinDeactivated(int pinNr);
@@ -60,9 +59,6 @@ private:
     EnableController m_enableController;
     FireController m_fireController;
     JoystickAxis m_leftStick, m_rightStick;
-
-    uint8_t *m_messageBuffer;
-    LinkedList m_messageQueue;
 };
 
 #endif

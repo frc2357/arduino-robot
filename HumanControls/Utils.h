@@ -11,7 +11,7 @@ public:
     DISCONNECTED = 0,
     DISABLED = 1,
     ENABLED = 2,
-    PRIMED = 3
+    PRIMED = 4
   };
   static void setMotors(TShirtCannonPayload &payload, float x, float y);
 };

@@ -4,7 +4,7 @@
 Utils::ControllerStatus HumanControls::status = Utils::ControllerStatus::DISABLED;
 Utils::ControllerStatus HumanControls::lastStatus = Utils::ControllerStatus::DISABLED;
 
-HumanControls::HumanControls(TShirtCannonPayload &payload, LinkedList &messageQueue,
+HumanControls::HumanControls(TShirtCannonPayload &payload,
                              unsigned int encoderPinA,
                              unsigned int encoderPinB,
                              unsigned int angleIncrement,
@@ -33,15 +33,12 @@ HumanControls::HumanControls(TShirtCannonPayload &payload, LinkedList &messageQu
                        pressureMax, durationIncrement, durationMin, durationMax, hangTimerDuration),
       m_pinDebouncer(numButtons), m_enableController(), m_fireController(),
       m_leftStick(joystickPinVRX, xDeadZoneSize, joystickMax),
-      m_rightStick(joystickPinVRY, yDeadZoneSize, joystickMax),
-      m_messageQueue(messageQueue)
+      m_rightStick(joystickPinVRY, yDeadZoneSize, joystickMax)
 {
     this->m_encoderPinSW = encoderPinSW;
     this->m_enablePin = enablePin;
     this->m_primePin = primePin;
     this->m_firePin = firePin;
-
-    this->m_messageQueue = messageQueue;
 }
 
 void HumanControls::init()
@@ -54,9 +51,8 @@ void HumanControls::init()
     m_menuController.init(m_payload);
 }
 
-void HumanControls::update()
+void HumanControls::update(uint8_t *messageBuffer)
 {
-    m_payload.setMessageIndex((m_payload.getMessageIndex() + 1) % 32);
     this->setStatus();
 
     m_menuController.menuUpdate(m_payload, status == Utils::ControllerStatus::ENABLED);
@@ -71,15 +67,7 @@ void HumanControls::update()
 
     Utils::setMotors(m_payload, turn, speed);
 
-    m_payload.buildTransmission(m_messageBuffer, 7);
-
-    // for (int i = 0; i < sizeof(m_messageBuffer); i++)
-    // {
-    //     Serial.print(m_messageBuffer[i], BIN);
-    // }
-    // Serial.println("\n--------");
-
-    m_messageQueue.push(m_messageBuffer);
+    m_payload.buildTransmission(messageBuffer, 7);
 }
 
 void HumanControls::setStatus()
