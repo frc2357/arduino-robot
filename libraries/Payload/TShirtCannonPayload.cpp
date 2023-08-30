@@ -43,7 +43,7 @@ bool TShirtCannonPayload::buildTransmission(uint8_t *transmission, const uint8_t
 
     int bitPos = 0;
     int elem = PAYLOAD_LENGTH_LAST_INDEX;
-    for (int i = DATA_LENGTH_LAST_INDEX; i > 0; i--)
+    for (int i = DATA_LENGTH_LAST_INDEX; i >= 0; i--)
     {
         uint8_t attrVal = data[i];
 
@@ -78,7 +78,7 @@ bool TShirtCannonPayload::readMessage(const uint8_t *message, const uint8_t len)
     int elem = PAYLOAD_LENGTH_LAST_INDEX;
 
     uint8_t attrVal = message[PAYLOAD_LENGTH_LAST_INDEX];
-    for (int i = DATA_LENGTH_LAST_INDEX; i > 0; i--)
+    for (int i = DATA_LENGTH_LAST_INDEX; i >= 0; i--)
     {
         for (int j = 0; j < getAttributeSize(static_cast<AttributeSize>(i)); j++)
         {

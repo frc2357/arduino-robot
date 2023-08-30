@@ -67,6 +67,8 @@ void HumanControls::update(uint8_t *messageBuffer)
 
     Utils::setMotors(m_payload, turn, speed);
 
+    // Message type for data from controller
+    m_payload.setMessageType(1);
     m_payload.buildTransmission(messageBuffer, 7);
 }
 
