@@ -32,8 +32,8 @@ HumanControls::HumanControls(TShirtCannonPayload &payload,
                        angleIncrement, angleMin, angleMax, pressureIncrement, pressureMin,
                        pressureMax, durationIncrement, durationMin, durationMax, hangTimerDuration),
       m_pinDebouncer(numButtons), m_enableController(), m_fireController(),
-      m_leftStick(joystickPinVRX, xDeadZoneSize, joystickMax),
-      m_rightStick(joystickPinVRY, yDeadZoneSize, joystickMax)
+      m_rightStick(joystickPinVRX, xDeadZoneSize, joystickMax),
+      m_leftStick(joystickPinVRY, yDeadZoneSize, joystickMax)
 {
     this->m_encoderPinSW = encoderPinSW;
     this->m_enablePin = enablePin;

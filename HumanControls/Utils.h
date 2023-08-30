@@ -13,7 +13,7 @@ public:
     ENABLED = 2,
     PRIMED = 4
   };
-  static void setMotors(TShirtCannonPayload &payload, float x, float y);
+  static void setMotors(TShirtCannonPayload &payload, float turn, float speed);
 };
 
 #endif
