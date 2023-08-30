@@ -157,6 +157,7 @@ void HumanControls::onPinActivated(int pinNr)
         {
             m_fireController.initiateFiring(true);
             m_fireController.setIsPrimed(false);
+            m_payload.setStatus(Utils::ControllerStatus::FIRING);
         }
     }
 }
