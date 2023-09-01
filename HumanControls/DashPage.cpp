@@ -37,7 +37,7 @@ void DashPage::paint(DisplayController &display, bool isActivated, TShirtCannonP
         display.intSetRegion(7, 1, payload.getFiringPressure());
 
         display.stringSetRegion(11, 1, "D:");
-        display.intSetRegion(13, 1, payload.getFiringTime());
+        display.intSetRegion(13, 1, (payload.getFiringTime() * 10) + 100);
     }
 }
 

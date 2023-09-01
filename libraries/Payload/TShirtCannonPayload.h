@@ -31,7 +31,6 @@ public:
     enum AttributeSize
     {
         MESSAGE_TYPE,
-        MESSAGE_INDEX,
         STATUS,
         ERROR,
         FIRING_TIME,
@@ -41,6 +40,7 @@ public:
         ANGLE,
         TANK_PRESSURE,
         FIRING_PRESSURE,
+        MESSAGE_INDEX,
         LAST
     };
 

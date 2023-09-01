@@ -44,15 +44,15 @@
 #define WAIT_FOR_ROBOT_MESSAGE_DELAY_MILLIS 5
 
 // Min - Max
-#define ANGLE_INCREMENT 1     // Increment amount for elevator angle
-#define ANGLE_MIN 20          // Minimum elevator angle
-#define ANGLE_MAX 70          // Maximum elevator angle
-#define PRESSURE_INCREMENT 1  // Increment amount for shot pressure
-#define PRESSURE_MIN 60       // Minimum shot pressure
-#define PRESSURE_MAX 120      // Maximum shot pressure
-#define DURATION_INCREMENT 10 // Increment amount for valve duration
-#define DURATION_MIN 100      // Minimum valve duration
-#define DURATION_MAX 250      // Maximum valve duration
+#define ANGLE_INCREMENT 1    // Increment amount for elevator angle
+#define ANGLE_MIN 20         // Minimum elevator angle
+#define ANGLE_MAX 70         // Maximum elevator angle
+#define PRESSURE_INCREMENT 1 // Increment amount for shot pressure
+#define PRESSURE_MIN 60      // Minimum shot pressure
+#define PRESSURE_MAX 120     // Maximum shot pressure
+#define DURATION_INCREMENT 1 // Increment amount for valve duration
+#define DURATION_MIN 0       // Minimum valve duration
+#define DURATION_MAX 15      // Maximum valve duration
 
 // Joystick deadzones and max
 #define X_DEAD_ZONE_SIZE 100 // Total size of the X deadzone
