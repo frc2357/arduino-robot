@@ -14,9 +14,10 @@ const uint8_t Robot::MAX_PAYLOAD_FIRING_VALUE = 20;
 const int Robot::MIN_FIRE_TIME_MILLIS = 100;
 const int Robot::PAYLOAD_TO_MILLIS = 10;
 
-Robot::Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress, int fireSolenoidPin) : m_payload(payload),
-                                                                                                                               m_statusLEDs(pinLedBuiltin),
-                                                                                                                               m_commsI2C(i2cHostAddress, i2cDeviceAddress, PREAMBLE_LEN)
+Robot::Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress,
+ int fireSolenoidPin, int leftDrivePWM, int rightDrivePWM) : m_payload(payload),
+                                                            m_statusLEDs(pinLedBuiltin),
+                                                            m_commsI2C(i2cHostAddress, i2cDeviceAddress, PREAMBLE_LEN)
 {
   m_initTimeSeconds = 0;
   m_lastRecvIndex = -1;
@@ -26,6 +27,9 @@ Robot::Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress
   m_isHoldingFire = false;
 
   m_fireTimeMillis = 100;
+
+  m_leftDrivePWM = leftDrivePWM;
+  m_rightDrivePWM = rightDrivePWM;
 }
 
 void Robot::init()
@@ -149,8 +153,11 @@ void Robot::setRobot()
 
   if (status != STATUS_ENABLED)
   {
-    Serial.write((uint8_t)0);
-    Serial.write((uint8_t)128);
+    analogWrite(m_leftDrivePWM, 512);
+    analogWrite(m_rightDrivePWM, 512);
+    
+    // Serial.write((uint8_t)0);
+    // Serial.write((uint8_t)128);
   }
 
   if (status != STATUS_FIRING && status != STATUS_ADJUSTING)
@@ -162,8 +169,16 @@ void Robot::setRobot()
 
   if (status == STATUS_ENABLED)
   {
-    Serial.write(m_payload.getControllerDriveLeft());
-    Serial.write(m_payload.getControllerDriveRight());
+    Serial.print("Left: ");
+    Serial.println(binToPWM(m_payload.getControllerDriveLeft()));
+    Serial.print("Right: ");
+    Serial.println(binToPWM(m_payload.getControllerDriveRight()));
+
+    analogWrite(m_leftDrivePWM, binToPWM(m_payload.getControllerDriveLeft()));
+    analogWrite(m_rightDrivePWM, binToPWM(m_payload.getControllerDriveRight()));
+    
+    // Serial.write(m_payload.getControllerDriveLeft());
+    // Serial.write(m_payload.getControllerDriveRight());
   }
 
   if (status == STATUS_FIRING)
@@ -223,6 +238,17 @@ void Robot::updateTickDurations(int tickDurationMillis)
 {
   m_tickDurations[m_tickDurationsIndex] = tickDurationMillis;
   m_tickDurationsIndex = Utils::incrementRingBufferIndex(m_tickDurationsIndex, ROBOT_TICK_DURATION_BUFFER_LEN);
+}
+
+int Robot::binToPWM(uint8_t value)
+{
+  int dir = value & 64;
+
+  int speed = value & 63;
+
+  int mappedSpeed = map(speed, 0, 63, 0, 511);
+
+  return 512 + (dir == 64 ? -mappedSpeed : mappedSpeed);
 }
 
 void Robot::setError(const char *format, ...)

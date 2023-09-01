@@ -28,8 +28,9 @@ class Robot
   static const int PAYLOAD_TO_MILLIS;
 
 public:
-  Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress, int fireSolenoidPin);
-
+  Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress, int fireSolenoidPin,
+  int leftDrivePWM, int rightDrivePWM);
+  
   void init();
   void update();
 
@@ -40,6 +41,7 @@ private:
   void setStatus();
   int getAverageTickDuration();
   void updateTickDurations(int tickDurationMicros);
+  int binToPWM(uint8_t value);
   void setError(const char *format, ...);
 
   TShirtCannonPayload &m_payload;
@@ -60,6 +62,10 @@ private:
   bool m_isHoldingFire;
   unsigned long m_fireTimeMillis;
   unsigned long m_solendoidCloseMillis;
+
+  int m_leftDrivePWM;
+
+  int m_rightDrivePWM;
 };
 
 #endif // ROBOT_H
