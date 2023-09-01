@@ -18,10 +18,14 @@
 #define PIN_LED_BUILTIN    LED_BUILTIN
 #define FIRE_SOLENOID_PIN 3
 
+#define LEFT_DRIVE_PWM A0
+
+#define RIGHT_DRIVE_PWM A1
+
 // Set up the JSON State for the robot
 TShirtCannonPayload payload;
 
-Robot robot(payload, PIN_LED_BUILTIN, I2C_HOST_ADDRESS, I2C_DEVICE_ADDRESS, FIRE_SOLENOID_PIN);
+Robot robot(payload, PIN_LED_BUILTIN, I2C_HOST_ADDRESS, I2C_DEVICE_ADDRESS, FIRE_SOLENOID_PIN, LEFT_DRIVE_PWM, RIGHT_DRIVE_PWM);
 
 // Primary Setup
 void setup() {
