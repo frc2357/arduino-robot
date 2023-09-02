@@ -38,7 +38,6 @@ void RobotComms::update()
     {
         Serial.println("No radio message");
     }
-    delay(100);
 }
 
 void RobotComms::onI2CReceive(int bytesRead)

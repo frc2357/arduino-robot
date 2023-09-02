@@ -6,7 +6,7 @@
 #include <CommsI2CMaster.h>
 #include "StatusLEDs.h"
 #include "Utils.h"
-#include "TimerOne.h"
+#include <Servo.h>
 
 #define ROBOT_TICK_DURATION_BUFFER_LEN 5
 #define PAYLOAD_LEN 7
@@ -30,8 +30,8 @@ class Robot
 
 public:
   Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress, int fireSolenoidPin,
-  int leftDrivePWM, int rightDrivePWM);
-  
+        int leftDrivePin, int rightDrivePin);
+
   void init();
   void update();
 
@@ -64,9 +64,10 @@ private:
   unsigned long m_fireTimeMillis;
   unsigned long m_solendoidCloseMillis;
 
-  int m_leftDrivePWM;
-
-  int m_rightDrivePWM;
+  int m_leftDrivePin;
+  int m_rightDrivePin;
+  Servo m_leftDriveMotor;
+  Servo m_rightDriveMotor;
 };
 
 #endif // ROBOT_H

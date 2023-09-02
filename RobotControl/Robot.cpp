@@ -15,10 +15,11 @@ const int Robot::MIN_FIRE_TIME_MILLIS = 100;
 const int Robot::PAYLOAD_TO_MILLIS = 10;
 
 Robot::Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress,
-             int fireSolenoidPin, int leftDrivePWM, int rightDrivePWM)
-  : m_payload(payload),
-    m_statusLEDs(pinLedBuiltin),
-    m_commsI2C(i2cHostAddress, i2cDeviceAddress, PREAMBLE_LEN) {
+             int fireSolenoidPin, int leftDrivePin, int rightDrivePin)
+    : m_payload(payload),
+      m_statusLEDs(pinLedBuiltin),
+      m_commsI2C(i2cHostAddress, i2cDeviceAddress, PREAMBLE_LEN)
+{
   m_initTimeSeconds = 0;
   m_lastRecvIndex = -1;
   m_lastRecvTimeMillis = 0;
@@ -28,28 +29,32 @@ Robot::Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress
 
   m_fireTimeMillis = 100;
 
-  m_leftDrivePWM = leftDrivePWM;
-  m_rightDrivePWM = rightDrivePWM;
+  m_leftDrivePin = leftDrivePin;
+  m_rightDrivePin = rightDrivePin;
 }
 
-void Robot::init() {
-  Timer1.initialize(3003);
-  Timer1.start();
+void Robot::init()
+{
   m_initTimeSeconds = (int)(millis() / 1000);
 
   m_tickDurationsIndex = 0;
-  for (int i = 0; i < ROBOT_TICK_DURATION_BUFFER_LEN; i++) {
+  for (int i = 0; i < ROBOT_TICK_DURATION_BUFFER_LEN; i++)
+  {
     m_tickDurations[i] = 0;
   }
 
   pinMode(m_fireSolenoidPin, OUTPUT);
   digitalWrite(m_fireSolenoidPin, LOW);
 
+  m_leftDriveMotor.attach(m_leftDrivePin);
+  m_rightDriveMotor.attach(m_rightDrivePin);
+
   m_statusLEDs.setBlinkPattern(StatusLEDs::DISABLED);
   m_commsI2C.init();
 }
 
-void Robot::update() {
+void Robot::update()
+{
   unsigned long tickStartMillis = millis();
   int tickDurationMillis = millis() - tickStartMillis;
 
@@ -64,107 +69,117 @@ void Robot::update() {
 
   updateSerial();
 
-  if (tickDurationMillis > TICK_DURATION_MILLIS) {
+  if (tickDurationMillis > TICK_DURATION_MILLIS)
+  {
     // setError("Tick %d ms", tickDurationMillis);
   }
 
   int timeLeftMillis = TICK_DURATION_MILLIS - (millis() - tickStartMillis);
-  if (timeLeftMillis > 0) {
+  if (timeLeftMillis > 0)
+  {
     // delay(timeLeftMillis);
   }
 }
 
-void Robot::updateSerial() {
+void Robot::updateSerial()
+{
   memset(m_payloadBytes, 0, PAYLOAD_LEN);
   memset(m_serialBuffer, 0, SERIAL_BUFFER_LEN);
 
-  if (m_commsI2C.getBytes(m_serialBuffer, SERIAL_BUFFER_LEN, m_payloadBytes, PAYLOAD_LEN)) {
+  if (m_commsI2C.getBytes(m_serialBuffer, SERIAL_BUFFER_LEN, m_payloadBytes, PAYLOAD_LEN))
+  {
     updatePayload(m_payloadBytes, PAYLOAD_LEN);
     // Serial.println("Bytes parsed");
   }
 
   setStatus();
   setRobot();
-
-  // m_payload.print();
-  // Serial.println();
 }
 
-void Robot::updatePayload(const uint8_t *data, const uint8_t len) {
+void Robot::updatePayload(const uint8_t *data, const uint8_t len)
+{
   bool success = m_payload.readMessage(data, len);
 
   const uint8_t status = m_payload.getStatus();
   const uint8_t err = m_payload.getError();
 
-  if (err > 0 || !success) {
+  if (err > 0 || !success)
+  {
     m_statusLEDs.setBlinkPattern(StatusLEDs::ERROR);
     m_payload.setStatus(STATUS_DISABLED);
-  } else {
-    if (status == STATUS_DISABLED) {
+  }
+  else
+  {
+    if (status == STATUS_DISABLED)
+    {
       m_statusLEDs.setBlinkPattern(StatusLEDs::DISABLED);
-    } else if (status == STATUS_ENABLED) {
+    }
+    else if (status == STATUS_ENABLED)
+    {
       m_statusLEDs.setBlinkPattern(StatusLEDs::ENABLED);
-    } else if (status == STATUS_PRIMED) {
+    }
+    else if (status == STATUS_PRIMED)
+    {
       m_statusLEDs.setBlinkPattern(StatusLEDs::PRIMED);
-    } else {
+    }
+    else
+    {
       m_statusLEDs.setBlinkPattern(StatusLEDs::OFF);
     }
   }
 }
 
-void Robot::setRobot() {
+void Robot::setRobot()
+{
   uint8_t status = m_payload.getStatus();
 
   uint8_t vlvTime = m_payload.getFiringTime();
 
-  if (vlvTime > MAX_PAYLOAD_FIRING_VALUE) {
+  if (vlvTime > MAX_PAYLOAD_FIRING_VALUE)
+  {
     vlvTime = 0;
-  } else {
+  }
+  else
+  {
     m_fireTimeMillis = MIN_FIRE_TIME_MILLIS + (vlvTime * PAYLOAD_TO_MILLIS);
   }
 
-  if (m_firing && millis() >= m_solendoidCloseMillis) {
+  if (m_firing && millis() >= m_solendoidCloseMillis)
+  {
     digitalWrite(m_fireSolenoidPin, LOW);
     m_firing = false;
     // Serial.print("Open for: ");
     // Serial.println(millis() - m_solenoidOpenMillis);
   }
 
-  if (status != STATUS_ENABLED) {
-    // analogWrite(m_leftDrivePWM, 128);
-    // analogWrite(m_rightDrivePWM, 128);
-    Timer1.pwm(m_leftDrivePWM, 512);
-    Timer1.pwm(m_rightDrivePWM, 512);
-
-    // Serial.write((uint8_t)0);
-    // Serial.write((uint8_t)128);
+  if (status != STATUS_ENABLED)
+  {
+    m_leftDriveMotor.writeMicroseconds(1500);
+    m_rightDriveMotor.writeMicroseconds(1500);
   }
 
-  if (status != STATUS_FIRING && status != STATUS_ADJUSTING) {
+  if (status != STATUS_FIRING && status != STATUS_ADJUSTING)
+  {
     digitalWrite(m_fireSolenoidPin, LOW);
     m_firing = false;
     m_isHoldingFire = false;
   }
 
-  if (status == STATUS_ENABLED) {
+  if (status == STATUS_ENABLED)
+  {
     Serial.print("Left: ");
     Serial.println(binToPWM(m_payload.getControllerDriveLeft()));
     Serial.print("Right: ");
     Serial.println(binToPWM(m_payload.getControllerDriveRight()));
 
-    // analogWrite(m_leftDrivePWM, binToPWM(m_payload.getControllerDriveLeft()));
-    // analogWrite(m_rightDrivePWM, binToPWM(m_payload.getControllerDriveRight()));
-    // Timer1.pwm(m_leftDrivePWM, binToPWM(m_payload.getControllerDriveLeft()));
-    // Timer1.pwm(m_rightDrivePWM, binToPWM(m_payload.getControllerDriveRight()));
-
-    Timer1.pwm(m_leftDrivePWM, 0);
-    Timer1.pwm(m_rightDrivePWM, 0);
-    // analogWrite(m_leftDrivePWM, 128);
-    // analogWrite(m_rightDrivePWM, 128);
+    m_leftDriveMotor.writeMicroseconds(binToPWM(m_payload.getControllerDriveLeft()));
+    m_rightDriveMotor.writeMicroseconds(binToPWM(m_payload.getControllerDriveRight()));
   }
 
-  if (status == STATUS_FIRING) {
-    if (!m_isHoldingFire) {
+  if (status == STATUS_FIRING)
+  {
+    if (!m_isHoldingFire)
+    {
       digitalWrite(m_fireSolenoidPin, HIGH);
       status = STATUS_ADJUSTING;
       m_solendoidCloseMillis = millis() + m_fireTimeMillis;
@@ -176,53 +191,63 @@ void Robot::setRobot() {
   m_payload.setStatus(status);
 }
 
-void Robot::setStatus() {
+void Robot::setStatus()
+{
   // First check if status should be Adjusting
-  if (m_payload.getStatus() == STATUS_DISABLED) {
+  if (m_payload.getStatus() == STATUS_DISABLED)
+  {
     return;
   }
 
-  if (m_firing && millis() < m_solendoidCloseMillis) {
+  if (m_firing && millis() < m_solendoidCloseMillis)
+  {
     m_payload.setStatus(STATUS_ADJUSTING);
     // Serial.println("Forced adjusting");
   }
 
   // Second check if status should be Disabled
   int currentIndex = m_payload.getMessageIndex();
-  if (m_lastRecvIndex != currentIndex) {
+  if (m_lastRecvIndex != currentIndex)
+  {
     m_lastRecvTimeMillis = millis();
     m_lastRecvIndex = currentIndex;
   }
 
-  if (millis() - m_lastRecvTimeMillis > KEEP_ALIVE_MILLIS) {
+  if (millis() - m_lastRecvTimeMillis > KEEP_ALIVE_MILLIS)
+  {
     m_payload.setStatus(STATUS_DISABLED);
   }
 }
 
-int Robot::getAverageTickDuration() {
+int Robot::getAverageTickDuration()
+{
   unsigned long total = 0;
-  for (int i = 0; i < ROBOT_TICK_DURATION_BUFFER_LEN; i++) {
+  for (int i = 0; i < ROBOT_TICK_DURATION_BUFFER_LEN; i++)
+  {
     total += m_tickDurations[i];
   }
   return (int)(total / ROBOT_TICK_DURATION_BUFFER_LEN);
 }
 
-void Robot::updateTickDurations(int tickDurationMillis) {
+void Robot::updateTickDurations(int tickDurationMillis)
+{
   m_tickDurations[m_tickDurationsIndex] = tickDurationMillis;
   m_tickDurationsIndex = Utils::incrementRingBufferIndex(m_tickDurationsIndex, ROBOT_TICK_DURATION_BUFFER_LEN);
 }
 
-int Robot::binToPWM(uint8_t value) {
+int Robot::binToPWM(uint8_t value)
+{
   int dir = value & 64;
 
   int speed = value & 63;
 
-  int mappedSpeed = map(speed, 0, 63, 0, 511);
+  int mappedSpeed = map(speed, 0, 63, 0, 500);
 
-  return 512 + (dir == 64 ? -mappedSpeed : mappedSpeed);
+  return 1500 + (dir == 64 ? -mappedSpeed : mappedSpeed);
 }
 
-void Robot::setError(const char *format, ...) {
+void Robot::setError(const char *format, ...)
+{
   va_list args;
   char message[32];
   va_start(args, format);
