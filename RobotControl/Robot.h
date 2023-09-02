@@ -6,6 +6,7 @@
 #include <CommsI2CMaster.h>
 #include "StatusLEDs.h"
 #include "Utils.h"
+#include "TimerOne.h"
 
 #define ROBOT_TICK_DURATION_BUFFER_LEN 5
 #define PAYLOAD_LEN 7
