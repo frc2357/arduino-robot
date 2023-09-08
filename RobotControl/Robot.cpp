@@ -46,8 +46,8 @@ void Robot::init()
   pinMode(m_fireSolenoidPin, OUTPUT);
   digitalWrite(m_fireSolenoidPin, LOW);
 
-  m_leftDriveMotor.attach(m_leftDrivePin);
-  m_rightDriveMotor.attach(m_rightDrivePin);
+  m_leftDriveMotor.attach(m_leftDrivePin, 1000, 2000);
+  m_rightDriveMotor.attach(m_rightDrivePin, 1000, 2000);
 
   m_statusLEDs.setBlinkPattern(StatusLEDs::DISABLED);
   m_commsI2C.init();
@@ -154,8 +154,8 @@ void Robot::setRobot()
 
   if (status != STATUS_ENABLED)
   {
-    m_leftDriveMotor.writeMicroseconds(1500);
-    m_rightDriveMotor.writeMicroseconds(1500);
+    m_leftDriveMotor.write(90);
+    m_rightDriveMotor.write(90);
   }
 
   if (status != STATUS_FIRING && status != STATUS_ADJUSTING)
@@ -167,13 +167,8 @@ void Robot::setRobot()
 
   if (status == STATUS_ENABLED)
   {
-    Serial.print("Left: ");
-    Serial.println(binToPWM(m_payload.getControllerDriveLeft()));
-    Serial.print("Right: ");
-    Serial.println(binToPWM(m_payload.getControllerDriveRight()));
-
-    m_leftDriveMotor.writeMicroseconds(binToPWM(m_payload.getControllerDriveLeft()));
-    m_rightDriveMotor.writeMicroseconds(binToPWM(m_payload.getControllerDriveRight()));
+    m_leftDriveMotor.write(binToPWM(m_payload.getControllerDriveLeft()));
+    m_rightDriveMotor.write(binToPWM(m_payload.getControllerDriveRight()));
   }
 
   if (status == STATUS_FIRING)
@@ -241,9 +236,9 @@ int Robot::binToPWM(uint8_t value)
 
   int speed = value & 63;
 
-  int mappedSpeed = map(speed, 0, 63, 0, 500);
+  int mappedSpeed = map(speed, 0, 63, 0, 90);
 
-  return 1500 + (dir == 64 ? -mappedSpeed : mappedSpeed);
+  return 90 + (dir == 64 ? -mappedSpeed : mappedSpeed);
 }
 
 void Robot::setError(const char *format, ...)

@@ -19,7 +19,6 @@
 #define FIRE_SOLENOID_PIN 3
 
 #define LEFT_DRIVE_PWM 9
-
 #define RIGHT_DRIVE_PWM 10
 
 // Set up the JSON State for the robot
