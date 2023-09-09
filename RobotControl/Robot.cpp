@@ -71,7 +71,7 @@ void Robot::update()
 
   if (tickDurationMillis > TICK_DURATION_MILLIS)
   {
-    // setError("Tick %d ms", tickDurationMillis);
+    setError("Tick %d ms", tickDurationMillis);
   }
 
   int timeLeftMillis = TICK_DURATION_MILLIS - (millis() - tickStartMillis);
@@ -197,7 +197,6 @@ void Robot::setStatus()
   if (m_firing && millis() < m_solendoidCloseMillis)
   {
     m_payload.setStatus(STATUS_ADJUSTING);
-    // Serial.println("Forced adjusting");
   }
 
   // Second check if status should be Disabled

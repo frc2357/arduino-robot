@@ -44,6 +44,7 @@ private:
   void updateTickDurations(int tickDurationMicros);
   int binToPWM(uint8_t value);
   void setError(const char *format, ...);
+  int binToPWM(uint8_t value);
 
   TShirtCannonPayload &m_payload;
   StatusLEDs m_statusLEDs;
@@ -58,6 +59,10 @@ private:
   uint8_t m_serialBuffer[SERIAL_BUFFER_LEN];
 
   int m_fireSolenoidPin;
+
+  int m_leftDrivePWM;
+
+  int m_rightDrivePWM;
 
   bool m_firing;
   bool m_isHoldingFire;
