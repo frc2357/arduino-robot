@@ -48,8 +48,3 @@ int ValvePage::rangeFilter(int value)
     }
     return value;
 }
-
-bool ValvePage::hasUpdated(TShirtCannonPayload &payload)
-{
-    return true;
-}

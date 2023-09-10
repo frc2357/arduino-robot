@@ -32,12 +32,12 @@ void setup()
   Serial.begin(SERIAL_BAUD_RATE);
   if (Serial)
   {
-    // Serial.print("----------- RobotControl v");
-    // Serial.print(SOFTWARE_VERSION);
-    // Serial.println(" -----------");
+    Serial.print("----------- RobotControl v");
+    Serial.print(SOFTWARE_VERSION);
+    Serial.println(" -----------");
   }
   robot.init();
-  // Serial.print("----------- Init complete -----------");
+  Serial.print("----------- Init complete -----------");
 }
 
 // Main Loop

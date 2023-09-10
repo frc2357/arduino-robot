@@ -60,8 +60,3 @@ int ShotPage::rangeFilter(int value)
     }
     return value;
 }
-
-bool ShotPage::hasUpdated(TShirtCannonPayload &payload)
-{
-  return true;
-}

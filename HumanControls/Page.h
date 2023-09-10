@@ -25,7 +25,6 @@ public:
     virtual void clockwise(TShirtCannonPayload &payload) = 0;
     virtual void counterClockwise(TShirtCannonPayload &payload) = 0;
     virtual int rangeFilter(int value) = 0;
-    virtual bool hasUpdated(TShirtCannonPayload &payload) = 0;
     bool canActivate();
     void setNextPage(Page &page);
     void setPreviousPage(Page &page);

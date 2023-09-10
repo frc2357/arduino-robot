@@ -54,8 +54,3 @@ int DashPage::rangeFilter(int value)
 {
     return 0;
 }
-
-bool DashPage::hasUpdated(TShirtCannonPayload &payload)
-{
-  return true;
-}

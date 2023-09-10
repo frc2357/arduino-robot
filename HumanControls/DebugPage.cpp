@@ -28,8 +28,3 @@ int DebugPage::rangeFilter(int value)
 {
     return 0;
 }
-
-bool DebugPage::hasUpdated(TShirtCannonPayload &payload)
-{
-  return true;
-}

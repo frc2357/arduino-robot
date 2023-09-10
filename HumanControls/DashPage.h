@@ -14,7 +14,6 @@ public:
     void clockwise(TShirtCannonPayload &payload);
     void counterClockwise(TShirtCannonPayload &payload);
     int rangeFilter(int value);
-    bool hasUpdated(TShirtCannonPayload &payload);
 };
 
 #endif

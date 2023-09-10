@@ -13,7 +13,7 @@ public:
     void stringSetRegion(int x, int y, const char *text);
     void intSetRegion(int x, int y, int num);
     void print();
-    
+
 private:
     SerLCD m_lcd;
     char m_lcdText[33];

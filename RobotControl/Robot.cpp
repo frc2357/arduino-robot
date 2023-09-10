@@ -148,8 +148,6 @@ void Robot::setRobot()
   {
     digitalWrite(m_fireSolenoidPin, LOW);
     m_firing = false;
-    // Serial.print("Open for: ");
-    // Serial.println(millis() - m_solenoidOpenMillis);
   }
 
   if (status != STATUS_ENABLED)
@@ -178,7 +176,6 @@ void Robot::setRobot()
       digitalWrite(m_fireSolenoidPin, HIGH);
       status = STATUS_ADJUSTING;
       m_solendoidCloseMillis = millis() + m_fireTimeMillis;
-      // Serial.println("Firing");
       m_firing = true;
       m_isHoldingFire = true;
     }

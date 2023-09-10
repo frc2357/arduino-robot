@@ -49,8 +49,3 @@ int ElevatorPage::rangeFilter(int value)
     }
     return value;
 }
-
-bool ElevatorPage::hasUpdated(TShirtCannonPayload &payload)
-{
-  return true;
-}

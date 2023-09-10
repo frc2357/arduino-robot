@@ -64,7 +64,7 @@ void MenuController::menuRefresh(TShirtCannonPayload &payload)
 void MenuController::menuUpdate(TShirtCannonPayload &payload, bool isEnabled)
 {
     this->m_rotation = this->m_rotaryKnob.getValue();
-    
+
     if (m_isActive && isEnabled)
     {
         if (this->m_rotation == 1)
@@ -110,10 +110,7 @@ void MenuController::menuUpdate(TShirtCannonPayload &payload, bool isEnabled)
         this->m_currentPage->paint(m_display, m_isActive, payload);
     }
 
-    if (this->m_currentPage->hasUpdated(payload))
-    {
-        m_display.print();
-    }
+    m_display.print();
 }
 
 void MenuController::menuPress(TShirtCannonPayload &payload, bool isEnabled)

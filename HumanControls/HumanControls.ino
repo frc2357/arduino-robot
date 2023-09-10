@@ -22,16 +22,11 @@
 #define ENABLE_PIN 10       // Digital Pin for the enable button
 #define PRIME_PIN 11        // Digital Pin for prime button
 #define FIRE_PIN 12         // Digital Pin for the fire button
-#define I2C_SDA 20          // I2C used by LCD
-#define I2C_SCL 21          // I2C used by LCD
 #define RFM95_CS PIN_RFM_CS
 #define RFM95_INT PIN_RFM_DIO0
 #define RFM95_RST PIN_RFM_RST
 
 // Other constraints
-#define DISPLAY_ADDRESS 0X27      // I2c address of the lcd display
-#define DISPLAY_LENGTH 16         // Length of the lcd display
-#define DISPLAY_WIDTH 2           // width of the lcd display
 #define NUM_BUTTONS 3             // Number of buttons to give the debouncer
 #define HANG_TIMER_DURATION 20000 // Amount in milliseconds to stay on a page before going to dash
 #define USB_BAUDRATE 115200
@@ -51,8 +46,8 @@
 #define PRESSURE_MIN 60      // Minimum shot pressure
 #define PRESSURE_MAX 120     // Maximum shot pressure
 #define DURATION_INCREMENT 1 // Increment amount for valve duration
-#define DURATION_MIN 0       // Minimum valve duration
-#define DURATION_MAX 15      // Maximum valve duration
+#define DURATION_MIN 0       // Minimum valve duration (100 ms)
+#define DURATION_MAX 15      // Maximum valve duration (250 ms)
 
 // Joystick deadzones and max
 #define X_DEAD_ZONE_SIZE 100 // Total size of the X deadzone
