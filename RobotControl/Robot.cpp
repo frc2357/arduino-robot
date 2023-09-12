@@ -2,20 +2,23 @@
 
 const unsigned long Robot::TICK_DURATION_MILLIS = 100;
 const uint8_t Robot::PREAMBLE_LEN = 4;
-const unsigned int Robot::KEEP_ALIVE_MILLIS = 100;
+const unsigned int Robot::KEEP_ALIVE_MILLIS = 1000;
 
-const uint8_t Robot::STATUS_DISABLED = 0;
-const uint8_t Robot::STATUS_ENABLED = 1;
-const uint8_t Robot::STATUS_ADJUSTING = 2;
-const uint8_t Robot::STATUS_PRIMED = 3;
-const uint8_t Robot::STATUS_FIRING = 4;
+const uint8_t Robot::STATUS_DISABLED = 1;
+const uint8_t Robot::STATUS_ENABLED = 2;
+const uint8_t Robot::STATUS_ADJUSTING = 3;
+const uint8_t Robot::STATUS_PRIMED = 4;
+const uint8_t Robot::STATUS_FIRING = 5;
 
-const unsigned long Robot::TEMP_FIRE_TIME_MILLIS = 100;
+const uint8_t Robot::MAX_PAYLOAD_FIRING_VALUE = 20;
+const int Robot::MIN_FIRE_TIME_MILLIS = 100;
+const int Robot::PAYLOAD_TO_MILLIS = 10;
 
 Robot::Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress,
-             int fireSolenoidPin, int leftDrivePWM, int rightDrivePWM) : m_payload(payload),
-                                                                         m_statusLEDs(pinLedBuiltin),
-                                                                         m_commsI2C(i2cHostAddress, i2cDeviceAddress, PREAMBLE_LEN)
+             int fireSolenoidPin, int leftDrivePin, int rightDrivePin)
+    : m_payload(payload),
+      m_statusLEDs(pinLedBuiltin),
+      m_commsI2C(i2cHostAddress, i2cDeviceAddress, PREAMBLE_LEN)
 {
   m_initTimeSeconds = 0;
   m_lastRecvIndex = -1;
@@ -24,8 +27,10 @@ Robot::Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress
   m_firing = false;
   m_isHoldingFire = false;
 
-  m_leftDrivePWM = leftDrivePWM;
-  m_rightDrivePWM = rightDrivePWM;
+  m_fireTimeMillis = 100;
+
+  m_leftDrivePin = leftDrivePin;
+  m_rightDrivePin = rightDrivePin;
 }
 
 void Robot::init()
@@ -40,6 +45,9 @@ void Robot::init()
 
   pinMode(m_fireSolenoidPin, OUTPUT);
   digitalWrite(m_fireSolenoidPin, LOW);
+
+  m_leftDriveMotor.attach(m_leftDrivePin, 1000, 2000);
+  m_rightDriveMotor.attach(m_rightDrivePin, 1000, 2000);
 
   m_statusLEDs.setBlinkPattern(StatusLEDs::DISABLED);
   m_commsI2C.init();
@@ -86,9 +94,6 @@ void Robot::updateSerial()
 
   setStatus();
   setRobot();
-
-  // m_payload.print();
-  // Serial.println();
 }
 
 void Robot::updatePayload(const uint8_t *data, const uint8_t len)
@@ -126,26 +131,29 @@ void Robot::updatePayload(const uint8_t *data, const uint8_t len)
 
 void Robot::setRobot()
 {
-  m_payload.print();
   uint8_t status = m_payload.getStatus();
 
-  if (m_firing)
+  uint8_t vlvTime = m_payload.getFiringTime();
+
+  if (vlvTime > MAX_PAYLOAD_FIRING_VALUE)
   {
-    if (millis() - TEMP_FIRE_TIME_MILLIS >= m_solenoidOpenMillis)
-    {
-      digitalWrite(m_fireSolenoidPin, LOW);
-      m_firing = false;
-     // Serial.print("Open for: ");
-      //Serial.println(millis() - m_solenoidOpenMillis);
-    }
+    vlvTime = 0;
+  }
+  else
+  {
+    m_fireTimeMillis = MIN_FIRE_TIME_MILLIS + (vlvTime * PAYLOAD_TO_MILLIS);
+  }
+
+  if (m_firing && millis() >= m_solendoidCloseMillis)
+  {
+    digitalWrite(m_fireSolenoidPin, LOW);
+    m_firing = false;
   }
 
   if (status != STATUS_ENABLED)
   {
-    analogWrite(m_leftDrivePWM, 512);
-    analogWrite(m_rightDrivePWM, 512);
-    // Serial.write((uint8_t)0);
-    // Serial.write((uint8_t)128);
+    m_leftDriveMotor.write(90);
+    m_rightDriveMotor.write(90);
   }
 
   if (status != STATUS_FIRING && status != STATUS_ADJUSTING)
@@ -155,18 +163,10 @@ void Robot::setRobot()
     m_isHoldingFire = false;
   }
 
-//Serial.println(status);
   if (status == STATUS_ENABLED)
   {
-    Serial.print("Left: ");
-    Serial.println(binToPWM(m_payload.getControllerDriveLeft()));
-    Serial.print("Right: ");
-    Serial.println(binToPWM(m_payload.getControllerDriveRight()));
-
-    analogWrite(m_leftDrivePWM, binToPWM(m_payload.getControllerDriveLeft()));
-    analogWrite(m_rightDrivePWM, binToPWM(m_payload.getControllerDriveRight()));
-    // Serial.write(m_payload.getControllerDriveLeft());
-    // Serial.write(m_payload.getControllerDriveRight());
+    m_leftDriveMotor.write(binToPWM(m_payload.getControllerDriveLeft()));
+    m_rightDriveMotor.write(binToPWM(m_payload.getControllerDriveRight()));
   }
 
   if (status == STATUS_FIRING)
@@ -174,9 +174,8 @@ void Robot::setRobot()
     if (!m_isHoldingFire)
     {
       digitalWrite(m_fireSolenoidPin, HIGH);
-      m_solenoidOpenMillis = millis();
       status = STATUS_ADJUSTING;
-      Serial.println("Firing");
+      m_solendoidCloseMillis = millis() + m_fireTimeMillis;
       m_firing = true;
       m_isHoldingFire = true;
     }
@@ -191,14 +190,10 @@ void Robot::setStatus()
   {
     return;
   }
-  // Broken here
-  if (m_firing)
+
+  if (m_firing && millis() < m_solendoidCloseMillis)
   {
-    if (millis() - TEMP_FIRE_TIME_MILLIS < m_solenoidOpenMillis)
-    {
-      m_payload.setStatus(STATUS_ADJUSTING);
-      Serial.println("Forced adjusting");
-    }
+    m_payload.setStatus(STATUS_ADJUSTING);
   }
 
   // Second check if status should be Disabled
@@ -237,9 +232,9 @@ int Robot::binToPWM(uint8_t value)
 
   int speed = value & 63;
 
-  int mappedSpeed = map(speed, 0, 63, 0, 511);
+  int mappedSpeed = map(speed, 0, 63, 0, 90);
 
-  return 512 + (dir == 64 ? -mappedSpeed : mappedSpeed);
+  return 90 + (dir == 64 ? -mappedSpeed : mappedSpeed);
 }
 
 void Robot::setError(const char *format, ...)

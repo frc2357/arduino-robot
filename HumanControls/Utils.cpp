@@ -1,15 +1,22 @@
 #include "Utils.h"
 
-static void Utils::setMotors(TShirtCannonPayload payload, float turn, float speed)
+#define MAX_DRIVE_SPEED 63
+#define RAMP_RATE_EXPONENT 3
+
+void Utils::setMotors(TShirtCannonPayload &payload, float turn, float speed)
 {
+
     double left, right;
     uint8_t leftSpeed, rightSpeed, leftDir, rightDir;
 
-    left = -((-1 * speed) + (-1 * turn));
-    right = -(speed + (-1 * turn));
+    right = (-1 * turn) + (-1 * speed);
+    left = turn + (-1 * speed);
 
     leftDir = left < 0 ? 1 : 0;
     rightDir = right < 0 ? 1 : 0;
+
+    turn = pow(turn, RAMP_RATE_EXPONENT);
+    speed = pow(speed, RAMP_RATE_EXPONENT);
 
     leftSpeed = MAX_DRIVE_SPEED * abs(left);
     rightSpeed = MAX_DRIVE_SPEED * abs(right);

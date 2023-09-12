@@ -6,6 +6,7 @@
 #include <CommsI2CMaster.h>
 #include "StatusLEDs.h"
 #include "Utils.h"
+#include <Servo.h>
 
 #define ROBOT_TICK_DURATION_BUFFER_LEN 5
 #define PAYLOAD_LEN 7
@@ -23,11 +24,13 @@ class Robot
   static const uint8_t STATUS_PRIMED;
   static const uint8_t STATUS_FIRING;
 
-  static const unsigned long TEMP_FIRE_TIME_MILLIS;
+  static const uint8_t MAX_PAYLOAD_FIRING_VALUE;
+  static const int MIN_FIRE_TIME_MILLIS;
+  static const int PAYLOAD_TO_MILLIS;
 
 public:
   Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress, int fireSolenoidPin,
-  int leftDrivePWM, int rightDrivePWM);
+        int leftDrivePin, int rightDrivePin);
 
   void init();
   void update();
@@ -39,6 +42,7 @@ private:
   void setStatus();
   int getAverageTickDuration();
   void updateTickDurations(int tickDurationMicros);
+  int binToPWM(uint8_t value);
   void setError(const char *format, ...);
   int binToPWM(uint8_t value);
 
@@ -55,7 +59,6 @@ private:
   uint8_t m_serialBuffer[SERIAL_BUFFER_LEN];
 
   int m_fireSolenoidPin;
-  unsigned long m_solenoidOpenMillis;
 
   int m_leftDrivePWM;
 
@@ -63,6 +66,13 @@ private:
 
   bool m_firing;
   bool m_isHoldingFire;
+  unsigned long m_fireTimeMillis;
+  unsigned long m_solendoidCloseMillis;
+
+  int m_leftDrivePin;
+  int m_rightDrivePin;
+  Servo m_leftDriveMotor;
+  Servo m_rightDriveMotor;
 };
 
 #endif // ROBOT_H
