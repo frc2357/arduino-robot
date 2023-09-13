@@ -50,9 +50,9 @@
 #define DURATION_MAX 15      // Maximum valve duration (250 ms)
 
 // Joystick deadzones and max
-#define X_DEAD_ZONE_SIZE 100 // Total size of the X deadzone
-#define JOYSTICK_MAX 1023    // Maximum joystick value that comes from the sensor
-#define Y_DEAD_ZONE_SIZE 100 // Total size of the y deadzone
+#define X_DEAD_ZONE_SIZE 25 // Total size of the X deadzone
+#define JOYSTICK_MAX 1023   // Maximum joystick value that comes from the sensor
+#define Y_DEAD_ZONE_SIZE 25 // Total size of the y deadzone
 
 // Global communication variables
 boolean hasRobotMessage = false;
@@ -123,13 +123,8 @@ void loop1()
   humanControls.update(currentControllerMessage);
   if (!hasControllerMessage)
   {
-    // memcmp is 1 when no data has changed because of messageIndex
-    if (memcmp(currentControllerMessage, lastControllerMessage, sizeof(currentControllerMessage)) != 1)
-    {
-      hasControllerMessage = true;
-      payload.setMessageIndex((payload.getMessageIndex() + 1) % 32);
-      memcpy(lastControllerMessage, currentControllerMessage, PAYLOAD_LENGTH);
-    }
+    hasControllerMessage = true;
+    memcpy(lastControllerMessage, currentControllerMessage, PAYLOAD_LENGTH);
   }
 }
 
