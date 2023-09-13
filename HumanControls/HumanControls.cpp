@@ -54,6 +54,7 @@ void HumanControls::init()
 void HumanControls::update(uint8_t *messageBuffer)
 {
     this->setStatus();
+    m_payload.setMessageIndex((m_payload.getMessageIndex() + 1) % 32);
 
     m_menuController.menuUpdate(m_payload, status == Utils::ControllerStatus::ENABLED);
     m_pinDebouncer.update();
