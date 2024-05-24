@@ -18,8 +18,8 @@
 #define PIN_LED_BUILTIN LED_BUILTIN
 #define FIRE_SOLENOID_PIN 3
 
-#define ANGLE_IN1 10 // TODO: Figure out which pin this is
-#define ANGLE_IN2 9  // TODO: Figure out which pin this is
+#define ANGLE_IN1 11 // TODO: Figure out which pin this is
+#define ANGLE_IN2 1  // TODO: Figure out which pin this is
 
 // 0.00067 = in/per 
 // 8,955.22388 = milliseconds to max travel
@@ -38,8 +38,6 @@ Robot robot(payload, PIN_LED_BUILTIN, I2C_HOST_ADDRESS, I2C_DEVICE_ADDRESS, FIRE
 void setup()
 {
   Serial.begin(SERIAL_BAUD_RATE);
-  if (Serial) {
-  }
   robot.init();
 }
 

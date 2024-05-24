@@ -144,14 +144,12 @@ void Robot::setRobot()
   {
     m_fireTimeMillis = MIN_FIRE_TIME_MILLIS + (vlvTime * PAYLOAD_TO_MILLIS);
   }
-}
 
   if (m_firing && millis() >= m_solenoidCloseMillis)
   {
     digitalWrite(m_fireSolenoidPin, LOW);
     m_firing = false;
   }
-}
 
   if (status != STATUS_ENABLED)
   {
@@ -183,6 +181,11 @@ void Robot::setRobot()
       m_isHoldingFire = true;
     }
   }
+
+  if (status == STATUS_ADJUSTING) {
+    m_actuator.update(m_payload.getAngle());
+  }
+
   m_payload.setStatus(status);
 }
 

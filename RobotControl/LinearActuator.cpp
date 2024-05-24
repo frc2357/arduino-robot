@@ -1,7 +1,8 @@
 #include "LinearActuator.h"
 
-const int LinearActuator::EXTEND = 1;
-const int LinearActuator::RETRACT = 2;
+const int LinearActuator::RETRACT = 0;
+const int LinearActuator::STOP = 1;
+const int LinearActuator::EXTEND = 2;
 
 const int LinearActuator::MAX_POS_MILLIS = 8955;
 const int LinearActuator::MIN_POS_MILLIS = 455;
@@ -10,7 +11,7 @@ LinearActuator::LinearActuator(int in1, int in2)
 {
     m_in1 = in1;
     m_in2 = in2;
-    m_currentDirection = 0;
+    m_currentDirection = STOP;
 }
 
 void LinearActuator::init()
@@ -51,10 +52,10 @@ void LinearActuator::update(int direction)
     }
     m_lastMillis = currentMillis;
 
-    if (m_currentPos<MIN_POS_MILLIS | m_currentPos> MAX_POS_MILLIS)
-    {
-        stop();
-    }
+    // if (m_currentPos < MIN_POS_MILLIS | m_currentPos > MAX_POS_MILLIS)
+    // {
+    //     stop();
+    // }
 
     Serial.print("Position: ");
     Serial.println(m_currentPos);
@@ -81,6 +82,7 @@ void LinearActuator::retract()
 
 void LinearActuator::stop()
 {
+    m_currentDirection = STOP;
     m_lastMillis = 0;
     digitalWrite(m_in1, LOW);
     digitalWrite(m_in2, LOW);

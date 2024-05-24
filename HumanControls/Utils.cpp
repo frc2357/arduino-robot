@@ -7,7 +7,7 @@
 void Utils::setMotors(TShirtCannonPayload &payload, float turn, float speed)
 {
     turn = copysign(pow(turn, TURN_RAMP_RATE_EXPONENT), turn);
-    speed = copysign(pow(speed, SPEED_RAMP_RATE_EXPONENT), speed);
+    speed = copysign(pow(speed, SPEED_RAMP_RATE_EXPONENT), speed);    
 
     double left, right;
     uint8_t leftSpeed, rightSpeed, leftDir, rightDir;

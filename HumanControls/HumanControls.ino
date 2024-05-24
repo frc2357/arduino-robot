@@ -19,8 +19,8 @@
 #define ENCODER_PIN_SW 13   // Gets the button for rotary knob
 #define ENCODER_PIN_A 5     // CLK gets degrees for rotary knob
 #define ENCODER_PIN_B 6     // DT gets direction for rotary knob
-#define ENABLE_PIN 10       // Digital Pin for the enable button
-#define PRIME_PIN 11        // Digital Pin for prime button
+#define ENABLE_PIN 11       // Digital Pin for the enable button
+#define PRIME_PIN 10        // Digital Pin for prime button
 #define FIRE_PIN 12         // Digital Pin for the fire button
 #define RFM95_CS PIN_RFM_CS
 #define RFM95_INT PIN_RFM_DIO0
@@ -40,8 +40,8 @@
 
 // Min - Max
 #define ANGLE_INCREMENT 1    // Increment amount for elevator angle
-#define ANGLE_MIN 20         // Minimum elevator angle
-#define ANGLE_MAX 70         // Maximum elevator angle
+#define ANGLE_MIN 0          // Minimum elevator angle
+#define ANGLE_MAX 2          // Maximum elevator angle
 #define PRESSURE_INCREMENT 1 // Increment amount for shot pressure
 #define PRESSURE_MIN 60      // Minimum shot pressure
 #define PRESSURE_MAX 120     // Maximum shot pressure
@@ -101,6 +101,7 @@ void loop()
 // Controls core
 void setup1()
 {
+  delay(1000);
   humanControls.init();
 }
 

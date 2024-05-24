@@ -5,8 +5,9 @@
 
 class LinearActuator
 {
-    static const int EXTEND;
     static const int RETRACT;
+    static const int STOP;
+    static const int EXTEND;
 
     static const int MAX_POS_MILLIS;
     static const int MIN_POS_MILLIS;

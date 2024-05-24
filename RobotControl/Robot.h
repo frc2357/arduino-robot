@@ -19,7 +19,15 @@ class Robot
   static const uint8_t PREAMBLE_LEN;
   static const unsigned int KEEP_ALIVE_MILLIS;
 
-  static const unsigned long TEMP_FIRE_TIME_MILLIS;
+  static const uint8_t STATUS_DISABLED;
+  static const uint8_t STATUS_ADJUSTING;
+  static const uint8_t STATUS_ENABLED;
+  static const uint8_t STATUS_PRIMED;
+  static const uint8_t STATUS_FIRING;
+
+  static const uint8_t Robot::MAX_PAYLOAD_FIRING_VALUE;
+  static const int Robot::MIN_FIRE_TIME_MILLIS;
+  static const int Robot::PAYLOAD_TO_MILLIS;
 
 public:
   Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress, int fireSolenoidPin,
