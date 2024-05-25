@@ -13,12 +13,23 @@ void ElevatorPage::paint(DisplayController &display, bool isActivated, TShirtCan
     display.clear();
 
     display.stringSetRegion(1, 0, "Elevator Angle");
-    display.intSetRegion(7, 1, payload.getAngle() - 1); // -1 to offset since payload angle is unsigned
+
+    switch (payload.getAngle()) {
+        case 0:
+            display.stringSetRegion(7, 1, "vv");
+            break;
+        case 2:
+            display.stringSetRegion(7, 1, "^^");
+            break;
+        default:
+            display.stringSetRegion(7, 1, "--");
+            break;
+    }
 
     if (isActivated)
     {
-        display.stringSetRegion(6, 1, "^");
-        display.stringSetRegion(9, 1, "v");
+        display.stringSetRegion(4, 1, "**");
+        display.stringSetRegion(10, 1, "**");
     }
 }
 
