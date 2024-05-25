@@ -122,7 +122,6 @@ void MenuController::menuPress(TShirtCannonPayload &payload, bool isEnabled)
 
         if (this->m_isActive && m_currentPage == &m_elevatorPage)
         {
-            Serial.println("Adjusting!!!");
             payload.setStatus(Utils::ControllerStatus::ADJUSTING);
         }
     }
