@@ -86,11 +86,13 @@ void MenuController::menuUpdate(TShirtCannonPayload &payload, bool isEnabled)
     {
         if (this->m_rotation == 1)
         {
+            this->m_isActive = false;
             this->m_currentPage = this->m_currentPage->getNextPage();
         }
 
         if (this->m_rotation == -1)
         {
+            this->m_isActive = false;
             this->m_currentPage = this->m_currentPage->getPreviousPage();
         }
     }

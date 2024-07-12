@@ -2,6 +2,7 @@
 #define LINEAR_ACTUATOR_H
 
 #include <Arduino.h>
+#include <Servo.h>
 
 class LinearActuator
 {
@@ -9,11 +10,15 @@ class LinearActuator
     static const int STOP;
     static const int EXTEND;
 
+    static const int RETRACT_WRITE_VALUE;
+    static const int STOP_WRITE_VALUE;
+    static const int EXTEND_WRITE_VALUE;
+
     static const int MAX_POS_MILLIS;
     static const int MIN_POS_MILLIS;
 
 public:
-    LinearActuator(int in1, int in2);
+    LinearActuator(int input);
     void init();
     void update(int direction);
     void extend();
@@ -22,8 +27,9 @@ public:
     bool isMoving(int direction);
 
 private:
-    int m_in1, m_in2, m_currentDirection, m_currentPos;
+    int m_inputPin, m_currentDirection, m_currentPos;
     unsigned long m_lastMillis;
+    Servo m_actuator;
 };
 
 #endif

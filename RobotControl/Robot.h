@@ -31,7 +31,7 @@ class Robot
 
 public:
   Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress, int fireSolenoidPin,
-        int leftDrivePin, int rightDrivePin, int in1, int in2);
+        int leftDrivePin, int rightDrivePin, int inputPin);
 
   void init();
   void update();
@@ -43,7 +43,6 @@ private:
   void setStatus();
   int getAverageTickDuration();
   void updateTickDurations(int tickDurationMicros);
-  int binToPWM(uint8_t value);
   void setError(const char *format, ...);
 
   TShirtCannonPayload &m_payload;

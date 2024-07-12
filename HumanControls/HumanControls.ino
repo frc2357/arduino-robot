@@ -19,8 +19,8 @@
 #define ENCODER_PIN_SW 13   // Gets the button for rotary knob
 #define ENCODER_PIN_A 5     // CLK gets degrees for rotary knob
 #define ENCODER_PIN_B 6     // DT gets direction for rotary knob
-#define ENABLE_PIN 11       // Digital Pin for the enable button
-#define PRIME_PIN 10        // Digital Pin for prime button
+#define ENABLE_PIN 10       // Digital Pin for the enable button
+#define PRIME_PIN 11        // Digital Pin for prime button
 #define FIRE_PIN 12         // Digital Pin for the fire button
 #define RFM95_CS PIN_RFM_CS
 #define RFM95_INT PIN_RFM_DIO0
