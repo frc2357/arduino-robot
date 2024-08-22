@@ -25,13 +25,13 @@ class Robot
   static const uint8_t STATUS_PRIMED;
   static const uint8_t STATUS_FIRING;
 
-  static const uint8_t Robot::MAX_PAYLOAD_FIRING_VALUE;
-  static const int Robot::MIN_FIRE_TIME_MILLIS;
-  static const int Robot::PAYLOAD_TO_MILLIS;
+  static const uint8_t MAX_PAYLOAD_FIRING_VALUE;
+  static const int MIN_FIRE_TIME_MILLIS;
+  static const int PAYLOAD_TO_MILLIS;
 
 public:
   Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress, int fireSolenoidPin,
-        int leftDrivePin, int rightDrivePin, int inputPin);
+        int leftDrivePin, int rightDrivePin, int anglePin);
 
   void init();
   void update();

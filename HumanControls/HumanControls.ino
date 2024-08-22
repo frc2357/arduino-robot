@@ -1,4 +1,3 @@
-#include <LiquidCrystal_I2C.h>
 #include <JsonElement.h>
 #include "RotaryKnobController.h"
 #include "MenuController.h"
@@ -9,6 +8,7 @@
 #include "FireController.h"
 #include "HumanControls.h"
 #include "TShirtCannonPayload.h"
+#include <LiquidCrystal_I2C.h>
 
 // Version
 #define SOFTWARE_VERSION 1
