@@ -7,6 +7,7 @@
 #include "StatusLEDs.h"
 #include "Utils.h"
 #include <Servo.h>
+#include "LinearActuator.h"
 
 #define ROBOT_TICK_DURATION_BUFFER_LEN 5
 #define PAYLOAD_LEN 7
@@ -30,7 +31,7 @@ class Robot
 
 public:
   Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress, int fireSolenoidPin,
-        int leftDrivePin, int rightDrivePin);
+        int leftDrivePin, int rightDrivePin, int anglePin);
 
   void init();
   void update();
@@ -42,7 +43,6 @@ private:
   void setStatus();
   int getAverageTickDuration();
   void updateTickDurations(int tickDurationMicros);
-  int binToPWM(uint8_t value);
   void setError(const char *format, ...);
 
   TShirtCannonPayload &m_payload;
@@ -59,19 +59,17 @@ private:
 
   int m_fireSolenoidPin;
 
-  int m_leftDrivePWM;
-
-  int m_rightDrivePWM;
-
   bool m_firing;
   bool m_isHoldingFire;
   unsigned long m_fireTimeMillis;
-  unsigned long m_solendoidCloseMillis;
+  unsigned long m_solenoidCloseMillis;
 
   int m_leftDrivePin;
   int m_rightDrivePin;
   Servo m_leftDriveMotor;
   Servo m_rightDriveMotor;
+
+  LinearActuator m_actuator;
 };
 
 #endif // ROBOT_H

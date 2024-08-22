@@ -15,10 +15,11 @@ const int Robot::MIN_FIRE_TIME_MILLIS = 100;
 const int Robot::PAYLOAD_TO_MILLIS = 10;
 
 Robot::Robot(TShirtCannonPayload &payload, int pinLedBuiltin, int i2cHostAddress, int i2cDeviceAddress,
-             int fireSolenoidPin, int leftDrivePin, int rightDrivePin)
+             int fireSolenoidPin, int leftDrivePin, int rightDrivePin, int anglePin)
     : m_payload(payload),
       m_statusLEDs(pinLedBuiltin),
-      m_commsI2C(i2cHostAddress, i2cDeviceAddress, PREAMBLE_LEN)
+      m_commsI2C(i2cHostAddress, i2cDeviceAddress, PREAMBLE_LEN),
+      m_actuator(anglePin)
 {
   m_initTimeSeconds = 0;
   m_lastRecvIndex = -1;
@@ -45,6 +46,8 @@ void Robot::init()
 
   pinMode(m_fireSolenoidPin, OUTPUT);
   digitalWrite(m_fireSolenoidPin, LOW);
+
+  m_actuator.init();
 
   m_leftDriveMotor.attach(m_leftDrivePin, 1000, 2000);
   m_rightDriveMotor.attach(m_rightDrivePin, 1000, 2000);
@@ -144,7 +147,7 @@ void Robot::setRobot()
     m_fireTimeMillis = MIN_FIRE_TIME_MILLIS + (vlvTime * PAYLOAD_TO_MILLIS);
   }
 
-  if (m_firing && millis() >= m_solendoidCloseMillis)
+  if (m_firing && millis() >= m_solenoidCloseMillis)
   {
     digitalWrite(m_fireSolenoidPin, LOW);
     m_firing = false;
@@ -165,8 +168,8 @@ void Robot::setRobot()
 
   if (status == STATUS_ENABLED)
   {
-    m_leftDriveMotor.write(binToPWM(m_payload.getControllerDriveLeft()));
-    m_rightDriveMotor.write(binToPWM(m_payload.getControllerDriveRight()));
+    m_leftDriveMotor.write(Utils::binaryToServoPWM(m_payload.getControllerDriveLeft()));
+    m_rightDriveMotor.write(Utils::binaryToServoPWM(m_payload.getControllerDriveRight()));
   }
 
   if (status == STATUS_FIRING)
@@ -175,11 +178,21 @@ void Robot::setRobot()
     {
       digitalWrite(m_fireSolenoidPin, HIGH);
       status = STATUS_ADJUSTING;
-      m_solendoidCloseMillis = millis() + m_fireTimeMillis;
+      m_solenoidCloseMillis = millis() + m_fireTimeMillis;
       m_firing = true;
       m_isHoldingFire = true;
     }
   }
+
+  if (status == STATUS_ADJUSTING)
+  {
+    m_actuator.update(m_payload.getAngle());
+  }
+  else
+  {
+    m_actuator.stop();
+  }
+
   m_payload.setStatus(status);
 }
 
@@ -191,7 +204,7 @@ void Robot::setStatus()
     return;
   }
 
-  if (m_firing && millis() < m_solendoidCloseMillis)
+  if (m_firing && millis() < m_solenoidCloseMillis)
   {
     m_payload.setStatus(STATUS_ADJUSTING);
   }
@@ -224,17 +237,6 @@ void Robot::updateTickDurations(int tickDurationMillis)
 {
   m_tickDurations[m_tickDurationsIndex] = tickDurationMillis;
   m_tickDurationsIndex = Utils::incrementRingBufferIndex(m_tickDurationsIndex, ROBOT_TICK_DURATION_BUFFER_LEN);
-}
-
-int Robot::binToPWM(uint8_t value)
-{
-  int dir = value & 64;
-
-  int speed = value & 63;
-
-  int mappedSpeed = map(speed, 0, 63, 0, 90);
-
-  return 90 + (dir == 64 ? -mappedSpeed : mappedSpeed);
 }
 
 void Robot::setError(const char *format, ...)

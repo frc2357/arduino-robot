@@ -1,4 +1,3 @@
-#include <LiquidCrystal_I2C.h>
 #include <JsonElement.h>
 #include "RotaryKnobController.h"
 #include "MenuController.h"
@@ -9,6 +8,7 @@
 #include "FireController.h"
 #include "HumanControls.h"
 #include "TShirtCannonPayload.h"
+#include <LiquidCrystal_I2C.h>
 
 // Version
 #define SOFTWARE_VERSION 1
@@ -40,8 +40,8 @@
 
 // Min - Max
 #define ANGLE_INCREMENT 1    // Increment amount for elevator angle
-#define ANGLE_MIN 20         // Minimum elevator angle
-#define ANGLE_MAX 70         // Maximum elevator angle
+#define ANGLE_MIN 0          // Minimum elevator angle
+#define ANGLE_MAX 2          // Maximum elevator angle
 #define PRESSURE_INCREMENT 1 // Increment amount for shot pressure
 #define PRESSURE_MIN 60      // Minimum shot pressure
 #define PRESSURE_MAX 120     // Maximum shot pressure
@@ -101,6 +101,7 @@ void loop()
 // Controls core
 void setup1()
 {
+  delay(1000);
   humanControls.init();
 }
 

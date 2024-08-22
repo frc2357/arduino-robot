@@ -1,7 +1,7 @@
 #include "ElevatorPage.h"
 
 ElevatorPage::ElevatorPage(int increment, int min, int max)
-    : Page(true, true, Page::PageType::ELEVATOR_PAGE)
+    : Page(true, false, Page::PageType::ELEVATOR_PAGE)
 {
     this->m_min = min;
     this->m_max = max;
@@ -13,25 +13,36 @@ void ElevatorPage::paint(DisplayController &display, bool isActivated, TShirtCan
     display.clear();
 
     display.stringSetRegion(1, 0, "Elevator Angle");
-    display.intSetRegion(7, 1, payload.getAngle());
+
+    switch (payload.getAngle()) {
+        case 0:
+            display.stringSetRegion(7, 1, "vv");
+            break;
+        case 2:
+            display.stringSetRegion(7, 1, "^^");
+            break;
+        default:
+            display.stringSetRegion(7, 1, "--");
+            break;
+    }
 
     if (isActivated)
     {
-        display.stringSetRegion(6, 1, "^");
-        display.stringSetRegion(9, 1, "v");
+        display.stringSetRegion(4, 1, "**");
+        display.stringSetRegion(10, 1, "**");
     }
 }
 
 void ElevatorPage::clockwise(TShirtCannonPayload &payload)
 {
-    uint8_t angle = payload.getAngle();
+    int angle = payload.getAngle();
     angle = angle + this->m_increment;
     angle = rangeFilter(angle);
     payload.setAngle(angle);
 }
 void ElevatorPage::counterClockwise(TShirtCannonPayload &payload)
 {
-    uint8_t angle = payload.getAngle();
+    int angle = payload.getAngle();
     angle = angle - this->m_increment;
     angle = rangeFilter(angle);
     payload.setAngle(angle);

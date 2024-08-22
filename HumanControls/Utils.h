@@ -11,6 +11,7 @@ public:
     DISCONNECTED = 0,
     DISABLED = 1,
     ENABLED = 2,
+    ADJUSTING = 3,
     PRIMED = 4,
     FIRING = 5
   };

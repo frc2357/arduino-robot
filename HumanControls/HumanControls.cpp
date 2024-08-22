@@ -170,6 +170,7 @@ void HumanControls::onPinDeactivated(int pinNr)
     {
         m_enableController.setIsEnabled(false);
         m_fireController.setIsPrimed(false);
+        m_payload.setAngle(1);
     }
     else if (pinNr == m_encoderPinSW)
     {

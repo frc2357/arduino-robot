@@ -47,7 +47,7 @@ void MenuController::init(TShirtCannonPayload &payload)
 {
     this->m_display.init();
     payload.setFiringTime(this->m_valvePage.rangeFilter(payload.getFiringTime()));
-    payload.setAngle(this->m_elevatorPage.rangeFilter(payload.getAngle()));
+    payload.setAngle(1);
     payload.setFiringPressure(this->m_shotPage.rangeFilter(payload.getFiringPressure()));
     this->m_currentPage->paint(m_display, this->m_isActive, payload);
 }
@@ -86,11 +86,13 @@ void MenuController::menuUpdate(TShirtCannonPayload &payload, bool isEnabled)
     {
         if (this->m_rotation == 1)
         {
+            this->m_isActive = false;
             this->m_currentPage = this->m_currentPage->getNextPage();
         }
 
         if (this->m_rotation == -1)
         {
+            this->m_isActive = false;
             this->m_currentPage = this->m_currentPage->getPreviousPage();
         }
     }
@@ -119,6 +121,11 @@ void MenuController::menuPress(TShirtCannonPayload &payload, bool isEnabled)
     {
         this->m_isActive = !this->m_isActive;
         this->m_time = millis();
+
+        if (this->m_isActive && m_currentPage == &m_elevatorPage)
+        {
+            payload.setStatus(Utils::ControllerStatus::ADJUSTING);
+        }
     }
     else
     {
