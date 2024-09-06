@@ -77,11 +77,11 @@ void Robot::update()
     setError("Tick %d ms", tickDurationMillis);
   }
 
-  int timeLeftMillis = TICK_DURATION_MILLIS - (millis() - tickStartMillis);
-  if (timeLeftMillis > 0)
-  {
+  // int timeLeftMillis = TICK_DURATION_MILLIS - (millis() - tickStartMillis);
+  // if (timeLeftMillis > 0)
+  // {
     // delay(timeLeftMillis);
-  }
+  // }
 }
 
 void Robot::updateSerial()
@@ -105,31 +105,6 @@ void Robot::updatePayload(const uint8_t *data, const uint8_t len)
 
   const uint8_t status = m_payload.getStatus();
   const uint8_t err = m_payload.getError();
-
-  if (err > 0 || !success)
-  {
-    m_statusLEDs.setBlinkPattern(StatusLEDs::ERROR);
-    m_payload.setStatus(STATUS_DISABLED);
-  }
-  else
-  {
-    if (status == STATUS_DISABLED)
-    {
-      m_statusLEDs.setBlinkPattern(StatusLEDs::DISABLED);
-    }
-    else if (status == STATUS_ENABLED)
-    {
-      m_statusLEDs.setBlinkPattern(StatusLEDs::ENABLED);
-    }
-    else if (status == STATUS_PRIMED)
-    {
-      m_statusLEDs.setBlinkPattern(StatusLEDs::PRIMED);
-    }
-    else
-    {
-      m_statusLEDs.setBlinkPattern(StatusLEDs::OFF);
-    }
-  }
 }
 
 void Robot::setRobot()
@@ -151,6 +126,7 @@ void Robot::setRobot()
   {
     digitalWrite(m_fireSolenoidPin, LOW);
     m_firing = false;
+    digitalWrite(LED_BUILTIN, LOW);
   }
 
   if (status != STATUS_ENABLED)
@@ -164,6 +140,7 @@ void Robot::setRobot()
     digitalWrite(m_fireSolenoidPin, LOW);
     m_firing = false;
     m_isHoldingFire = false;
+    digitalWrite(LED_BUILTIN, LOW);
   }
 
   if (status == STATUS_ENABLED)
@@ -181,6 +158,7 @@ void Robot::setRobot()
       m_solenoidCloseMillis = millis() + m_fireTimeMillis;
       m_firing = true;
       m_isHoldingFire = true;
+      digitalWrite(LED_BUILTIN, HIGH);
     }
   }
 

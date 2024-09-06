@@ -18,7 +18,7 @@
 #define PIN_LED_BUILTIN LED_BUILTIN
 #define FIRE_SOLENOID_PIN 3
 
-#define ANGLE_IN 11
+#define ANGLE_INPUT 11
 
 // 0.00067 = in/per 
 // 8,955.22388 = milliseconds to max travel

@@ -75,7 +75,6 @@ void HumanControls::update(uint8_t *messageBuffer)
 
 void HumanControls::setStatus()
 {
-
     if (m_payload.getStatus() != Utils::ControllerStatus::DISCONNECTED)
     {
         if (m_payload.getError() == 0)
@@ -85,7 +84,15 @@ void HumanControls::setStatus()
             // set both statuses to disabled. Robot status and controller status should always be the same.
             // Only exception may be due to firing setting status to enabled after firing.
 
-            if (m_enableController.getIsEnabled())
+            // Send an extra payload with the FIRING status
+            // This is to ensure we aren't missing the signal to fire on the robot side
+            if (!m_hasSentSecondFirePayload) 
+            {
+                status = Utils::ControllerStatus::FIRING;
+                m_hasSentSecondFirePayload = true;
+                Serial.println("Extra firing payload");
+            }
+            else if (m_enableController.getIsEnabled())
             {
                 if (m_fireController.getIsPrimed())
                 {
@@ -159,6 +166,7 @@ void HumanControls::onPinActivated(int pinNr)
             m_fireController.initiateFiring(true);
             m_fireController.setIsPrimed(false);
             m_payload.setStatus(Utils::ControllerStatus::FIRING);
+            m_hasSentSecondFirePayload = false;
         }
     }
 }
