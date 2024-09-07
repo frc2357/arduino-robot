@@ -88,5 +88,4 @@ void LinearActuator::stop()
   m_currentDirection = STOP;
   m_lastMillis = 0;
   m_actuator.write(STOP_WRITE_VALUE);
-  Serial.println("Stopping...");
 }

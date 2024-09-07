@@ -49,6 +49,8 @@ public:
 private:
     void setError(const char *format, ...);
 
+    bool m_hasSentSecondFirePayload;
+
     int m_encoderPinSW, m_enablePin, m_primePin, m_firePin;
     static Utils::ControllerStatus lastStatus;
 
